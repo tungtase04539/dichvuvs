@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { supabase, generateOrderCode } from "@/lib/supabase";
+import { getSupabase, generateOrderCode } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
 import { Plus, Minus, Trash2, ShoppingCart, User, Phone, Mail, MessageSquare, Loader2 } from "lucide-react";
 
@@ -35,6 +35,12 @@ export default function OrderForm() {
   // Load products DIRECTLY from Supabase - NO serverless delay!
   useEffect(() => {
     const loadProducts = async () => {
+      const supabase = getSupabase();
+      if (!supabase) {
+        setIsLoading(false);
+        return;
+      }
+      
       const { data, error } = await supabase
         .from("Service")
         .select("id, name, slug, description, price, icon, featured")
@@ -128,6 +134,13 @@ export default function OrderForm() {
     }
 
     setIsSubmitting(true);
+    const supabase = getSupabase();
+    if (!supabase) {
+      alert("Lỗi kết nối, vui lòng thử lại");
+      setIsSubmitting(false);
+      return;
+    }
+    
     const orderCode = generateOrderCode();
     const mainProduct = cart[0].product;
     const details = cart.map((item) => `${item.product.name} x${item.quantity}`).join(", ");

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -45,6 +45,12 @@ export default function ProductDetailPage({
 
   useEffect(() => {
     const loadData = async () => {
+      const supabase = getSupabase();
+      if (!supabase) {
+        setIsLoading(false);
+        return;
+      }
+      
       // Load product
       const { data: productData } = await supabase
         .from("Service")

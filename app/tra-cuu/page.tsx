@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { formatCurrency, formatDateTime, getStatusLabel, getStatusColor } from "@/lib/utils";
 import {
   Search,
@@ -241,6 +241,13 @@ function TrackOrderContent() {
 
     setIsLoading(true);
     setSearched(true);
+
+    const supabase = getSupabase();
+    if (!supabase) {
+      setError("Lỗi kết nối");
+      setIsLoading(false);
+      return;
+    }
 
     // Query Supabase DIRECTLY - INSTANT!
     const { data, error: err } = await supabase

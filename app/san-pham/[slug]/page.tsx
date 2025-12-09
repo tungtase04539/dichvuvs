@@ -214,7 +214,7 @@ export default function ProductDetailPage({
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Price Card */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 sticky top-28">
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 text-amber-400 fill-amber-400" />

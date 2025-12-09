@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth";
+import { createServerSupabaseClient } from "@/lib/supabase-server";
 import AdminSidebar from "./components/AdminSidebar";
 import AdminHeader from "./components/AdminHeader";
 
@@ -8,11 +8,20 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getSession();
+  const supabase = createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user) {
     redirect("/quan-tri-vien-dang-nhap");
   }
+
+  // Get user metadata
+  const session = {
+    id: user.id,
+    email: user.email || "",
+    name: user.user_metadata?.name || user.email?.split("@")[0] || "Admin",
+    role: user.user_metadata?.role || "admin",
+  };
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -24,4 +33,3 @@ export default async function AdminLayout({
     </div>
   );
 }
-

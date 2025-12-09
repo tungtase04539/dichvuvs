@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase-auth";
 import { Lock, Mail, Loader2, Sparkles, Eye, EyeOff } from "lucide-react";
 
 export default function AdminLoginPage() {
@@ -24,25 +25,27 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const supabase = createClient();
+      
+      // Login with Supabase Auth - INSTANT!
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Đăng nhập thất bại");
+      if (authError) {
+        setError("Email hoặc mật khẩu không đúng");
+        setIsLoading(false);
         return;
       }
 
-      // Redirect based on role
-      router.push("/admin");
-      router.refresh();
+      if (data.user) {
+        // Redirect to admin
+        router.push("/admin");
+        router.refresh();
+      }
     } catch {
       setError("Đã có lỗi xảy ra, vui lòng thử lại");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -54,10 +57,10 @@ export default function AdminLoginPage() {
 
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 mb-4 shadow-lg shadow-primary-500/30">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 mb-4 shadow-lg shadow-purple-500/30">
             <Sparkles className="w-8 h-8 text-white" />
           </div>
-          <h1 className="font-display text-3xl font-bold text-white mb-2">
+          <h1 className="text-3xl font-bold text-white mb-2">
             Đăng nhập quản trị
           </h1>
           <p className="text-slate-400">Vui lòng đăng nhập để tiếp tục</p>
@@ -75,8 +78,8 @@ export default function AdminLoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@vesinhhcm.vn"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/10 border border-white/10 text-white placeholder-slate-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                  placeholder="admin@dichvuvs.vn"
+                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/10 border border-white/10 text-white placeholder-slate-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all"
                 />
               </div>
             </div>
@@ -92,7 +95,7 @@ export default function AdminLoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-11 pr-12 py-3 rounded-xl bg-white/10 border border-white/10 text-white placeholder-slate-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                  className="w-full pl-11 pr-12 py-3 rounded-xl bg-white/10 border border-white/10 text-white placeholder-slate-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all"
                 />
                 <button
                   type="button"
@@ -113,7 +116,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="btn btn-primary w-full py-3"
+              className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-purple-500/30 transition-all disabled:opacity-50"
             >
               {isLoading ? (
                 <>
@@ -131,10 +134,9 @@ export default function AdminLoginPage() {
         </div>
 
         <p className="text-center text-slate-500 text-sm mt-6">
-          © {new Date().getFullYear()} VệSinhHCM. Trang quản trị nội bộ.
+          © {new Date().getFullYear()} ChatBot VN Store. Trang quản trị nội bộ.
         </p>
       </div>
     </div>
   );
 }
-

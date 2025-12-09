@@ -37,10 +37,24 @@ export default async function BookingSuccessPage({
 
   // Generate SePay QR URL
   const bankAccount = bankInfo.bank_account || process.env.SEPAY_BANK_ACCOUNT || "";
-  const bankName = bankInfo.bank_name || process.env.SEPAY_BANK_NAME || "MB";
+  // Map bank name to SePay bank code
+  const bankNameMap: Record<string, string> = {
+    "MB Bank": "MBBank",
+    "MB": "MBBank", 
+    "Vietcombank": "Vietcombank",
+    "VCB": "Vietcombank",
+    "Techcombank": "Techcombank",
+    "TCB": "Techcombank",
+    "ACB": "ACB",
+    "VPBank": "VPBank",
+    "TPBank": "TPBank",
+    "Sacombank": "Sacombank",
+  };
+  const rawBankName = bankInfo.bank_name || process.env.SEPAY_BANK_NAME || "MB Bank";
+  const bankCode = bankNameMap[rawBankName] || "MBBank";
   const amount = order ? Math.round(order.totalPrice) : 0;
   const qrUrl = bankAccount 
-    ? `https://qr.sepay.vn/img?acc=${bankAccount}&bank=${bankName}&amount=${amount}&des=${encodeURIComponent(orderCode)}&template=compact`
+    ? `https://qr.sepay.vn/img?bank=${bankCode}&acc=${bankAccount}&template=compact&amount=${amount}&des=${encodeURIComponent(orderCode)}`
     : "";
 
   return (

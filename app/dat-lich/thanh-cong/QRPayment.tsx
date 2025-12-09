@@ -67,20 +67,30 @@ export default function QRPayment({ qrUrl, orderCode, amount }: QRPaymentProps) 
   return (
     <div className="bg-gradient-to-b from-blue-50 to-white rounded-xl p-4 mb-4">
       {/* QR Code */}
-      <div className="bg-white rounded-xl p-3 mb-3 flex justify-center">
+      <div className="bg-white rounded-xl p-3 mb-3 flex flex-col items-center justify-center">
         {qrUrl ? (
-          <img
-            src={qrUrl}
-            alt="QR Code thanh toán"
-            className="w-48 h-48 object-contain"
-            onError={(e) => {
-              // Fallback nếu QR không load được
-              (e.target as HTMLImageElement).style.display = "none";
-            }}
-          />
+          <>
+            <img
+              src={qrUrl}
+              alt="QR Code thanh toán"
+              className="w-52 h-52 object-contain"
+              onError={(e) => {
+                // Fallback nếu QR không load được
+                const target = e.target as HTMLImageElement;
+                target.style.display = "none";
+                const fallback = target.nextElementSibling as HTMLElement;
+                if (fallback) fallback.style.display = "flex";
+              }}
+            />
+            <div className="w-52 h-52 bg-slate-100 rounded-lg items-center justify-center hidden flex-col">
+              <QrCode className="w-12 h-12 text-slate-400 mb-2" />
+              <p className="text-xs text-slate-500">QR đang tải...</p>
+            </div>
+          </>
         ) : (
-          <div className="w-48 h-48 bg-slate-100 rounded-lg flex items-center justify-center">
-            <QrCode className="w-16 h-16 text-slate-300" />
+          <div className="w-52 h-52 bg-slate-100 rounded-lg flex items-center justify-center flex-col">
+            <QrCode className="w-12 h-12 text-slate-400 mb-2" />
+            <p className="text-xs text-slate-500">Chưa có QR</p>
           </div>
         )}
       </div>

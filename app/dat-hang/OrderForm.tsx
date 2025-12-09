@@ -32,7 +32,6 @@ export default function OrderForm() {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  // Load products DIRECTLY from Supabase - NO serverless delay!
   useEffect(() => {
     const loadProducts = async () => {
       const supabase = getSupabase();
@@ -54,7 +53,6 @@ export default function OrderForm() {
       setIsLoading(false);
     };
 
-    // Check sessionStorage for pre-selected cart
     const savedCart = sessionStorage.getItem("cart");
     if (savedCart) {
       sessionStorage.setItem("pendingCart", savedCart);
@@ -64,7 +62,6 @@ export default function OrderForm() {
     loadProducts();
   }, []);
 
-  // Populate cart when products loaded
   useEffect(() => {
     if (products.length > 0) {
       const pendingCart = sessionStorage.getItem("pendingCart");
@@ -78,12 +75,10 @@ export default function OrderForm() {
               cartItems.push({ product, quantity: item.quantity });
             }
           });
-          if (cartItems.length > 0) {
-            setCart(cartItems);
-          }
+          if (cartItems.length > 0) setCart(cartItems);
           sessionStorage.removeItem("pendingCart");
         } catch (e) {
-          console.error("Error loading pending cart:", e);
+          console.error(e);
         }
       }
     }
@@ -94,9 +89,7 @@ export default function OrderForm() {
       const existing = prev.find((item) => item.product.id === product.id);
       if (existing) {
         return prev.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+          item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
       return [...prev, { product, quantity: 1 }];
@@ -120,14 +113,10 @@ export default function OrderForm() {
   };
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cart.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
-    0
-  );
+  const totalPrice = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (cart.length === 0) {
       alert("Vui lòng chọn ít nhất 1 ChatBot");
       return;
@@ -145,7 +134,6 @@ export default function OrderForm() {
     const mainProduct = cart[0].product;
     const details = cart.map((item) => `${item.product.name} x${item.quantity}`).join(", ");
 
-    // Insert DIRECTLY to Supabase - INSTANT!
     const { error } = await supabase.from("Order").insert({
       id: crypto.randomUUID(),
       orderCode,
@@ -180,7 +168,7 @@ export default function OrderForm() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
       </div>
     );
   }
@@ -189,9 +177,9 @@ export default function OrderForm() {
     <form onSubmit={handleSubmit}>
       <div className="grid lg:grid-cols-2 gap-8">
         {/* Product Selection */}
-        <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
-          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-            <ShoppingCart className="w-5 h-5 text-purple-400" />
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+          <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+            <ShoppingCart className="w-5 h-5 text-primary-600" />
             Chọn ChatBot
           </h2>
 
@@ -201,18 +189,16 @@ export default function OrderForm() {
               return (
                 <div
                   key={product.id}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all ${
+                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
                     inCart
-                      ? "bg-purple-500/20 border-purple-500"
-                      : "bg-white/5 border-white/10 hover:border-purple-500/50"
+                      ? "bg-primary-50 border-primary-500"
+                      : "bg-slate-50 border-transparent hover:border-primary-200"
                   }`}
                   onClick={() => addToCart(product)}
                 >
                   <div className="text-3xl mb-2">{product.icon}</div>
-                  <h3 className="font-semibold text-sm mb-1 line-clamp-1">{product.name}</h3>
-                  <p className="text-purple-400 font-bold text-sm">
-                    {formatCurrency(product.price)}
-                  </p>
+                  <h3 className="font-semibold text-slate-900 text-sm mb-1 line-clamp-1">{product.name}</h3>
+                  <p className="text-primary-600 font-bold text-sm">{formatCurrency(product.price)}</p>
                   {inCart && (
                     <div className="mt-2 flex items-center gap-2">
                       <button
@@ -221,18 +207,18 @@ export default function OrderForm() {
                           e.stopPropagation();
                           updateQuantity(product.id, -1);
                         }}
-                        className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20"
+                        className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-100"
                       >
                         <Minus className="w-3 h-3" />
                       </button>
-                      <span className="font-bold">{inCart.quantity}</span>
+                      <span className="font-bold text-slate-900">{inCart.quantity}</span>
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           updateQuantity(product.id, 1);
                         }}
-                        className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20"
+                        className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-100"
                       >
                         <Plus className="w-3 h-3" />
                       </button>
@@ -247,104 +233,94 @@ export default function OrderForm() {
         {/* Order Summary & Customer Info */}
         <div className="space-y-6">
           {/* Cart Summary */}
-          <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
-            <h2 className="text-xl font-bold mb-4">Giỏ hàng ({totalItems})</h2>
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+            <h2 className="text-xl font-bold text-slate-900 mb-4">Giỏ hàng ({totalItems})</h2>
 
             {cart.length === 0 ? (
-              <p className="text-slate-400 text-center py-8">
-                Chọn sản phẩm bên trái
-              </p>
+              <p className="text-slate-500 text-center py-8">Chọn sản phẩm bên trái</p>
             ) : (
               <div className="space-y-3">
                 {cart.map((item) => (
-                  <div
-                    key={item.product.id}
-                    className="flex items-center gap-3 p-2 bg-white/5 rounded-lg"
-                  >
+                  <div key={item.product.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
                     <span className="text-xl">{item.product.icon}</span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{item.product.name}</p>
-                      <p className="text-purple-400 text-xs">
+                      <p className="text-sm font-medium text-slate-900 truncate">{item.product.name}</p>
+                      <p className="text-primary-600 text-xs font-semibold">
                         {formatCurrency(item.product.price)} x {item.quantity}
                       </p>
                     </div>
                     <button
                       type="button"
                       onClick={() => removeFromCart(item.product.id)}
-                      className="p-1 text-red-400 hover:bg-red-500/20 rounded"
+                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 ))}
-
-                <div className="pt-3 border-t border-white/10 flex justify-between font-bold">
-                  <span>Tổng:</span>
-                  <span className="text-purple-400">{formatCurrency(totalPrice)}</span>
+                <div className="pt-3 border-t border-slate-200 flex justify-between items-center">
+                  <span className="font-semibold text-slate-900">Tổng cộng:</span>
+                  <span className="text-xl font-bold text-primary-600">{formatCurrency(totalPrice)}</span>
                 </div>
               </div>
             )}
           </div>
 
           {/* Customer Info */}
-          <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
-            <h2 className="text-xl font-bold mb-4">Thông tin</h2>
-
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+            <h2 className="text-xl font-bold text-slate-900 mb-4">Thông tin khách hàng</h2>
             <div className="space-y-4">
               <div>
-                <label className="flex items-center gap-2 text-sm text-slate-400 mb-1">
-                  <User className="w-4 h-4" />
-                  Họ tên *
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
+                  <User className="w-4 h-4 text-slate-400" />
+                  Họ tên <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   required
-                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl focus:border-purple-500 focus:outline-none"
+                  className="input"
                   placeholder="Nhập họ tên"
                 />
               </div>
-
               <div>
-                <label className="flex items-center gap-2 text-sm text-slate-400 mb-1">
-                  <Phone className="w-4 h-4" />
-                  Số điện thoại *
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
+                  <Phone className="w-4 h-4 text-slate-400" />
+                  Số điện thoại <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
-                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl focus:border-purple-500 focus:outline-none"
+                  className="input"
                   placeholder="0912345678"
                 />
               </div>
-
               <div>
-                <label className="flex items-center gap-2 text-sm text-slate-400 mb-1">
-                  <Mail className="w-4 h-4" />
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
+                  <Mail className="w-4 h-4 text-slate-400" />
                   Email
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl focus:border-purple-500 focus:outline-none"
+                  className="input"
                   placeholder="email@example.com"
                 />
               </div>
-
               <div>
-                <label className="flex items-center gap-2 text-sm text-slate-400 mb-1">
-                  <MessageSquare className="w-4 h-4" />
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
+                  <MessageSquare className="w-4 h-4 text-slate-400" />
                   Ghi chú
                 </label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={2}
-                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl focus:border-purple-500 focus:outline-none resize-none"
+                  className="input resize-none"
                   placeholder="Ghi chú thêm..."
                 />
               </div>
@@ -355,7 +331,7 @@ export default function OrderForm() {
           <button
             type="submit"
             disabled={isSubmitting || cart.length === 0}
-            className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg font-bold rounded-xl shadow-lg shadow-purple-500/30 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="btn btn-primary w-full text-lg py-4"
           >
             {isSubmitting ? (
               <>

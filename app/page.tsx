@@ -1,146 +1,279 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import prisma from "@/lib/prisma";
+import { getSupabase } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
-import { 
-  Phone, 
-  MapPin, 
-  Clock, 
-  Star, 
-  CheckCircle, 
-  ArrowRight, 
-  Sparkles,
-  Shield,
-  Zap,
-  Heart,
-  Bot,
-  MessageSquare,
-  TrendingUp,
-  Users,
-  ShoppingCart,
-} from "lucide-react";
 import Header from "@/components/Header";
-import ChatWidget from "@/components/ChatWidget";
 import Footer from "@/components/Footer";
+import ChatWidget from "@/components/ChatWidget";
+import {
+  Bot,
+  Zap,
+  Shield,
+  Clock,
+  Users,
+  TrendingUp,
+  CheckCircle,
+  ArrowRight,
+  Star,
+  MessageSquare,
+  Phone,
+  Mail,
+  MapPin,
+  Play,
+  Sparkles,
+  Award,
+  HeadphonesIcon,
+} from "lucide-react";
 
-export const dynamic = "force-dynamic";
-
-async function getProducts() {
-  return prisma.service.findMany({
-    where: { active: true },
-    orderBy: [{ featured: "desc" }, { name: "asc" }],
-  });
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  icon: string | null;
+  featured: boolean;
 }
 
-async function getSettings() {
-  const settings = await prisma.setting.findMany();
-  return settings.reduce((acc, s) => ({ ...acc, [s.key]: s.value }), {} as Record<string, string>);
-}
+export default function HomePage() {
+  const [products, setProducts] = useState<Product[]>([]);
 
-export default async function HomePage() {
-  const [products, settings] = await Promise.all([getProducts(), getSettings()]);
+  useEffect(() => {
+    const loadProducts = async () => {
+      const supabase = getSupabase();
+      if (!supabase) return;
+
+      const { data } = await supabase
+        .from("Service")
+        .select("id, name, slug, description, price, icon, featured")
+        .eq("active", true)
+        .order("featured", { ascending: false })
+        .limit(6);
+
+      if (data) setProducts(data);
+    };
+    loadProducts();
+  }, []);
+
+  const features = [
+    {
+      icon: Zap,
+      title: "Cài đặt 5 phút",
+      description: "Không cần code, cài đặt nhanh chóng với hướng dẫn chi tiết",
+    },
+    {
+      icon: Clock,
+      title: "Hoạt động 24/7",
+      description: "ChatBot tự động trả lời mọi lúc, không bỏ lỡ khách hàng",
+    },
+    {
+      icon: Shield,
+      title: "Bảo mật cao",
+      description: "Dữ liệu được mã hóa, bảo vệ thông tin khách hàng tuyệt đối",
+    },
+    {
+      icon: TrendingUp,
+      title: "Tăng doanh số",
+      description: "Tỷ lệ chuyển đổi tăng 300% với tư vấn tự động thông minh",
+    },
+    {
+      icon: Users,
+      title: "Đa nền tảng",
+      description: "Tích hợp Facebook, Zalo, Website chỉ với 1 ChatBot",
+    },
+    {
+      icon: HeadphonesIcon,
+      title: "Hỗ trợ tận tâm",
+      description: "Đội ngũ kỹ thuật hỗ trợ 24/7, giải đáp mọi thắc mắc",
+    },
+  ];
+
+  const stats = [
+    { value: "10,000+", label: "Khách hàng tin dùng" },
+    { value: "50M+", label: "Tin nhắn xử lý/tháng" },
+    { value: "99.9%", label: "Uptime cam kết" },
+    { value: "24/7", label: "Hỗ trợ kỹ thuật" },
+  ];
+
+  const testimonials = [
+    {
+      name: "Nguyễn Văn An",
+      role: "CEO, TechStore",
+      content: "ChatBot giúp shop tôi tiết kiệm 80% thời gian trả lời tin nhắn. Doanh số tăng 40% sau 2 tháng sử dụng!",
+      avatar: "A",
+    },
+    {
+      name: "Trần Thị Bình",
+      role: "Founder, BeautyShop",
+      content: "Rất hài lòng với dịch vụ. ChatBot thông minh, hiểu khách hàng và tư vấn chính xác. Đội ngũ support rất nhiệt tình!",
+      avatar: "B",
+    },
+    {
+      name: "Lê Minh Châu",
+      role: "Marketing Manager",
+      content: "Giá cả phải chăng, hiệu quả cao. ChatBot giúp team tôi focus vào những việc quan trọng hơn.",
+      avatar: "C",
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
-      <Header settings={settings} />
+    <div className="min-h-screen bg-white">
+      <Header settings={{ site_phone: "1900 8686" }} />
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Animated background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-purple-950/50 to-slate-950" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%238b5cf6%22%20fill-opacity%3D%220.05%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')]" />
-        
-        {/* Glowing orbs */}
-        <div className="absolute top-20 left-10 w-96 h-96 bg-purple-500 rounded-full blur-[150px] opacity-20 animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-500 rounded-full blur-[150px] opacity-20 animate-pulse" style={{ animationDelay: "1s" }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-violet-500 rounded-full blur-[200px] opacity-10" />
+      <section className="relative min-h-screen flex items-center bg-gradient-hero overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-white rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent-400 rounded-full blur-3xl" />
+        </div>
+        <div className="absolute inset-0 pattern-dots opacity-5" />
 
-        <div className="container mx-auto px-4 relative z-10 pt-32 pb-20">
-          <div className="max-w-5xl mx-auto text-center">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 backdrop-blur-sm rounded-full border border-white/10 mb-8 animate-fade-in">
-              <Bot className="w-4 h-4 text-purple-400" />
-              <span className="text-sm font-medium text-slate-300">ChatBot AI #1 Việt Nam</span>
-              <span className="px-2 py-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-xs font-bold">NEW</span>
+        <div className="container mx-auto px-4 pt-32 pb-20 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-white mb-6 border border-white/20">
+                <Sparkles className="w-4 h-4 text-yellow-400" />
+                #1 ChatBot AI tại Việt Nam
+              </div>
+
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+                Tự động hóa
+                <span className="block text-accent-300">Chăm sóc khách hàng</span>
+                với AI ChatBot
+              </h1>
+
+              <p className="text-lg md:text-xl text-blue-100 mb-8 max-w-xl mx-auto lg:mx-0">
+                Tăng doanh số, tiết kiệm thời gian với ChatBot AI thông minh. 
+                Chỉ từ <span className="text-white font-bold">30.000đ/bot</span> - Cài đặt trong 5 phút!
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Link
+                  href="/dat-hang"
+                  className="btn btn-white text-lg"
+                >
+                  Mua ngay
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+                <Link
+                  href="/san-pham"
+                  className="btn bg-transparent text-white border-2 border-white/30 hover:bg-white/10 text-lg"
+                >
+                  Xem sản phẩm
+                </Link>
+              </div>
+
+              {/* Trust indicators */}
+              <div className="mt-10 flex items-center gap-6 justify-center lg:justify-start">
+                <div className="flex -space-x-3">
+                  {["A", "B", "C", "D", "E"].map((letter, i) => (
+                    <div
+                      key={i}
+                      className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-400 to-primary-400 flex items-center justify-center text-white font-semibold text-sm border-2 border-white"
+                    >
+                      {letter}
+                    </div>
+                  ))}
+                </div>
+                <div className="text-left">
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                    ))}
+                  </div>
+                  <p className="text-sm text-blue-100">10,000+ khách hàng tin dùng</p>
+                </div>
+              </div>
             </div>
 
-            {/* Main heading */}
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight animate-slide-up">
-              <span className="text-white">ChatBot AI</span>
-              <span className="block mt-2 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-                Cho Mọi Doanh Nghiệp
-              </span>
-            </h1>
-
-            <p className="text-xl md:text-2xl text-slate-400 mb-10 max-w-3xl mx-auto leading-relaxed animate-slide-up" style={{ animationDelay: "100ms" }}>
-              Tự động hóa kinh doanh với ChatBot AI thông minh. 
-              Chỉ <span className="text-purple-400 font-bold">30.000đ/bot</span> - Sở hữu ngay hôm nay!
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-slide-up" style={{ animationDelay: "200ms" }}>
-              <Link
-                href="/san-pham"
-                className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg font-semibold rounded-2xl shadow-xl shadow-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/40 hover:-translate-y-1 transition-all duration-300"
-              >
-                <ShoppingCart className="w-5 h-5" />
-                Mua ChatBot Ngay
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <a
-                href={`tel:${settings.site_phone?.replace(/\s/g, "")}`}
-                className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white/5 text-white text-lg font-semibold rounded-2xl border border-white/10 hover:bg-white/10 transition-all duration-300"
-              >
-                <Phone className="w-5 h-5 text-purple-400" />
-                {settings.site_phone || "1900 8686"}
-              </a>
-            </div>
-
-            {/* Stats */}
-            <div className="flex flex-wrap justify-center gap-8 animate-slide-up" style={{ animationDelay: "300ms" }}>
-              {[
-                { icon: Users, value: "5,000+", label: "Khách hàng" },
-                { icon: Bot, value: "10,000+", label: "Bot đã bán" },
-                { icon: Star, value: "4.9/5", label: "Đánh giá" },
-                { icon: Zap, value: "24/7", label: "Hoạt động" },
-              ].map((stat, i) => (
-                <div key={i} className="flex items-center gap-3 px-4 py-2 bg-white/5 rounded-xl border border-white/10">
-                  <stat.icon className="w-5 h-5 text-purple-400" />
-                  <div className="text-left">
-                    <p className="font-bold text-white">{stat.value}</p>
-                    <p className="text-xs text-slate-400">{stat.label}</p>
+            {/* Hero Image/Illustration */}
+            <div className="relative hidden lg:block">
+              <div className="relative z-10">
+                <div className="w-full max-w-md mx-auto bg-white rounded-3xl shadow-2xl p-6 animate-float">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-2xl bg-primary-100 flex items-center justify-center">
+                      <Bot className="w-7 h-7 text-primary-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-900">ChatBot AI</p>
+                      <p className="text-sm text-green-500 flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                        Đang hoạt động
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="bg-slate-100 rounded-2xl rounded-tl-sm p-3 max-w-[80%]">
+                      <p className="text-sm text-slate-700">Xin chào! Tôi có thể giúp gì cho bạn?</p>
+                    </div>
+                    <div className="bg-primary-500 rounded-2xl rounded-tr-sm p-3 max-w-[80%] ml-auto">
+                      <p className="text-sm text-white">Tôi muốn mua ChatBot cho shop online</p>
+                    </div>
+                    <div className="bg-slate-100 rounded-2xl rounded-tl-sm p-3 max-w-[80%]">
+                      <p className="text-sm text-slate-700">Tuyệt vời! Chúng tôi có nhiều gói ChatBot phù hợp với shop online. Bạn muốn tư vấn gói nào?</p>
+                    </div>
                   </div>
                 </div>
-              ))}
+              </div>
+              {/* Decorative elements */}
+              <div className="absolute top-10 -right-10 w-20 h-20 bg-accent-400 rounded-2xl rotate-12 opacity-80" />
+              <div className="absolute -bottom-5 -left-5 w-16 h-16 bg-yellow-400 rounded-xl -rotate-12" />
             </div>
+          </div>
+        </div>
+
+        {/* Wave divider */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="white"/>
+          </svg>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-12 bg-white relative -mt-1">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center p-6">
+                <p className="text-3xl md:text-4xl font-bold text-primary-600 mb-1">{stat.value}</p>
+                <p className="text-slate-600">{stat.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-slate-900/50 relative">
+      <section id="tinh-nang" className="section bg-slate-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <span className="inline-block px-4 py-2 bg-purple-500/10 text-purple-400 rounded-full text-sm font-semibold mb-4 border border-purple-500/20">
-              Tại sao chọn chúng tôi?
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 text-primary-700 rounded-full text-sm font-semibold mb-4">
+              <Zap className="w-4 h-4" />
+              Tính năng nổi bật
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              ChatBot <span className="text-purple-400">Thế Hệ Mới</span>
+            <h2 className="section-title">
+              Tại sao chọn <span className="text-primary-600">ChatBot VN</span>?
             </h2>
+            <p className="section-subtitle">
+              Giải pháp ChatBot AI toàn diện, giúp doanh nghiệp tự động hóa và tăng trưởng
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { icon: Zap, title: "Cài đặt 5 phút", desc: "Không cần code, chỉ cần kết nối và sử dụng ngay", color: "from-yellow-500 to-orange-500" },
-              { icon: MessageSquare, title: "AI Thông Minh", desc: "Hiểu ngữ cảnh, trả lời tự nhiên như người thật", color: "from-purple-500 to-pink-500" },
-              { icon: TrendingUp, title: "Tăng 300% Sales", desc: "Chốt đơn tự động 24/7, không bỏ lỡ khách hàng", color: "from-green-500 to-emerald-500" },
-              { icon: Shield, title: "Bảo mật cao", desc: "Dữ liệu được mã hóa, bảo vệ thông tin khách hàng", color: "from-blue-500 to-cyan-500" },
-            ].map((item, i) => (
-              <div key={i} className="group p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-purple-500/50 hover:bg-white/10 transition-all duration-300">
-                <div className={`inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-r ${item.color} mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                  <item.icon className="w-7 h-7 text-white" />
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className="card-hover p-8 group"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-primary-100 flex items-center justify-center mb-6 group-hover:bg-primary-600 group-hover:scale-110 transition-all duration-300">
+                  <feature.icon className="w-7 h-7 text-primary-600 group-hover:text-white transition-colors" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
-                <p className="text-slate-400">{item.desc}</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-3">{feature.title}</h3>
+                <p className="text-slate-600 leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -148,49 +281,51 @@ export default async function HomePage() {
       </section>
 
       {/* Products Section */}
-      <section className="py-24 bg-slate-950" id="san-pham">
+      <section id="san-pham" className="section bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <span className="inline-block px-4 py-2 bg-cyan-500/10 text-cyan-400 rounded-full text-sm font-semibold mb-4 border border-cyan-500/20">
-              <Bot className="w-4 h-4 inline mr-1" />
-              Sản phẩm ChatBot
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 text-primary-700 rounded-full text-sm font-semibold mb-4">
+              <Bot className="w-4 h-4" />
+              Sản phẩm
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Chọn <span className="text-cyan-400">ChatBot</span> Phù Hợp
+            <h2 className="section-title">
+              ChatBot <span className="text-primary-600">phù hợp</span> với bạn
             </h2>
-            <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-              10+ loại ChatBot chuyên biệt cho từng ngành nghề
+            <p className="section-subtitle">
+              Đa dạng loại ChatBot cho mọi ngành nghề, mọi quy mô kinh doanh
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {products.map((product) => (
               <Link
                 key={product.id}
                 href={`/san-pham/${product.slug}`}
-                className="group relative bg-white/5 p-5 rounded-2xl border border-white/10 hover:border-purple-500/50 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1"
+                className="card-hover p-6 group"
               >
                 {product.featured && (
-                  <div className="absolute -top-2 -right-2">
-                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-yellow-400 to-orange-400 text-slate-900 text-xs font-bold rounded-full">
+                  <div className="absolute -top-3 -right-3">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-amber-400 to-orange-400 text-white text-xs font-bold rounded-full shadow-lg">
                       <Star className="w-3 h-3 fill-current" />
                       HOT
                     </span>
                   </div>
                 )}
-                <div className="text-4xl mb-3">{product.icon}</div>
-                <h3 className="font-bold text-white mb-2 group-hover:text-purple-400 transition-colors line-clamp-1">
+
+                <div className="text-5xl mb-4">{product.icon}</div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors">
                   {product.name}
                 </h3>
-                <p className="text-slate-400 text-sm mb-4 line-clamp-2">
-                  {product.description}
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xl font-bold text-purple-400">
-                    {formatCurrency(product.price)}
-                  </span>
-                  <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500 transition-colors">
-                    <ArrowRight className="w-4 h-4 text-purple-400 group-hover:text-white transition-colors" />
+                <p className="text-slate-600 text-sm mb-4 line-clamp-2">{product.description}</p>
+
+                <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                  <div>
+                    <span className="text-2xl font-bold text-primary-600">
+                      {formatCurrency(product.price)}
+                    </span>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center group-hover:bg-primary-600 transition-colors">
+                    <ArrowRight className="w-5 h-5 text-primary-600 group-hover:text-white transition-colors" />
                   </div>
                 </div>
               </Link>
@@ -198,10 +333,7 @@ export default async function HomePage() {
           </div>
 
           <div className="text-center mt-12">
-            <Link
-              href="/san-pham"
-              className="inline-flex items-center gap-2 px-6 py-3 text-purple-400 font-semibold hover:text-purple-300 transition-colors"
-            >
+            <Link href="/san-pham" className="btn btn-primary">
               Xem tất cả sản phẩm
               <ArrowRight className="w-5 h-5" />
             </Link>
@@ -209,76 +341,35 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Pricing highlight */}
-      <section className="py-24 bg-gradient-to-r from-purple-900/50 via-slate-900 to-pink-900/50 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.03%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')]" />
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl md:text-6xl font-bold mb-6">
-              Chỉ <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">30.000đ</span> / ChatBot
-            </h2>
-            <p className="text-xl text-slate-300 mb-8">
-              Mua càng nhiều, tiết kiệm càng lớn. Sở hữu trọn bộ ChatBot cho doanh nghiệp của bạn!
-            </p>
-            
-            <div className="flex flex-wrap justify-center gap-4 mb-10">
-              {[
-                "✓ Cài đặt miễn phí",
-                "✓ Hỗ trợ 24/7",
-                "✓ Update trọn đời",
-                "✓ Hoàn tiền 7 ngày",
-              ].map((item, i) => (
-                <span key={i} className="px-4 py-2 bg-white/10 rounded-full text-sm text-slate-300">
-                  {item}
-                </span>
-              ))}
-            </div>
-
-            <Link
-              href="/dat-hang"
-              className="inline-flex items-center justify-center gap-3 px-10 py-5 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xl font-bold rounded-2xl shadow-xl shadow-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/40 hover:-translate-y-1 transition-all duration-300"
-            >
-              <ShoppingCart className="w-6 h-6" />
-              Mua Ngay - Giảm 20%
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* Testimonials */}
-      <section className="py-24 bg-slate-950">
+      <section className="section bg-slate-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <span className="inline-block px-4 py-2 bg-yellow-500/10 text-yellow-400 rounded-full text-sm font-semibold mb-4 border border-yellow-500/20">
-              <Star className="w-4 h-4 inline mr-1 fill-current" />
-              Đánh giá từ khách hàng
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 text-primary-700 rounded-full text-sm font-semibold mb-4">
+              <Star className="w-4 h-4" />
+              Đánh giá
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              <span className="text-yellow-400">5,000+</span> Doanh Nghiệp Tin Dùng
+            <h2 className="section-title">
+              Khách hàng <span className="text-primary-600">nói gì</span>?
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {[
-              { name: "Anh Minh", company: "Shop Thời Trang", text: "ChatBot bán hàng giúp tôi tăng 200% đơn hàng. Chốt sales 24/7 mà không cần thuê thêm nhân viên!", avatar: "👨‍💼" },
-              { name: "Chị Lan", company: "Spa Beauty", text: "Đặt lịch tự động rất tiện, khách hàng không phải chờ đợi. Tỷ lệ book lịch tăng gấp 3 lần.", avatar: "👩‍💼" },
-              { name: "Anh Hùng", company: "BĐS Phú Gia", text: "Chatbot lọc khách tiềm năng cực kỳ hiệu quả. Tiết kiệm được 70% thời gian tư vấn.", avatar: "🧑‍💼" },
-            ].map((item, i) => (
-              <div key={i} className="bg-white/5 p-6 rounded-2xl border border-white/10">
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <div key={index} className="card p-8">
+                <div className="flex items-center gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 text-amber-400 fill-amber-400" />
                   ))}
                 </div>
-                <p className="text-slate-300 mb-6">&ldquo;{item.text}&rdquo;</p>
+                <p className="text-slate-600 mb-6 leading-relaxed">&ldquo;{testimonial.content}&rdquo;</p>
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-2xl">
-                    {item.avatar}
+                  <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold">
+                    {testimonial.avatar}
                   </div>
                   <div>
-                    <p className="font-bold text-white">{item.name}</p>
-                    <p className="text-sm text-slate-400">{item.company}</p>
+                    <p className="font-semibold text-slate-900">{testimonial.name}</p>
+                    <p className="text-sm text-slate-500">{testimonial.role}</p>
                   </div>
                 </div>
               </div>
@@ -288,82 +379,115 @@ export default async function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-slate-900">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl p-12 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.1%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')]" />
-            
-            <div className="relative z-10">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                Bắt đầu với ChatBot AI ngay hôm nay!
-              </h2>
-              <p className="text-xl text-purple-100 mb-8">
-                Đừng để đối thủ đi trước. Tự động hóa kinh doanh với ChatBot AI thông minh.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/dat-hang"
-                  className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-purple-600 text-lg font-bold rounded-xl hover:bg-purple-50 transition-colors"
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                  Mua ChatBot Ngay
-                </Link>
-                <a
-                  href={`tel:${settings.site_phone?.replace(/\s/g, "")}`}
-                  className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white/10 text-white text-lg font-semibold rounded-xl border border-white/30 hover:bg-white/20 transition-colors"
-                >
-                  <Phone className="w-5 h-5" />
-                  Tư vấn miễn phí
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact */}
-      <section className="py-24 bg-slate-950" id="lien-he">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                Liên hệ với chúng tôi
-              </h2>
-              <p className="text-xl text-slate-400">
-                Hỗ trợ 24/7 - Sẵn sàng tư vấn miễn phí
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              <a href={`tel:${settings.site_phone?.replace(/\s/g, "")}`} className="group bg-white/5 p-6 rounded-2xl border border-white/10 hover:border-purple-500/50 transition-all text-center">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 mb-4 group-hover:scale-110 transition-transform">
-                  <Phone className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="font-bold text-white mb-2">Hotline 24/7</h3>
-                <p className="text-xl font-bold text-purple-400">{settings.site_phone}</p>
+      <section className="section bg-gradient-cta relative overflow-hidden">
+        <div className="absolute inset-0 pattern-dots opacity-10" />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
+              Sẵn sàng tự động hóa kinh doanh?
+            </h2>
+            <p className="text-xl text-blue-100 mb-8">
+              Bắt đầu ngay hôm nay với ChatBot AI. Chỉ từ 30.000đ!
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/dat-hang" className="btn btn-white text-lg">
+                Mua ChatBot ngay
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <a href="tel:19008686" className="btn bg-transparent text-white border-2 border-white/30 hover:bg-white/10 text-lg">
+                <Phone className="w-5 h-5" />
+                Gọi tư vấn: 1900 8686
               </a>
-
-              <div className="bg-white/5 p-6 rounded-2xl border border-white/10 text-center">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 mb-4">
-                  <MapPin className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="font-bold text-white mb-2">Địa chỉ</h3>
-                <p className="text-slate-400">{settings.site_address}</p>
-              </div>
-
-              <div className="bg-white/5 p-6 rounded-2xl border border-white/10 text-center">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-r from-orange-500 to-yellow-500 mb-4">
-                  <Clock className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="font-bold text-white mb-2">Giờ làm việc</h3>
-                <p className="text-slate-400">{settings.working_hours}</p>
-              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <Footer settings={settings} />
+      {/* Contact Section */}
+      <section id="lien-he" className="section bg-white">
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-16">
+            <div>
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 text-primary-700 rounded-full text-sm font-semibold mb-4">
+                <MessageSquare className="w-4 h-4" />
+                Liên hệ
+              </span>
+              <h2 className="section-title mb-6">
+                Chúng tôi sẵn sàng <span className="text-primary-600">hỗ trợ</span> bạn
+              </h2>
+              <p className="text-slate-600 mb-8 text-lg">
+                Có câu hỏi? Đội ngũ của chúng tôi luôn sẵn sàng tư vấn và hỗ trợ bạn 24/7.
+              </p>
+
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-primary-100 flex items-center justify-center">
+                    <Phone className="w-6 h-6 text-primary-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-500">Hotline</p>
+                    <a href="tel:19008686" className="text-xl font-semibold text-slate-900 hover:text-primary-600">
+                      1900 8686
+                    </a>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-primary-100 flex items-center justify-center">
+                    <Mail className="w-6 h-6 text-primary-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-500">Email</p>
+                    <a href="mailto:support@chatbotvn.com" className="text-xl font-semibold text-slate-900 hover:text-primary-600">
+                      support@chatbotvn.com
+                    </a>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-primary-100 flex items-center justify-center">
+                    <MapPin className="w-6 h-6 text-primary-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-500">Địa chỉ</p>
+                    <p className="text-xl font-semibold text-slate-900">
+                      123 Nguyễn Huệ, Q.1, TP.HCM
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="card p-8">
+              <h3 className="text-2xl font-bold text-slate-900 mb-6">Gửi tin nhắn</h3>
+              <form className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Họ tên</label>
+                    <input type="text" className="input" placeholder="Nhập họ tên" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Số điện thoại</label>
+                    <input type="tel" className="input" placeholder="0912 345 678" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
+                  <input type="email" className="input" placeholder="email@example.com" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Nội dung</label>
+                  <textarea rows={4} className="input resize-none" placeholder="Nhập nội dung tin nhắn..." />
+                </div>
+                <button type="submit" className="btn btn-primary w-full">
+                  Gửi tin nhắn
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer settings={{ site_phone: "1900 8686" }} />
       <ChatWidget />
     </div>
   );

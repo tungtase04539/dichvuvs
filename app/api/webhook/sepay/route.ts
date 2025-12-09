@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-// SePay API Key - đặt trong Environment Variables
-const SEPAY_API_KEY = process.env.SEPAY_API_KEY || "";
-
 interface SepayWebhookPayload {
   id: number;
   gateway: string;
@@ -21,15 +18,6 @@ interface SepayWebhookPayload {
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify SePay authorization
-    const authHeader = request.headers.get("Authorization");
-    const token = authHeader?.replace("Apikey ", "");
-    
-    if (SEPAY_API_KEY && token !== SEPAY_API_KEY) {
-      console.log("Invalid SePay API key");
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
-
     const transaction: SepayWebhookPayload = await request.json();
     
     console.log("SePay webhook received:", transaction);

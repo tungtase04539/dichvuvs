@@ -22,7 +22,7 @@ export default function QRPayment({ qrUrl, orderCode, amount }: QRPaymentProps) 
 
     const checkPayment = async () => {
       try {
-        const res = await fetch(`/api/orders?orderCode=${orderCode}&phone=check`);
+        const res = await fetch(`/api/orders/status?orderCode=${orderCode}`);
         if (res.ok) {
           const data = await res.json();
           if (data.order && data.order.status !== "pending") {

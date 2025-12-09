@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 // SePay configuration
 const SEPAY_BANK_ACCOUNT = process.env.SEPAY_BANK_ACCOUNT || "";
 const SEPAY_BANK_NAME = process.env.SEPAY_BANK_NAME || "MB";

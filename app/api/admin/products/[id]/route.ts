@@ -42,7 +42,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { name, slug, description, price, icon, featured, active } = body;
+    const { name, slug, description, longDescription, price, icon, featured, active } = body;
 
     if (!name || !slug || !price) {
       return NextResponse.json(
@@ -71,6 +71,7 @@ export async function PUT(
         name,
         slug,
         description: description || null,
+        longDescription: longDescription || null,
         price: parseFloat(price),
         icon: icon || "🤖",
         featured: featured || false,

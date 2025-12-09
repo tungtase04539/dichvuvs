@@ -26,18 +26,19 @@ model User {
 }
 
 model Service {
-  id          String   @id @default(uuid())
-  name        String
-  slug        String   @unique
-  description String
-  price       Float
-  unit        String   @default("m2") // m2, room, hour
-  icon        String?
-  image       String?
-  featured    Boolean  @default(false)
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String   @id @default(uuid())
+  name            String
+  slug            String   @unique
+  description     String
+  longDescription String?  // Chi tiết sản phẩm (HTML/Markdown)
+  price           Float
+  unit            String   @default("bot")
+  icon            String?
+  image           String?
+  featured        Boolean  @default(false)
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   // Relations
   orders Order[]

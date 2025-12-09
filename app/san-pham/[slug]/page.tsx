@@ -165,35 +165,41 @@ export default async function ProductDetailPage({
               <h2 className="text-2xl font-bold mb-6">Mô tả chi tiết</h2>
               
               <div className="space-y-6 text-slate-300">
-                <p>
-                  <strong className="text-white">{product.name}</strong> là giải pháp ChatBot AI tiên tiến, 
-                  được thiết kế đặc biệt để tự động hóa quy trình kinh doanh và tăng hiệu quả tương tác với khách hàng.
-                </p>
+                {product.longDescription ? (
+                  <div className="whitespace-pre-wrap">{product.longDescription}</div>
+                ) : (
+                  <>
+                    <p>
+                      <strong className="text-white">{product.name}</strong> là giải pháp ChatBot AI tiên tiến, 
+                      được thiết kế đặc biệt để tự động hóa quy trình kinh doanh và tăng hiệu quả tương tác với khách hàng.
+                    </p>
 
-                <h3 className="text-xl font-bold text-white">🚀 Lợi ích khi sử dụng:</h3>
-                <ul className="list-disc list-inside space-y-2 ml-4">
-                  <li>Tự động trả lời khách hàng 24/7, không bỏ lỡ bất kỳ cơ hội nào</li>
-                  <li>Giảm 80% thời gian xử lý các câu hỏi thường gặp</li>
-                  <li>Tăng tỷ lệ chuyển đổi lên đến 300%</li>
-                  <li>Tiết kiệm chi phí nhân sự, không cần thuê thêm nhân viên</li>
-                  <li>Tích hợp dễ dàng với Facebook, Zalo, Website</li>
-                </ul>
+                    <h3 className="text-xl font-bold text-white">🚀 Lợi ích khi sử dụng:</h3>
+                    <ul className="list-disc list-inside space-y-2 ml-4">
+                      <li>Tự động trả lời khách hàng 24/7, không bỏ lỡ bất kỳ cơ hội nào</li>
+                      <li>Giảm 80% thời gian xử lý các câu hỏi thường gặp</li>
+                      <li>Tăng tỷ lệ chuyển đổi lên đến 300%</li>
+                      <li>Tiết kiệm chi phí nhân sự, không cần thuê thêm nhân viên</li>
+                      <li>Tích hợp dễ dàng với Facebook, Zalo, Website</li>
+                    </ul>
 
-                <h3 className="text-xl font-bold text-white">📦 Bạn sẽ nhận được:</h3>
-                <ul className="list-disc list-inside space-y-2 ml-4">
-                  <li>1 ChatBot AI đã được cấu hình sẵn</li>
-                  <li>Hướng dẫn cài đặt chi tiết</li>
-                  <li>Hỗ trợ kỹ thuật 24/7</li>
-                  <li>Update tính năng mới miễn phí trọn đời</li>
-                  <li>Bảo hành và hoàn tiền trong 7 ngày</li>
-                </ul>
+                    <h3 className="text-xl font-bold text-white">📦 Bạn sẽ nhận được:</h3>
+                    <ul className="list-disc list-inside space-y-2 ml-4">
+                      <li>1 ChatBot AI đã được cấu hình sẵn</li>
+                      <li>Hướng dẫn cài đặt chi tiết</li>
+                      <li>Hỗ trợ kỹ thuật 24/7</li>
+                      <li>Update tính năng mới miễn phí trọn đời</li>
+                      <li>Bảo hành và hoàn tiền trong 7 ngày</li>
+                    </ul>
 
-                <h3 className="text-xl font-bold text-white">⚙️ Yêu cầu kỹ thuật:</h3>
-                <ul className="list-disc list-inside space-y-2 ml-4">
-                  <li>Fanpage Facebook hoặc Zalo OA (nếu dùng trên các nền tảng này)</li>
-                  <li>Website có thể nhúng code (nếu dùng trên web)</li>
-                  <li>Không yêu cầu kiến thức lập trình</li>
-                </ul>
+                    <h3 className="text-xl font-bold text-white">⚙️ Yêu cầu kỹ thuật:</h3>
+                    <ul className="list-disc list-inside space-y-2 ml-4">
+                      <li>Fanpage Facebook hoặc Zalo OA (nếu dùng trên các nền tảng này)</li>
+                      <li>Website có thể nhúng code (nếu dùng trên web)</li>
+                      <li>Không yêu cầu kiến thức lập trình</li>
+                    </ul>
+                  </>
+                )}
               </div>
             </div>
 

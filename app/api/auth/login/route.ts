@@ -16,13 +16,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Find user
-    console.log("Login attempt for:", email);
-    
     const user = await prisma.user.findUnique({
       where: { email },
     });
-
-    console.log("User found:", user ? "Yes" : "No");
 
     if (!user) {
       return NextResponse.json(
@@ -40,10 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify password
-    console.log("Comparing password...");
     const isValidPassword = await bcrypt.compare(password, user.password);
-    console.log("Password valid:", isValidPassword);
-    
     if (!isValidPassword) {
       return NextResponse.json(
         { error: "Email hoặc mật khẩu không đúng" },

@@ -10,10 +10,11 @@ export interface UserPayload {
   email: string;
   name: string;
   role: string;
+  [key: string]: unknown;
 }
 
 export async function signToken(payload: UserPayload): Promise<string> {
-  return new SignJWT(payload)
+  return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")

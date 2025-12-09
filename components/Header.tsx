@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, Phone, Sparkles } from "lucide-react";
+import { Menu, X, Phone, Bot, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface HeaderProps {
@@ -22,8 +22,8 @@ export default function Header({ settings }: HeaderProps) {
   }, []);
 
   const navLinks = [
-    { href: "/#dich-vu", label: "Dịch vụ" },
-    { href: "/bang-gia", label: "Bảng giá" },
+    { href: "/san-pham", label: "Sản phẩm" },
+    { href: "/#san-pham", label: "Danh mục" },
     { href: "/#lien-he", label: "Liên hệ" },
   ];
 
@@ -32,7 +32,7 @@ export default function Header({ settings }: HeaderProps) {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         isScrolled
-          ? "bg-white/95 backdrop-blur-md shadow-md py-3"
+          ? "bg-slate-900/95 backdrop-blur-md shadow-xl shadow-black/20 py-3"
           : "bg-transparent py-5"
       )}
     >
@@ -40,11 +40,11 @@ export default function Header({ settings }: HeaderProps) {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/30">
-              <Sparkles className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
+              <Bot className="w-6 h-6 text-white" />
             </div>
-            <span className="font-display text-2xl font-bold text-slate-900">
-              VệSinh<span className="text-primary-500">HCM</span>
+            <span className="text-2xl font-bold text-white">
+              ChatBot<span className="text-purple-400">VN</span>
             </span>
           </Link>
 
@@ -54,7 +54,7 @@ export default function Header({ settings }: HeaderProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-slate-600 hover:text-primary-600 font-medium transition-colors"
+                className="text-slate-300 hover:text-purple-400 font-medium transition-colors"
               >
                 {link.label}
               </Link>
@@ -65,49 +65,54 @@ export default function Header({ settings }: HeaderProps) {
           <div className="hidden md:flex items-center gap-4">
             <a
               href={`tel:${settings.site_phone?.replace(/\s/g, "")}`}
-              className="flex items-center gap-2 text-slate-600 hover:text-primary-600 font-medium"
+              className="flex items-center gap-2 text-slate-300 hover:text-purple-400 font-medium"
             >
               <Phone className="w-5 h-5" />
               {settings.site_phone}
             </a>
-            <Link href="/dat-lich" className="btn btn-primary">
-              Đặt lịch ngay
+            <Link
+              href="/dat-hang"
+              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-purple-500/30 transition-all"
+            >
+              <ShoppingCart className="w-5 h-5" />
+              Mua ngay
             </Link>
           </div>
 
           {/* Mobile menu button */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-slate-100"
+            className="md:hidden p-2 rounded-lg hover:bg-white/10"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? (
-              <X className="w-6 h-6 text-slate-700" />
+              <X className="w-6 h-6 text-white" />
             ) : (
-              <Menu className="w-6 h-6 text-slate-700" />
+              <Menu className="w-6 h-6 text-white" />
             )}
           </button>
         </div>
 
         {/* Mobile menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 border-t border-slate-100 animate-slide-down">
+          <div className="md:hidden mt-4 pb-4 border-t border-white/10 animate-slide-down">
             <nav className="flex flex-col gap-2 mt-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="px-4 py-3 rounded-xl text-slate-600 hover:bg-primary-50 hover:text-primary-600 font-medium"
+                  className="px-4 py-3 rounded-xl text-slate-300 hover:bg-white/10 hover:text-purple-400 font-medium"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.label}
                 </Link>
               ))}
               <Link
-                href="/dat-lich"
-                className="btn btn-primary mt-2"
+                href="/dat-hang"
+                className="flex items-center justify-center gap-2 mt-2 px-5 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Đặt lịch ngay
+                <ShoppingCart className="w-5 h-5" />
+                Mua ngay
               </Link>
             </nav>
           </div>
@@ -116,4 +121,3 @@ export default function Header({ settings }: HeaderProps) {
     </header>
   );
 }
-

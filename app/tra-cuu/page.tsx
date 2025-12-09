@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
@@ -10,14 +11,13 @@ import {
   Search,
   Loader2,
   Package,
-  MapPin,
   Calendar,
-  Clock,
   User,
   Phone,
   ArrowLeft,
-  Home,
   CheckCircle,
+  Bot,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,11 +26,8 @@ interface Order {
   orderCode: string;
   customerName: string;
   customerPhone: string;
-  address: string;
-  district: string;
+  customerEmail?: string;
   status: string;
-  scheduledDate: string;
-  scheduledTime: string;
   totalPrice: number;
   quantity: number;
   unit: string;
@@ -40,19 +37,24 @@ interface Order {
     name: string;
     icon: string;
   };
-  assignedTo?: {
-    name: string;
-    phone: string;
-  };
 }
 
 export default function TrackOrderPage() {
+  const searchParams = useSearchParams();
   const [orderCode, setOrderCode] = useState("");
   const [phone, setPhone] = useState("");
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [searched, setSearched] = useState(false);
+
+  // Auto-fill from URL params
+  useEffect(() => {
+    const code = searchParams.get("code");
+    if (code) {
+      setOrderCode(code);
+    }
+  }, [searchParams]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,7 +96,7 @@ export default function TrackOrderPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <div className="min-h-screen bg-slate-950">
       <Header settings={{}} />
 
       <main className="pt-32 pb-20">
@@ -102,39 +104,42 @@ export default function TrackOrderPage() {
           <div className="max-w-2xl mx-auto">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-slate-600 hover:text-primary-600 mb-6"
+              className="inline-flex items-center gap-2 text-slate-400 hover:text-purple-400 mb-6 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Về trang chủ
             </Link>
 
             <div className="text-center mb-8">
-              <h1 className="font-display text-4xl font-bold text-slate-900 mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 mb-4">
+                <Search className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-4xl font-bold text-white mb-4">
                 Tra cứu đơn hàng
               </h1>
-              <p className="text-slate-600">
+              <p className="text-slate-400">
                 Nhập mã đơn hàng và số điện thoại để xem trạng thái
               </p>
             </div>
 
             {/* Search form */}
-            <div className="card p-6 mb-8">
+            <div className="bg-white/5 rounded-2xl p-6 mb-8 border border-white/10">
               <form onSubmit={handleSearch} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
                     Mã đơn hàng
                   </label>
                   <input
                     type="text"
                     value={orderCode}
                     onChange={(e) => setOrderCode(e.target.value.toUpperCase())}
-                    placeholder="VD: VS241209ABCD"
-                    className="input font-mono"
+                    placeholder="VD: CB241209ABCD"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
                     Số điện thoại
                   </label>
                   <input
@@ -142,12 +147,12 @@ export default function TrackOrderPage() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="0901234567"
-                    className="input"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none"
                   />
                 </div>
 
                 {error && (
-                  <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+                  <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
                     {error}
                   </div>
                 )}
@@ -155,7 +160,7 @@ export default function TrackOrderPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="btn btn-primary w-full"
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-purple-500/30 transition-all disabled:opacity-50"
                 >
                   {isLoading ? (
                     <>
@@ -174,15 +179,15 @@ export default function TrackOrderPage() {
 
             {/* Order result */}
             {searched && !isLoading && order && (
-              <div className="card p-6 animate-fade-in">
+              <div className="bg-white/5 rounded-2xl p-6 border border-white/10 animate-fade-in">
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <p className="text-sm text-slate-500">Mã đơn hàng</p>
-                    <p className="text-xl font-bold font-mono text-primary-600">
+                    <p className="text-sm text-slate-400">Mã đơn hàng</p>
+                    <p className="text-xl font-bold font-mono text-purple-400">
                       {order.orderCode}
                     </p>
                   </div>
-                  <span className={cn("badge text-sm", getStatusColor(order.status))}>
+                  <span className={cn("px-3 py-1 rounded-full text-sm font-medium", getStatusColor(order.status))}>
                     {getStatusLabel(order.status)}
                   </span>
                 </div>
@@ -197,8 +202,8 @@ export default function TrackOrderPage() {
                             className={cn(
                               "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all",
                               getCurrentStep() >= index
-                                ? "bg-primary-500 border-primary-500 text-white"
-                                : "bg-white border-slate-200 text-slate-400"
+                                ? "bg-purple-500 border-purple-500 text-white"
+                                : "bg-slate-800 border-slate-600 text-slate-500"
                             )}
                           >
                             {getCurrentStep() > index ? (
@@ -207,15 +212,15 @@ export default function TrackOrderPage() {
                               index + 1
                             )}
                           </div>
-                          <span className="text-xs text-slate-500 mt-2 text-center">
+                          <span className="text-xs text-slate-400 mt-2 text-center">
                             {getStatusLabel(step)}
                           </span>
                         </div>
                       ))}
                       {/* Progress line */}
-                      <div className="absolute top-5 left-0 right-0 h-0.5 bg-slate-200 -z-0">
+                      <div className="absolute top-5 left-0 right-0 h-0.5 bg-slate-700 -z-0">
                         <div
-                          className="h-full bg-primary-500 transition-all"
+                          className="h-full bg-purple-500 transition-all"
                           style={{
                             width: `${(getCurrentStep() / (statusSteps.length - 1)) * 100}%`,
                           }}
@@ -227,80 +232,81 @@ export default function TrackOrderPage() {
 
                 {/* Order details */}
                 <div className="space-y-4">
-                  <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl">
+                  <div className="flex items-start gap-3 p-4 bg-white/5 rounded-xl border border-white/10">
                     <span className="text-3xl">{order.service.icon}</span>
-                    <div>
-                      <p className="font-semibold text-slate-900">{order.service.name}</p>
-                      <p className="text-sm text-slate-600">
-                        Số lượng: {order.quantity} {order.unit}
-                      </p>
-                      <p className="text-primary-600 font-semibold mt-1">
-                        {formatCurrency(order.totalPrice)}
+                    <div className="flex-1">
+                      <p className="font-semibold text-white">{order.service.name}</p>
+                      <p className="text-sm text-slate-400">
+                        Số lượng: {order.quantity} bot
                       </p>
                     </div>
+                    <p className="text-purple-400 font-bold">
+                      {formatCurrency(order.totalPrice)}
+                    </p>
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="flex items-start gap-3">
-                      <Calendar className="w-5 h-5 text-slate-400 mt-0.5" />
+                      <User className="w-5 h-5 text-slate-500 mt-0.5" />
                       <div>
-                        <p className="text-sm text-slate-500">Ngày thực hiện</p>
-                        <p className="font-medium">
-                          {new Date(order.scheduledDate).toLocaleDateString("vi-VN")}
-                        </p>
+                        <p className="text-sm text-slate-400">Khách hàng</p>
+                        <p className="font-medium text-white">{order.customerName}</p>
                       </div>
                     </div>
 
                     <div className="flex items-start gap-3">
-                      <Clock className="w-5 h-5 text-slate-400 mt-0.5" />
+                      <Phone className="w-5 h-5 text-slate-500 mt-0.5" />
                       <div>
-                        <p className="text-sm text-slate-500">Khung giờ</p>
-                        <p className="font-medium">{order.scheduledTime}</p>
+                        <p className="text-sm text-slate-400">Số điện thoại</p>
+                        <p className="font-medium text-white">{order.customerPhone}</p>
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3 md:col-span-2">
-                      <MapPin className="w-5 h-5 text-slate-400 mt-0.5" />
-                      <div>
-                        <p className="text-sm text-slate-500">Địa chỉ</p>
-                        <p className="font-medium">
-                          {order.address}, {order.district}, TP.HCM
-                        </p>
-                      </div>
-                    </div>
-
-                    {order.assignedTo && (
+                    {order.customerEmail && (
                       <div className="flex items-start gap-3 md:col-span-2">
-                        <User className="w-5 h-5 text-slate-400 mt-0.5" />
+                        <Mail className="w-5 h-5 text-slate-500 mt-0.5" />
                         <div>
-                          <p className="text-sm text-slate-500">Nhân viên phụ trách</p>
-                          <p className="font-medium">{order.assignedTo.name}</p>
-                          {order.assignedTo.phone && (
-                            <a
-                              href={`tel:${order.assignedTo.phone}`}
-                              className="text-primary-600 text-sm hover:underline"
-                            >
-                              {order.assignedTo.phone}
-                            </a>
-                          )}
+                          <p className="text-sm text-slate-400">Email</p>
+                          <p className="font-medium text-white">{order.customerEmail}</p>
                         </div>
                       </div>
                     )}
+
+                    <div className="flex items-start gap-3 md:col-span-2">
+                      <Calendar className="w-5 h-5 text-slate-500 mt-0.5" />
+                      <div>
+                        <p className="text-sm text-slate-400">Ngày đặt</p>
+                        <p className="font-medium text-white">{formatDateTime(order.createdAt)}</p>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="pt-4 border-t border-slate-100">
-                    <p className="text-sm text-slate-500">
-                      Đặt lúc: {formatDateTime(order.createdAt)}
-                    </p>
-                  </div>
+                  {order.notes && (
+                    <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+                      <p className="text-sm text-slate-400 mb-1">Ghi chú</p>
+                      <p className="text-white">{order.notes}</p>
+                    </div>
+                  )}
+
+                  {order.status === "confirmed" && (
+                    <div className="p-4 bg-green-500/10 rounded-xl border border-green-500/20">
+                      <div className="flex items-center gap-2 text-green-400 mb-2">
+                        <CheckCircle className="w-5 h-5" />
+                        <span className="font-semibold">Đã thanh toán!</span>
+                      </div>
+                      <p className="text-sm text-slate-300">
+                        ChatBot của bạn sẽ được gửi qua email trong vòng 24h.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
             {searched && !isLoading && !order && !error && (
-              <div className="card p-8 text-center">
-                <Package className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                <p className="text-slate-500">Không tìm thấy đơn hàng</p>
+              <div className="bg-white/5 rounded-2xl p-8 text-center border border-white/10">
+                <Package className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                <p className="text-slate-400">Không tìm thấy đơn hàng</p>
               </div>
             )}
           </div>
@@ -312,4 +318,3 @@ export default function TrackOrderPage() {
     </div>
   );
 }
-

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { formatCurrency } from "@/lib/utils";
-import { CheckCircle, Home, Search, Phone, Sparkles, Copy, CreditCard, Building2 } from "lucide-react";
+import { CheckCircle, Home, Search, Phone, Sparkles, CreditCard, RefreshCw } from "lucide-react";
 import CopyButton from "./CopyButton";
+import QRPayment from "./QRPayment";
 
 async function getOrder(orderCode: string) {
   if (!orderCode) return null;
@@ -34,94 +35,95 @@ export default async function BookingSuccessPage({
     getBankInfo(),
   ]);
 
+  // Generate SePay QR URL
+  const bankAccount = bankInfo.bank_account || process.env.SEPAY_BANK_ACCOUNT || "";
+  const bankName = bankInfo.bank_name || process.env.SEPAY_BANK_NAME || "MB";
+  const amount = order ? Math.round(order.totalPrice) : 0;
+  const qrUrl = bankAccount 
+    ? `https://qr.sepay.vn/img?acc=${bankAccount}&bank=${bankName}&amount=${amount}&des=${encodeURIComponent(orderCode)}&template=compact`
+    : "";
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white flex items-center justify-center p-4">
       <div className="max-w-lg w-full">
         <div className="bg-white rounded-3xl shadow-xl p-8 animate-scale-in">
-          <div className="text-center mb-8">
-            <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-12 h-12 text-emerald-600" />
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-10 h-10 text-emerald-600" />
             </div>
 
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">
               Đặt lịch thành công!
             </h1>
-            <p className="text-slate-600">
-              Vui lòng chuyển khoản để xác nhận đơn hàng
+            <p className="text-slate-600 text-sm">
+              Quét mã QR hoặc chuyển khoản để xác nhận đơn hàng
             </p>
           </div>
 
           {orderCode && (
-            <div className="bg-emerald-50 rounded-2xl p-4 mb-6 text-center">
-              <p className="text-sm text-slate-600 mb-1">Mã đơn hàng</p>
-              <p className="text-2xl font-bold text-emerald-600 font-mono">
+            <div className="bg-emerald-50 rounded-xl p-3 mb-4 text-center">
+              <p className="text-xs text-slate-500 mb-1">Mã đơn hàng</p>
+              <p className="text-xl font-bold text-emerald-600 font-mono">
                 {orderCode}
               </p>
             </div>
           )}
 
+          {/* QR Code từ SePay */}
+          {qrUrl && order && (
+            <QRPayment 
+              qrUrl={qrUrl} 
+              orderCode={orderCode}
+              amount={order.totalPrice}
+            />
+          )}
+
           {/* Payment Info */}
-          <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl p-6 text-white mb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <CreditCard className="w-5 h-5" />
-              <span className="font-semibold">Thông tin chuyển khoản</span>
+          <div className="bg-slate-50 rounded-xl p-4 mb-4">
+            <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-slate-700">
+              <CreditCard className="w-4 h-4" />
+              Hoặc chuyển khoản thủ công
             </div>
             
-            <div className="space-y-3 text-sm">
+            <div className="space-y-2 text-sm">
               <div className="flex justify-between items-center">
-                <span className="text-blue-100">Ngân hàng:</span>
-                <span className="font-semibold">{bankInfo.bank_name || "MB Bank"}</span>
+                <span className="text-slate-500">Ngân hàng:</span>
+                <span className="font-medium">{bankInfo.bank_name || "MB Bank"}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-blue-100">Số tài khoản:</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono font-semibold">{bankInfo.bank_account || "0123456789"}</span>
-                  <CopyButton text={bankInfo.bank_account || "0123456789"} />
+                <span className="text-slate-500">Số TK:</span>
+                <div className="flex items-center gap-1">
+                  <span className="font-mono font-medium">{bankInfo.bank_account || "---"}</span>
+                  {bankInfo.bank_account && <CopyButton text={bankInfo.bank_account} />}
                 </div>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-blue-100">Chủ tài khoản:</span>
-                <span className="font-semibold">{bankInfo.bank_owner || "CONG TY VE SINH HCM"}</span>
-              </div>
-              <hr className="border-white/20" />
-              <div className="flex justify-between items-center">
-                <span className="text-blue-100">Số tiền:</span>
-                <span className="text-xl font-bold">{order ? formatCurrency(order.totalPrice) : "---"}</span>
+                <span className="text-slate-500">Chủ TK:</span>
+                <span className="font-medium text-xs">{bankInfo.bank_owner || "---"}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-blue-100">Nội dung CK:</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono font-semibold">{orderCode}</span>
+                <span className="text-slate-500">Số tiền:</span>
+                <span className="font-bold text-emerald-600">{order ? formatCurrency(order.totalPrice) : "---"}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-500">Nội dung:</span>
+                <div className="flex items-center gap-1">
+                  <span className="font-mono font-medium text-emerald-600">{orderCode}</span>
                   <CopyButton text={orderCode} />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* QR Code placeholder */}
-          <div className="bg-slate-50 rounded-2xl p-6 mb-6 text-center">
-            <p className="text-sm text-slate-600 mb-3">Quét mã QR để thanh toán nhanh</p>
-            <div className="w-48 h-48 mx-auto bg-white rounded-xl border-2 border-dashed border-slate-200 flex items-center justify-center">
-              <div className="text-center text-slate-400">
-                <Building2 className="w-12 h-12 mx-auto mb-2" />
-                <p className="text-xs">QR Code</p>
-              </div>
-            </div>
-            <p className="text-xs text-slate-500 mt-3">
-              Sau khi chuyển khoản, đơn hàng sẽ tự động được xác nhận
-            </p>
-          </div>
-
           {/* Order Summary */}
           {order && (
-            <div className="bg-slate-50 rounded-2xl p-4 mb-6">
-              <p className="font-semibold text-slate-900 mb-3">Chi tiết đơn hàng</p>
+            <div className="bg-slate-50 rounded-xl p-3 mb-4">
               <div className="flex items-center gap-3">
-                <span className="text-3xl">{order.service.icon}</span>
-                <div className="flex-1">
-                  <p className="font-medium text-slate-900">{order.service.name}</p>
-                  <p className="text-sm text-slate-500">
-                    {order.quantity} {order.unit} × {formatCurrency(order.basePrice)}
+                <span className="text-2xl">{order.service.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-slate-900 text-sm">{order.service.name}</p>
+                  <p className="text-xs text-slate-500">
+                    {order.quantity} {order.unit}
                   </p>
                 </div>
                 <p className="font-bold text-emerald-600">{formatCurrency(order.totalPrice)}</p>
@@ -129,35 +131,34 @@ export default async function BookingSuccessPage({
             </div>
           )}
 
-          <div className="space-y-3">
-            <Link href="/tra-cuu" className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-emerald-500 text-white font-semibold rounded-xl hover:bg-emerald-600 transition-colors">
-              <Search className="w-5 h-5" />
-              Kiểm tra trạng thái đơn hàng
+          <div className="space-y-2">
+            <Link href={`/tra-cuu?code=${orderCode}`} className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-emerald-500 text-white font-semibold rounded-xl hover:bg-emerald-600 transition-colors text-sm">
+              <RefreshCw className="w-4 h-4" />
+              Kiểm tra trạng thái thanh toán
             </Link>
-            <Link href="/" className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors">
-              <Home className="w-5 h-5" />
+            <Link href="/" className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-slate-100 text-slate-600 font-medium rounded-xl hover:bg-slate-200 transition-colors text-sm">
+              <Home className="w-4 h-4" />
               Về trang chủ
             </Link>
           </div>
 
-          <div className="mt-6 pt-6 border-t border-slate-100 text-center">
-            <p className="text-sm text-slate-500 mb-2">Cần hỗ trợ?</p>
+          <div className="mt-4 pt-4 border-t border-slate-100 text-center">
+            <p className="text-xs text-slate-400 mb-1">Cần hỗ trợ?</p>
             <a
               href={`tel:${bankInfo.site_phone?.replace(/\s/g, "") || "19001234"}`}
-              className="inline-flex items-center gap-2 text-emerald-600 font-medium hover:underline"
+              className="inline-flex items-center gap-1 text-emerald-600 font-medium text-sm hover:underline"
             >
-              <Phone className="w-4 h-4" />
+              <Phone className="w-3 h-3" />
               {bankInfo.site_phone || "1900 1234"}
             </a>
           </div>
         </div>
 
-        <div className="mt-6 flex items-center justify-center gap-2 text-slate-500">
-          <Sparkles className="w-4 h-4 text-emerald-500" />
-          <span className="text-sm">VệSinhHCM - Dịch vụ vệ sinh chuyên nghiệp</span>
+        <div className="mt-4 flex items-center justify-center gap-2 text-slate-400">
+          <Sparkles className="w-3 h-3 text-emerald-500" />
+          <span className="text-xs">Thanh toán tự động qua SePay</span>
         </div>
       </div>
     </div>
   );
 }
-

@@ -19,13 +19,13 @@ export default function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="p-1 rounded hover:bg-white/20 transition-colors"
+      className="p-1 rounded hover:bg-slate-200 transition-colors"
       title="Sao chép"
     >
       {copied ? (
-        <Check className="w-4 h-4 text-green-300" />
+        <Check className="w-3.5 h-3.5 text-emerald-500" />
       ) : (
-        <Copy className="w-4 h-4" />
+        <Copy className="w-3.5 h-3.5 text-slate-400" />
       )}
     </button>
   );

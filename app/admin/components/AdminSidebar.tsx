@@ -11,6 +11,7 @@ import {
   Bot,
   BarChart3,
   ShoppingBag,
+  Key,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserPayload } from "@/lib/auth";
@@ -29,6 +30,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
     ...(user.role === "admin"
       ? [
           { href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" },
+          { href: "/admin/tai-khoan", icon: Key, label: "Tài khoản" },
           { href: "/admin/nhan-vien", icon: Users, label: "Nhân viên" },
           { href: "/admin/thong-ke", icon: BarChart3, label: "Thống kê" },
           { href: "/admin/cai-dat", icon: Settings, label: "Cài đặt" },

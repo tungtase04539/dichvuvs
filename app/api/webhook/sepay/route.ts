@@ -39,9 +39,10 @@ export async function POST(request: NextRequest) {
 
     const orderCode = orderCodeMatch[0].toUpperCase();
     
-    // Find order
+    // Find order with service info
     const order = await prisma.order.findUnique({
       where: { orderCode },
+      include: { service: true },
     });
 
     if (!order) {
@@ -59,16 +60,41 @@ export async function POST(request: NextRequest) {
     const tolerance = 1000;
     const isAmountMatch = Math.abs(transaction.transferAmount - order.totalPrice) <= tolerance;
 
-    // Update order status to confirmed
+    // Find available credential for this service
+    const availableCredential = await prisma.productCredential.findFirst({
+      where: {
+        serviceId: order.serviceId,
+        isUsed: false,
+      },
+      orderBy: { createdAt: "asc" }, // First in, first out
+    });
+
+    // Update order status to confirmed and assign credential
+    const updateData: Record<string, unknown> = {
+      status: "confirmed",
+      notes: order.notes 
+        ? `${order.notes}\n\n✅ Đã thanh toán ${transaction.transferAmount.toLocaleString('vi-VN')}đ qua ${transaction.gateway} lúc ${transaction.transactionDate}${!isAmountMatch ? ' (Số tiền không khớp)' : ''}`
+        : `✅ Đã thanh toán ${transaction.transferAmount.toLocaleString('vi-VN')}đ qua ${transaction.gateway} lúc ${transaction.transactionDate}${!isAmountMatch ? ' (Số tiền không khớp)' : ''}`,
+    };
+
     await prisma.order.update({
       where: { id: order.id },
-      data: {
-        status: "confirmed",
-        notes: order.notes 
-          ? `${order.notes}\n\n✅ Đã thanh toán ${transaction.transferAmount.toLocaleString('vi-VN')}đ qua ${transaction.gateway} lúc ${transaction.transactionDate}${!isAmountMatch ? ' (Số tiền không khớp)' : ''}`
-          : `✅ Đã thanh toán ${transaction.transferAmount.toLocaleString('vi-VN')}đ qua ${transaction.gateway} lúc ${transaction.transactionDate}${!isAmountMatch ? ' (Số tiền không khớp)' : ''}`,
-      },
+      data: updateData,
     });
+
+    // Assign credential if available
+    if (availableCredential) {
+      await prisma.productCredential.update({
+        where: { id: availableCredential.id },
+        data: {
+          isUsed: true,
+          orderId: order.id,
+        },
+      });
+      console.log(`✅ Credential assigned to order ${orderCode}`);
+    } else {
+      console.log(`⚠️ No credential available for service ${order.service.name}`);
+    }
 
     console.log(`✅ Order ${orderCode} confirmed with payment ${transaction.transferAmount}`);
 
@@ -92,4 +118,3 @@ export async function GET() {
     message: "SePay webhook endpoint is active" 
   });
 }
-

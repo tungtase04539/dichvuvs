@@ -41,7 +41,8 @@ model Service {
   updatedAt       DateTime @updatedAt
 
   // Relations
-  orders Order[]
+  orders      Order[]
+  credentials ProductCredential[]
 }
 
 model Order {
@@ -80,6 +81,9 @@ model Order {
   // Chat
   chatSessionId String?
   chatSession   ChatSession? @relation(fields: [chatSessionId], references: [id])
+  
+  // Credential được gán khi thanh toán thành công
+  credential    ProductCredential?
   
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -123,5 +127,24 @@ model Setting {
   value     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Tài khoản/mật khẩu cho sản phẩm ChatBot
+model ProductCredential {
+  id          String   @id @default(uuid())
+  serviceId   String
+  service     Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  
+  accountInfo String   // Thông tin tài khoản (encrypted)
+  password    String   // Mật khẩu (encrypted)
+  apiKey      String?  // API Key nếu có
+  notes       String?  // Ghi chú thêm
+  
+  isUsed      Boolean  @default(false) // Đã gán cho đơn hàng chưa
+  orderId     String?  @unique // Đơn hàng được gán
+  order       Order?   @relation(fields: [orderId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 

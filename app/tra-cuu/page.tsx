@@ -17,6 +17,11 @@ import {
   ArrowLeft,
   CheckCircle,
   Mail,
+  Key,
+  Eye,
+  EyeOff,
+  Copy,
+  Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +41,174 @@ interface Order {
     name: string;
     icon: string;
   };
+}
+
+interface Credential {
+  accountInfo: string;
+  password: string;
+  apiKey: string | null;
+  notes: string | null;
+}
+
+function CredentialDisplay({ orderCode, phone }: { orderCode: string; phone: string }) {
+  const [credential, setCredential] = useState<Credential | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadCredential = async () => {
+      try {
+        const res = await fetch(
+          `/api/orders/credentials?orderCode=${encodeURIComponent(orderCode)}&phone=${encodeURIComponent(phone)}`
+        );
+        const data = await res.json();
+        
+        if (data.credential) {
+          setCredential(data.credential);
+        } else {
+          setMessage(data.message || "Đang xử lý");
+        }
+      } catch {
+        setMessage("Không thể tải thông tin");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCredential();
+  }, [orderCode, phone]);
+
+  const copyToClipboard = async (text: string, id: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(id);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="p-4 bg-purple-500/10 rounded-xl border border-purple-500/20">
+        <div className="flex items-center gap-2">
+          <Loader2 className="w-5 h-5 animate-spin text-purple-400" />
+          <span className="text-slate-300">Đang tải thông tin tài khoản...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!credential) {
+    return (
+      <div className="p-4 bg-green-500/10 rounded-xl border border-green-500/20">
+        <div className="flex items-center gap-2 text-green-400 mb-2">
+          <CheckCircle className="w-5 h-5" />
+          <span className="font-semibold">Đã thanh toán!</span>
+        </div>
+        <p className="text-sm text-slate-300">
+          {message || "Tài khoản đang được chuẩn bị, vui lòng liên hệ hỗ trợ."}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl border border-green-500/20">
+      <div className="flex items-center gap-2 text-green-400 mb-4">
+        <Key className="w-5 h-5" />
+        <span className="font-semibold">Thông tin tài khoản ChatBot</span>
+      </div>
+
+      <div className="space-y-3 bg-slate-900/50 rounded-lg p-4">
+        {/* Account */}
+        <div>
+          <p className="text-xs text-slate-400 mb-1">Tài khoản</p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 text-sm font-mono bg-slate-800 px-3 py-2 rounded text-green-400">
+              {credential.accountInfo}
+            </code>
+            <button
+              onClick={() => copyToClipboard(credential.accountInfo, "acc")}
+              className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+              title="Sao chép"
+            >
+              {copied === "acc" ? (
+                <Check className="w-4 h-4 text-green-400" />
+              ) : (
+                <Copy className="w-4 h-4 text-slate-400" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Password */}
+        <div>
+          <p className="text-xs text-slate-400 mb-1">Mật khẩu</p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 text-sm font-mono bg-slate-800 px-3 py-2 rounded text-green-400">
+              {showPassword ? credential.password : "••••••••••"}
+            </code>
+            <button
+              onClick={() => setShowPassword(!showPassword)}
+              className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+              title={showPassword ? "Ẩn" : "Hiện"}
+            >
+              {showPassword ? (
+                <EyeOff className="w-4 h-4 text-slate-400" />
+              ) : (
+                <Eye className="w-4 h-4 text-slate-400" />
+              )}
+            </button>
+            <button
+              onClick={() => copyToClipboard(credential.password, "pwd")}
+              className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+              title="Sao chép"
+            >
+              {copied === "pwd" ? (
+                <Check className="w-4 h-4 text-green-400" />
+              ) : (
+                <Copy className="w-4 h-4 text-slate-400" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* API Key */}
+        {credential.apiKey && (
+          <div>
+            <p className="text-xs text-slate-400 mb-1">API Key</p>
+            <div className="flex items-center gap-2">
+              <code className="flex-1 text-sm font-mono bg-slate-800 px-3 py-2 rounded text-green-400 truncate">
+                {credential.apiKey}
+              </code>
+              <button
+                onClick={() => copyToClipboard(credential.apiKey!, "api")}
+                className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                title="Sao chép"
+              >
+                {copied === "api" ? (
+                  <Check className="w-4 h-4 text-green-400" />
+                ) : (
+                  <Copy className="w-4 h-4 text-slate-400" />
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Notes */}
+        {credential.notes && (
+          <div className="pt-2 border-t border-slate-700">
+            <p className="text-xs text-slate-400 mb-1">Hướng dẫn</p>
+            <p className="text-sm text-slate-300 whitespace-pre-wrap">{credential.notes}</p>
+          </div>
+        )}
+      </div>
+
+      <p className="text-xs text-slate-500 mt-3">
+        🔒 Vui lòng bảo mật thông tin này. Không chia sẻ cho người khác.
+      </p>
+    </div>
+  );
 }
 
 function TrackOrderContent() {
@@ -274,16 +447,8 @@ function TrackOrderContent() {
               </div>
             )}
 
-            {order.status === "confirmed" && (
-              <div className="p-4 bg-green-500/10 rounded-xl border border-green-500/20">
-                <div className="flex items-center gap-2 text-green-400 mb-2">
-                  <CheckCircle className="w-5 h-5" />
-                  <span className="font-semibold">Đã thanh toán!</span>
-                </div>
-                <p className="text-sm text-slate-300">
-                  ChatBot của bạn sẽ được gửi qua email trong vòng 24h.
-                </p>
-              </div>
+            {(order.status === "confirmed" || order.status === "completed") && (
+              <CredentialDisplay orderCode={order.orderCode} phone={phone} />
             )}
           </div>
         </div>

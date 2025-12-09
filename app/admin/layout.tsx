@@ -9,6 +9,11 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const supabase = createServerSupabaseClient();
+  
+  if (!supabase) {
+    redirect("/quan-tri-vien-dang-nhap");
+  }
+
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {

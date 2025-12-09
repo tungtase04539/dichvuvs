@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
+// Fast status check endpoint
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -10,6 +13,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Order code required" }, { status: 400 });
     }
 
+    // Only select needed fields for speed
     const order = await prisma.order.findUnique({
       where: { orderCode },
       select: {
@@ -17,8 +21,6 @@ export async function GET(request: NextRequest) {
         orderCode: true,
         status: true,
         totalPrice: true,
-        customerName: true,
-        notes: true,
       },
     });
 
@@ -35,4 +37,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-

@@ -4,6 +4,7 @@ import { generateOrderCode } from "@/lib/utils";
 import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,10 +21,7 @@ export async function GET(request: NextRequest) {
           customerPhone: phone,
         },
         include: {
-          service: true,
-          assignedTo: {
-            select: { id: true, name: true, phone: true },
-          },
+          service: { select: { id: true, name: true, icon: true } },
         },
       });
 
@@ -58,10 +56,8 @@ export async function GET(request: NextRequest) {
       prisma.order.findMany({
         where,
         include: {
-          service: true,
-          assignedTo: {
-            select: { id: true, name: true },
-          },
+          service: { select: { id: true, name: true, icon: true } },
+          assignedTo: { select: { id: true, name: true } },
         },
         orderBy: { createdAt: "desc" },
         take: limit,
@@ -86,10 +82,10 @@ export async function POST(request: NextRequest) {
     const {
       customerName,
       customerPhone,
-      phone, // Support both field names
+      phone,
       email,
       notes,
-      items, // Array of { serviceId, quantity, price, details }
+      items,
     } = body;
 
     const finalPhone = customerPhone || phone;
@@ -109,18 +105,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get all services in ONE query (optimized)
+    const serviceIds = items.map((item: { serviceId: string }) => item.serviceId);
+    const services = await prisma.service.findMany({
+      where: { id: { in: serviceIds } },
+      select: { id: true, name: true, price: true },
+    });
+
+    const serviceMap = new Map(services.map((s) => [s.id, s]));
+
     // Calculate total
     let totalPrice = 0;
     let totalQuantity = 0;
     const orderDetails: string[] = [];
 
     for (const item of items) {
-      const service = await prisma.service.findUnique({
-        where: { id: item.serviceId },
-      });
+      const service = serviceMap.get(item.serviceId);
       if (!service) {
         return NextResponse.json(
-          { error: `Sản phẩm không tồn tại` },
+          { error: "Sản phẩm không tồn tại" },
           { status: 400 }
         );
       }
@@ -129,31 +132,23 @@ export async function POST(request: NextRequest) {
       orderDetails.push(`${service.name} x${item.quantity}`);
     }
 
-    // Generate unique order code
-    let orderCode = generateOrderCode();
-    let existingOrder = await prisma.order.findUnique({ where: { orderCode } });
-    while (existingOrder) {
-      orderCode = generateOrderCode();
-      existingOrder = await prisma.order.findUnique({ where: { orderCode } });
-    }
+    // Generate order code (simple, no loop)
+    const orderCode = generateOrderCode();
 
-    // Get first service for the order (main product)
-    const mainServiceId = items[0].serviceId;
-    const mainService = await prisma.service.findUnique({
-      where: { id: mainServiceId },
-    });
+    // Get main service
+    const mainService = serviceMap.get(items[0].serviceId);
 
-    // Create order
+    // Create order in ONE query
     const order = await prisma.order.create({
       data: {
         orderCode,
-        serviceId: mainServiceId,
+        serviceId: items[0].serviceId,
         quantity: totalQuantity,
         unit: "bot",
         customerName,
         customerPhone: finalPhone,
         customerEmail: email || null,
-        address: "Online", // Not needed for digital products
+        address: "Online",
         district: "Online",
         scheduledDate: new Date(),
         scheduledTime: "Giao ngay",
@@ -163,7 +158,7 @@ export async function POST(request: NextRequest) {
         status: "pending",
       },
       include: {
-        service: true,
+        service: { select: { id: true, name: true, icon: true } },
       },
     });
 

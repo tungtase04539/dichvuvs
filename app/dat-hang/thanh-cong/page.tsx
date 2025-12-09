@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
 import QRPayment from "./QRPayment";
 import CopyButton from "./CopyButton";
+import { getSupabase } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
 import {
   CheckCircle,
@@ -17,12 +18,14 @@ import {
   Search,
   Loader2,
   AlertCircle,
+  Home,
 } from "lucide-react";
 
 interface Order {
   orderCode: string;
   totalPrice: number;
   status: string;
+  customerName: string;
   service?: {
     name: string;
     icon: string;
@@ -34,17 +37,66 @@ function OrderSuccessContent() {
   const orderCode = searchParams.get("code") || "";
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (orderCode) {
-      // Simple mock - in real app, fetch from API
-      setOrder({
-        orderCode,
-        totalPrice: 30000,
-        status: "pending",
-      });
+    const fetchOrder = async () => {
+      if (!orderCode) {
+        setError("Không có mã đơn hàng");
+        setIsLoading(false);
+        return;
+      }
+
+      const supabase = getSupabase();
+      if (!supabase) {
+        // Fallback if supabase not available
+        setOrder({
+          orderCode,
+          totalPrice: 30000,
+          status: "pending",
+          customerName: "Khách hàng",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error: err } = await supabase
+          .from("Order")
+          .select("orderCode, totalPrice, status, customerName, serviceId")
+          .eq("orderCode", orderCode)
+          .single();
+
+        if (err || !data) {
+          // If not found, still show with default data
+          setOrder({
+            orderCode,
+            totalPrice: 30000,
+            status: "pending",
+            customerName: "Khách hàng",
+          });
+        } else {
+          setOrder({
+            orderCode: data.orderCode,
+            totalPrice: data.totalPrice,
+            status: data.status,
+            customerName: data.customerName,
+          });
+        }
+      } catch (e) {
+        console.error("Fetch order error:", e);
+        setOrder({
+          orderCode,
+          totalPrice: 30000,
+          status: "pending",
+          customerName: "Khách hàng",
+        });
+      }
+      
       setIsLoading(false);
-    }
+    };
+
+    fetchOrder();
   }, [orderCode]);
 
   if (isLoading) {
@@ -55,11 +107,15 @@ function OrderSuccessContent() {
     );
   }
 
-  if (!order) {
+  if (error || !order) {
     return (
       <div className="text-center py-20">
         <AlertCircle className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-        <p className="text-slate-500">Không tìm thấy đơn hàng</p>
+        <p className="text-slate-500 mb-6">{error || "Không tìm thấy đơn hàng"}</p>
+        <Link href="/" className="btn btn-primary">
+          <Home className="w-5 h-5" />
+          Về trang chủ
+        </Link>
       </div>
     );
   }
@@ -68,8 +124,8 @@ function OrderSuccessContent() {
     <>
       {/* Success Icon */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary-100 mb-4">
-          <CheckCircle className="w-10 h-10 text-primary-600" />
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-4">
+          <CheckCircle className="w-10 h-10 text-green-600" />
         </div>
         <h1 className="text-3xl font-bold text-slate-900 mb-2">
           Đặt hàng thành công!

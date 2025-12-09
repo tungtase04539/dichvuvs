@@ -20,34 +20,70 @@ interface CartItem {
   quantity: number;
 }
 
-export default function OrderForm({ products }: { products: Product[] }) {
+export default function OrderForm() {
+  const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  // Load cart from sessionStorage
+  // Load products on mount
   useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const res = await fetch("/api/products");
+        const data = await res.json();
+        if (data.products) {
+          setProducts(data.products);
+        }
+      } catch (error) {
+        console.error("Load products error:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Check sessionStorage for pre-selected cart
     const savedCart = sessionStorage.getItem("cart");
     if (savedCart) {
       try {
         const items = JSON.parse(savedCart);
-        const cartItems: CartItem[] = [];
-        items.forEach((item: { id: string; quantity: number }) => {
-          const product = products.find((p) => p.id === item.id);
-          if (product) {
-            cartItems.push({ product, quantity: item.quantity });
-          }
-        });
-        if (cartItems.length > 0) {
-          setCart(cartItems);
-        }
+        // Will populate cart after products load
+        sessionStorage.setItem("pendingCart", savedCart);
         sessionStorage.removeItem("cart");
       } catch (e) {
         console.error("Error loading cart:", e);
+      }
+    }
+
+    loadProducts();
+  }, []);
+
+  // Populate cart when products loaded
+  useEffect(() => {
+    if (products.length > 0) {
+      const pendingCart = sessionStorage.getItem("pendingCart");
+      if (pendingCart) {
+        try {
+          const items = JSON.parse(pendingCart);
+          const cartItems: CartItem[] = [];
+          items.forEach((item: { id: string; quantity: number }) => {
+            const product = products.find((p) => p.id === item.id);
+            if (product) {
+              cartItems.push({ product, quantity: item.quantity });
+            }
+          });
+          if (cartItems.length > 0) {
+            setCart(cartItems);
+          }
+          sessionStorage.removeItem("pendingCart");
+        } catch (e) {
+          console.error("Error loading pending cart:", e);
+        }
       }
     }
   }, [products]);
@@ -90,7 +126,7 @@ export default function OrderForm({ products }: { products: Product[] }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (cart.length === 0) {
       alert("Vui lòng chọn ít nhất 1 ChatBot");
       return;
@@ -110,8 +146,6 @@ export default function OrderForm({ products }: { products: Product[] }) {
           items: cart.map((item) => ({
             serviceId: item.product.id,
             quantity: item.quantity,
-            price: item.product.price,
-            details: item.product.name,
           })),
         }),
       });
@@ -130,6 +164,14 @@ export default function OrderForm({ products }: { products: Product[] }) {
       setIsSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit}>
@@ -194,64 +236,39 @@ export default function OrderForm({ products }: { products: Product[] }) {
         <div className="space-y-6">
           {/* Cart Summary */}
           <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
-            <h2 className="text-xl font-bold mb-4">Giỏ hàng ({totalItems} sản phẩm)</h2>
+            <h2 className="text-xl font-bold mb-4">Giỏ hàng ({totalItems})</h2>
 
             {cart.length === 0 ? (
               <p className="text-slate-400 text-center py-8">
-                Chưa có sản phẩm nào trong giỏ hàng
+                Chọn sản phẩm bên trái
               </p>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {cart.map((item) => (
                   <div
                     key={item.product.id}
-                    className="flex items-center gap-4 p-3 bg-white/5 rounded-xl"
+                    className="flex items-center gap-3 p-2 bg-white/5 rounded-lg"
                   >
-                    <div className="text-2xl">{item.product.icon}</div>
+                    <span className="text-xl">{item.product.icon}</span>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-sm truncate">
-                        {item.product.name}
-                      </h4>
-                      <p className="text-purple-400 text-sm">
+                      <p className="text-sm font-medium truncate">{item.product.name}</p>
+                      <p className="text-purple-400 text-xs">
                         {formatCurrency(item.product.price)} x {item.quantity}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => updateQuantity(item.product.id, -1)}
-                        className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20"
-                      >
-                        <Minus className="w-3 h-3" />
-                      </button>
-                      <span className="w-8 text-center font-bold">
-                        {item.quantity}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => updateQuantity(item.product.id, 1)}
-                        className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20"
-                      >
-                        <Plus className="w-3 h-3" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => removeFromCart(item.product.id)}
-                        className="w-7 h-7 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center hover:bg-red-500/30"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeFromCart(item.product.id)}
+                      className="p-1 text-red-400 hover:bg-red-500/20 rounded"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 ))}
 
-                <div className="pt-4 border-t border-white/10">
-                  <div className="flex justify-between text-lg font-bold">
-                    <span>Tổng tiền:</span>
-                    <span className="text-purple-400">
-                      {formatCurrency(totalPrice)}
-                    </span>
-                  </div>
+                <div className="pt-3 border-t border-white/10 flex justify-between font-bold">
+                  <span>Tổng:</span>
+                  <span className="text-purple-400">{formatCurrency(totalPrice)}</span>
                 </div>
               </div>
             )}
@@ -259,74 +276,74 @@ export default function OrderForm({ products }: { products: Product[] }) {
 
           {/* Customer Info */}
           <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
-            <h2 className="text-xl font-bold mb-4">Thông tin khách hàng</h2>
+            <h2 className="text-xl font-bold mb-4">Thông tin</h2>
 
             <div className="space-y-4">
               <div>
-                <label className="flex items-center gap-2 text-sm text-slate-400 mb-2">
+                <label className="flex items-center gap-2 text-sm text-slate-400 mb-1">
                   <User className="w-4 h-4" />
-                  Họ tên <span className="text-red-400">*</span>
+                  Họ tên *
                 </label>
                 <input
                   type="text"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   required
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-purple-500 focus:outline-none transition-colors"
+                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl focus:border-purple-500 focus:outline-none"
                   placeholder="Nhập họ tên"
                 />
               </div>
 
               <div>
-                <label className="flex items-center gap-2 text-sm text-slate-400 mb-2">
+                <label className="flex items-center gap-2 text-sm text-slate-400 mb-1">
                   <Phone className="w-4 h-4" />
-                  Số điện thoại <span className="text-red-400">*</span>
+                  Số điện thoại *
                 </label>
                 <input
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-purple-500 focus:outline-none transition-colors"
+                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl focus:border-purple-500 focus:outline-none"
                   placeholder="0912345678"
                 />
               </div>
 
               <div>
-                <label className="flex items-center gap-2 text-sm text-slate-400 mb-2">
+                <label className="flex items-center gap-2 text-sm text-slate-400 mb-1">
                   <Mail className="w-4 h-4" />
-                  Email (không bắt buộc)
+                  Email
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-purple-500 focus:outline-none transition-colors"
+                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl focus:border-purple-500 focus:outline-none"
                   placeholder="email@example.com"
                 />
               </div>
 
               <div>
-                <label className="flex items-center gap-2 text-sm text-slate-400 mb-2">
+                <label className="flex items-center gap-2 text-sm text-slate-400 mb-1">
                   <MessageSquare className="w-4 h-4" />
                   Ghi chú
                 </label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  rows={3}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-purple-500 focus:outline-none transition-colors resize-none"
-                  placeholder="Yêu cầu đặc biệt, nền tảng muốn tích hợp..."
+                  rows={2}
+                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl focus:border-purple-500 focus:outline-none resize-none"
+                  placeholder="Ghi chú thêm..."
                 />
               </div>
             </div>
           </div>
 
-          {/* Submit Button */}
+          {/* Submit */}
           <button
             type="submit"
             disabled={isSubmitting || cart.length === 0}
-            className="w-full flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg font-bold rounded-xl shadow-xl shadow-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg font-bold rounded-xl shadow-lg shadow-purple-500/30 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             {isSubmitting ? (
               <>
@@ -345,4 +362,3 @@ export default function OrderForm({ products }: { products: Product[] }) {
     </form>
   );
 }
-

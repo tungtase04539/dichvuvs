@@ -1,4 +1,3 @@
-import prisma from "@/lib/prisma";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
@@ -10,20 +9,14 @@ export const metadata = {
   description: "Mua ChatBot AI với giá chỉ 30.000đ/bot",
 };
 
-async function getProducts() {
-  return prisma.service.findMany({
-    where: { active: true },
-    orderBy: [{ featured: "desc" }, { name: "asc" }],
-  });
-}
+// Use static settings to avoid DB call
+const defaultSettings = {
+  site_name: "ChatBot VN Store",
+  site_phone: "1900 8686",
+};
 
-async function getSettings() {
-  const settings = await prisma.setting.findMany();
-  return settings.reduce((acc, s) => ({ ...acc, [s.key]: s.value }), {} as Record<string, string>);
-}
-
-export default async function OrderPage() {
-  const [products, settings] = await Promise.all([getProducts(), getSettings()]);
+export default function OrderPage() {
+  const settings = defaultSettings;
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -43,8 +36,8 @@ export default async function OrderPage() {
               </p>
             </div>
 
-            {/* Order Form */}
-            <OrderForm products={products} />
+            {/* Order Form - loads products client-side */}
+            <OrderForm />
           </div>
         </div>
       </main>

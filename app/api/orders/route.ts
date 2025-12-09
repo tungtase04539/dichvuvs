@@ -3,6 +3,8 @@ import prisma from "@/lib/prisma";
 import { generateOrderCode } from "@/lib/utils";
 import { getSession } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   try {
     const user = await getSession();
@@ -82,46 +84,49 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const {
-      serviceId,
-      quantity,
       customerName,
       customerPhone,
-      customerEmail,
-      address,
-      district,
-      scheduledDate,
-      scheduledTime,
+      phone, // Support both field names
+      email,
       notes,
-      basePrice,
-      totalPrice,
-      unit,
+      items, // Array of { serviceId, quantity, price, details }
     } = body;
 
+    const finalPhone = customerPhone || phone;
+
     // Validation
-    if (!serviceId || !customerName || !customerPhone || !address || !district) {
+    if (!customerName || !finalPhone) {
       return NextResponse.json(
-        { error: "Thiếu thông tin bắt buộc" },
+        { error: "Vui lòng nhập họ tên và số điện thoại" },
         { status: 400 }
       );
     }
 
-    if (!scheduledDate || !scheduledTime) {
+    if (!items || items.length === 0) {
       return NextResponse.json(
-        { error: "Vui lòng chọn thời gian thực hiện" },
+        { error: "Vui lòng chọn ít nhất 1 sản phẩm" },
         { status: 400 }
       );
     }
 
-    // Check if service exists
-    const service = await prisma.service.findUnique({
-      where: { id: serviceId },
-    });
+    // Calculate total
+    let totalPrice = 0;
+    let totalQuantity = 0;
+    const orderDetails: string[] = [];
 
-    if (!service) {
-      return NextResponse.json(
-        { error: "Dịch vụ không tồn tại" },
-        { status: 400 }
-      );
+    for (const item of items) {
+      const service = await prisma.service.findUnique({
+        where: { id: item.serviceId },
+      });
+      if (!service) {
+        return NextResponse.json(
+          { error: `Sản phẩm không tồn tại` },
+          { status: 400 }
+        );
+      }
+      totalPrice += service.price * item.quantity;
+      totalQuantity += item.quantity;
+      orderDetails.push(`${service.name} x${item.quantity}`);
     }
 
     // Generate unique order code
@@ -132,23 +137,29 @@ export async function POST(request: NextRequest) {
       existingOrder = await prisma.order.findUnique({ where: { orderCode } });
     }
 
+    // Get first service for the order (main product)
+    const mainServiceId = items[0].serviceId;
+    const mainService = await prisma.service.findUnique({
+      where: { id: mainServiceId },
+    });
+
     // Create order
     const order = await prisma.order.create({
       data: {
         orderCode,
-        serviceId,
-        quantity: parseFloat(quantity) || 1,
-        unit: unit || service.unit,
+        serviceId: mainServiceId,
+        quantity: totalQuantity,
+        unit: "bot",
         customerName,
-        customerPhone,
-        customerEmail: customerEmail || null,
-        address,
-        district,
-        scheduledDate: new Date(scheduledDate),
-        scheduledTime,
-        notes: notes || null,
-        basePrice: basePrice || service.price,
-        totalPrice: totalPrice || service.price * (parseFloat(quantity) || 1),
+        customerPhone: finalPhone,
+        customerEmail: email || null,
+        address: "Online", // Not needed for digital products
+        district: "Online",
+        scheduledDate: new Date(),
+        scheduledTime: "Giao ngay",
+        notes: notes ? `${notes}\n---\nChi tiết: ${orderDetails.join(", ")}` : `Chi tiết: ${orderDetails.join(", ")}`,
+        basePrice: mainService?.price || 30000,
+        totalPrice,
         status: "pending",
       },
       include: {
@@ -165,4 +176,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

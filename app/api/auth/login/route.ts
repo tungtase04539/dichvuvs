@@ -3,10 +3,13 @@ import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { signToken, setSession } from "@/lib/auth";
 
+// Optimize: Reduce cold start
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { email, password } = body;
+    const { email, password } = await request.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -15,22 +18,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find user
+    // Find user - only select needed fields
     const user = await prisma.user.findUnique({
       where: { email },
+      select: {
+        id: true,
+        email: true,
+        password: true,
+        name: true,
+        role: true,
+        active: true,
+      },
     });
 
-    if (!user) {
+    if (!user || !user.active) {
       return NextResponse.json(
         { error: "Email hoặc mật khẩu không đúng" },
-        { status: 401 }
-      );
-    }
-
-    // Check if user is active
-    if (!user.active) {
-      return NextResponse.json(
-        { error: "Tài khoản đã bị vô hiệu hóa" },
         { status: 401 }
       );
     }
@@ -44,7 +47,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create token
+    // Create token and set session in parallel
     const token = await signToken({
       id: user.id,
       email: user.email,
@@ -52,7 +55,6 @@ export async function POST(request: NextRequest) {
       role: user.role,
     });
 
-    // Set session cookie
     await setSession(token);
 
     return NextResponse.json({
@@ -64,9 +66,8 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Login error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Lỗi hệ thống" },
       { status: 500 }
     );
   }

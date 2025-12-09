@@ -15,18 +15,22 @@ import {
 } from "lucide-react";
 import { formatCurrency, formatDateTime, getStatusLabel, getStatusColor } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import ExportExcel from "./ExportExcel";
 
 interface Order {
   id: string;
   orderCode: string;
   customerName: string;
   customerPhone: string;
+  customerEmail?: string | null;
   address: string;
   district: string;
   status: string;
   scheduledDate: string;
   scheduledTime: string;
   totalPrice: number;
+  quantity: number;
+  notes?: string | null;
   createdAt: string;
   service: {
     name: string;
@@ -93,16 +97,32 @@ export default function OrdersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <h1 className="text-2xl font-bold text-slate-900">Quản lý đơn hàng</h1>
-        <button
-          onClick={fetchOrders}
-          className="btn btn-secondary"
-          disabled={isLoading}
-        >
-          <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
-          Làm mới
-        </button>
+        <div className="flex items-center gap-3">
+          <ExportExcel 
+            orders={filteredOrders.map(o => ({
+              orderCode: o.orderCode,
+              customerName: o.customerName,
+              customerPhone: o.customerPhone,
+              customerEmail: o.customerEmail || null,
+              status: o.status,
+              totalPrice: o.totalPrice,
+              quantity: o.quantity || 1,
+              notes: o.notes || null,
+              createdAt: o.createdAt,
+              serviceName: o.service?.name,
+            }))} 
+          />
+          <button
+            onClick={fetchOrders}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors"
+            disabled={isLoading}
+          >
+            <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
+            Làm mới
+          </button>
+        </div>
       </div>
 
       {/* Filters */}

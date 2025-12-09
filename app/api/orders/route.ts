@@ -61,13 +61,18 @@ export async function GET(request: NextRequest) {
         orderCode: true,
         customerName: true,
         customerPhone: true,
+        customerEmail: true,
         status: true,
         totalPrice: true,
+        quantity: true,
+        notes: true,
+        scheduledDate: true,
+        scheduledTime: true,
         createdAt: true,
         service: { select: { name: true, icon: true } },
       },
       orderBy: { createdAt: "desc" },
-      take: 50,
+      take: 200,
     });
 
     return NextResponse.json({ orders, total: orders.length });

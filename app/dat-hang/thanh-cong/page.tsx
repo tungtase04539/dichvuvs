@@ -1,191 +1,172 @@
+"use client";
+
+import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
-import prisma from "@/lib/prisma";
-import { formatCurrency } from "@/lib/utils";
-import { CheckCircle, Home, Phone, Sparkles, CreditCard, RefreshCw, ShoppingBag } from "lucide-react";
-import CopyButton from "./CopyButton";
+import { useSearchParams } from "next/navigation";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import ChatWidget from "@/components/ChatWidget";
 import QRPayment from "./QRPayment";
+import CopyButton from "./CopyButton";
+import { formatCurrency } from "@/lib/utils";
+import {
+  CheckCircle,
+  ArrowRight,
+  Clock,
+  CreditCard,
+  Search,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 
-async function getOrder(orderCode: string) {
-  if (!orderCode) return null;
-  return prisma.order.findUnique({
-    where: { orderCode },
-    include: { service: true },
-  });
-}
-
-async function getBankInfo() {
-  const settings = await prisma.setting.findMany({
-    where: {
-      key: {
-        in: ["bank_name", "bank_account", "bank_owner", "site_phone"],
-      },
-    },
-  });
-  return settings.reduce((acc, s) => ({ ...acc, [s.key]: s.value }), {} as Record<string, string>);
-}
-
-export default async function OrderSuccessPage({
-  searchParams,
-}: {
-  searchParams: { code?: string };
-}) {
-  const orderCode = searchParams.code || "";
-  const [order, bankInfo] = await Promise.all([
-    getOrder(orderCode),
-    getBankInfo(),
-  ]);
-
-  // Generate SePay QR URL
-  const bankAccount = bankInfo.bank_account || process.env.SEPAY_BANK_ACCOUNT || "";
-  const bankNameMap: Record<string, string> = {
-    "MB Bank": "MBBank",
-    "MB": "MBBank",
-    "Vietcombank": "Vietcombank",
-    "VCB": "Vietcombank",
-    "Techcombank": "Techcombank",
-    "TCB": "Techcombank",
-    "ACB": "ACB",
-    "VPBank": "VPBank",
-    "TPBank": "TPBank",
-    "Sacombank": "Sacombank",
+interface Order {
+  orderCode: string;
+  totalPrice: number;
+  status: string;
+  service?: {
+    name: string;
+    icon: string;
   };
-  const rawBankName = bankInfo.bank_name || process.env.SEPAY_BANK_NAME || "MB Bank";
-  const bankCode = bankNameMap[rawBankName] || "MBBank";
-  const amount = order ? Math.round(order.totalPrice) : 0;
-  const qrUrl = bankAccount
-    ? `https://qr.sepay.vn/img?bank=${bankCode}&acc=${bankAccount}&template=compact&amount=${amount}&des=${encodeURIComponent(orderCode)}`
-    : "";
+}
+
+function OrderSuccessContent() {
+  const searchParams = useSearchParams();
+  const orderCode = searchParams.get("code") || "";
+  const [order, setOrder] = useState<Order | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (orderCode) {
+      // Simple mock - in real app, fetch from API
+      setOrder({
+        orderCode,
+        totalPrice: 30000,
+        status: "pending",
+      });
+      setIsLoading(false);
+    }
+  }, [orderCode]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+      </div>
+    );
+  }
+
+  if (!order) {
+    return (
+      <div className="text-center py-20">
+        <AlertCircle className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+        <p className="text-slate-500">Không tìm thấy đơn hàng</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      <div className="max-w-lg w-full">
-        <div className="bg-slate-900 rounded-3xl shadow-2xl p-8 border border-white/10">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-10 h-10 text-white" />
-            </div>
+    <>
+      {/* Success Icon */}
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary-100 mb-4">
+          <CheckCircle className="w-10 h-10 text-primary-600" />
+        </div>
+        <h1 className="text-3xl font-bold text-slate-900 mb-2">
+          Đặt hàng thành công!
+        </h1>
+        <p className="text-slate-600">
+          Vui lòng thanh toán để hoàn tất đơn hàng
+        </p>
+      </div>
 
-            <h1 className="text-2xl font-bold text-white mb-2">
-              Đặt hàng thành công!
-            </h1>
-            <p className="text-slate-400 text-sm">
-              Quét mã QR hoặc chuyển khoản để nhận ChatBot
-            </p>
-          </div>
-
-          {orderCode && (
-            <div className="bg-purple-500/10 rounded-xl p-3 mb-4 text-center border border-purple-500/20">
-              <p className="text-xs text-slate-400 mb-1">Mã đơn hàng</p>
-              <p className="text-xl font-bold text-purple-400 font-mono">
-                {orderCode}
+      {/* Order Info */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 mb-6">
+        <div className="flex items-center justify-between mb-4 pb-4 border-b border-slate-100">
+          <div>
+            <p className="text-sm text-slate-500">Mã đơn hàng</p>
+            <div className="flex items-center gap-2">
+              <p className="text-xl font-bold font-mono text-primary-600">
+                {order.orderCode}
               </p>
-            </div>
-          )}
-
-          {/* QR Code từ SePay */}
-          {qrUrl && order && (
-            <QRPayment
-              qrUrl={qrUrl}
-              orderCode={orderCode}
-              amount={order.totalPrice}
-            />
-          )}
-
-          {/* Payment Info */}
-          <div className="bg-white/5 rounded-xl p-4 mb-4 border border-white/10">
-            <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-white">
-              <CreditCard className="w-4 h-4 text-purple-400" />
-              Hoặc chuyển khoản thủ công
-            </div>
-
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between items-center">
-                <span className="text-slate-400">Ngân hàng:</span>
-                <span className="font-medium text-white">{bankInfo.bank_name || "MB Bank"}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-400">Số TK:</span>
-                <div className="flex items-center gap-1">
-                  <span className="font-mono font-medium text-white">{bankInfo.bank_account || "---"}</span>
-                  {bankInfo.bank_account && <CopyButton text={bankInfo.bank_account} />}
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-400">Chủ TK:</span>
-                <span className="font-medium text-white text-xs">{bankInfo.bank_owner || "---"}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-400">Số tiền:</span>
-                <span className="font-bold text-purple-400">{order ? formatCurrency(order.totalPrice) : "---"}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-400">Nội dung:</span>
-                <div className="flex items-center gap-1">
-                  <span className="font-mono font-medium text-purple-400">{orderCode}</span>
-                  <CopyButton text={orderCode} />
-                </div>
-              </div>
+              <CopyButton text={order.orderCode} />
             </div>
           </div>
-
-          {/* Order Summary */}
-          {order && (
-            <div className="bg-white/5 rounded-xl p-3 mb-4 border border-white/10">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{order.service.icon}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-white text-sm">{order.service.name}</p>
-                  <p className="text-xs text-slate-400">
-                    {order.quantity} {order.unit}
-                  </p>
-                </div>
-                <p className="font-bold text-purple-400">{formatCurrency(order.totalPrice)}</p>
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Link
-              href={`/tra-cuu?code=${orderCode}`}
-              className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-purple-500/30 transition-all text-sm"
-            >
-              <RefreshCw className="w-4 h-4" />
-              Kiểm tra trạng thái thanh toán
-            </Link>
-            <Link
-              href="/san-pham"
-              className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-white/10 text-white font-medium rounded-xl hover:bg-white/20 transition-colors text-sm border border-white/10"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              Mua thêm ChatBot
-            </Link>
-            <Link
-              href="/"
-              className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-slate-400 font-medium rounded-xl hover:text-white transition-colors text-sm"
-            >
-              <Home className="w-4 h-4" />
-              Về trang chủ
-            </Link>
-          </div>
-
-          <div className="mt-4 pt-4 border-t border-white/10 text-center">
-            <p className="text-xs text-slate-500 mb-1">Cần hỗ trợ?</p>
-            <a
-              href={`tel:${bankInfo.site_phone?.replace(/\s/g, "") || "19008686"}`}
-              className="inline-flex items-center gap-1 text-purple-400 font-medium text-sm hover:underline"
-            >
-              <Phone className="w-3 h-3" />
-              {bankInfo.site_phone || "1900 8686"}
-            </a>
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-100 text-amber-700 rounded-full text-sm font-medium">
+            <Clock className="w-4 h-4" />
+            Chờ thanh toán
           </div>
         </div>
 
-        <div className="mt-4 flex items-center justify-center gap-2 text-slate-500">
-          <Sparkles className="w-3 h-3 text-purple-400" />
-          <span className="text-xs">Thanh toán tự động qua SePay</span>
+        <div className="flex items-center justify-between">
+          <span className="text-slate-600">Tổng thanh toán</span>
+          <span className="text-2xl font-bold text-primary-600">
+            {formatCurrency(order.totalPrice)}
+          </span>
         </div>
       </div>
-    </div>
+
+      {/* Payment Section */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 mb-6">
+        <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+          <CreditCard className="w-5 h-5 text-primary-600" />
+          Thông tin thanh toán
+        </h2>
+
+        <QRPayment orderCode={order.orderCode} amount={order.totalPrice} />
+
+        <div className="mt-6 p-4 bg-primary-50 rounded-xl border border-primary-100">
+          <p className="text-sm text-primary-800">
+            <strong>Lưu ý:</strong> Vui lòng ghi đúng nội dung chuyển khoản là{" "}
+            <span className="font-mono font-bold">{order.orderCode}</span> để hệ thống
+            tự động xác nhận thanh toán.
+          </p>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <Link
+          href={`/tra-cuu?code=${order.orderCode}`}
+          className="btn btn-primary flex-1"
+        >
+          <Search className="w-5 h-5" />
+          Tra cứu đơn hàng
+        </Link>
+        <Link
+          href="/san-pham"
+          className="btn btn-secondary flex-1"
+        >
+          Tiếp tục mua sắm
+          <ArrowRight className="w-5 h-5" />
+        </Link>
+      </div>
+    </>
   );
 }
 
+export default function OrderSuccessPage() {
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <Header settings={{}} />
+
+      <main className="pt-32 pb-20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-xl mx-auto">
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center py-20">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+                </div>
+              }
+            >
+              <OrderSuccessContent />
+            </Suspense>
+          </div>
+        </div>
+      </main>
+
+      <Footer settings={{}} />
+      <ChatWidget />
+    </div>
+  );
+}

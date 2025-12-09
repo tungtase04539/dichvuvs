@@ -2,75 +2,65 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ShoppingCart, Plus, Minus } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
+import { ShoppingCart, Plus, Minus, ArrowRight } from "lucide-react";
 
 interface Product {
   id: string;
   name: string;
   price: number;
-  slug: string;
-  icon: string | null;
 }
 
-export default function AddToCartButton({ product }: { product: Product }) {
+interface AddToCartButtonProps {
+  product: Product;
+}
+
+export default function AddToCartButton({ product }: AddToCartButtonProps) {
   const [quantity, setQuantity] = useState(1);
   const router = useRouter();
 
-  const handleBuyNow = () => {
-    // Store in sessionStorage for checkout
-    const cart = [
-      {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        quantity,
-        icon: product.icon,
-      },
-    ];
+  const handleAddToCart = () => {
+    // Save to session storage
+    const cart = [{ id: product.id, quantity }];
     sessionStorage.setItem("cart", JSON.stringify(cart));
     router.push("/dat-hang");
   };
 
   return (
     <div className="space-y-4">
-      {/* Quantity selector */}
       <div className="flex items-center gap-4">
-        <span className="text-slate-400">Số lượng:</span>
-        <div className="flex items-center gap-2 bg-white/5 rounded-xl border border-white/10">
+        <span className="text-sm font-medium text-slate-700">Số lượng:</span>
+        <div className="flex items-center gap-3 bg-slate-100 rounded-xl p-1">
           <button
-            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-            className="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-l-xl transition-colors"
+            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+            className="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center hover:bg-slate-50 transition-colors"
           >
             <Minus className="w-4 h-4" />
           </button>
-          <span className="w-12 text-center font-bold text-xl">{quantity}</span>
+          <span className="w-10 text-center font-bold text-lg">{quantity}</span>
           <button
-            onClick={() => setQuantity((q) => Math.min(99, q + 1))}
-            className="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-r-xl transition-colors"
+            onClick={() => setQuantity(quantity + 1)}
+            className="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center hover:bg-slate-50 transition-colors"
           >
             <Plus className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* Total */}
-      <div className="flex items-center justify-between py-4 border-t border-white/10">
-        <span className="text-slate-400">Tổng tiền:</span>
-        <span className="text-3xl font-bold text-purple-400">
-          {formatCurrency(product.price * quantity)}
-        </span>
-      </div>
-
-      {/* Buy button */}
       <button
-        onClick={handleBuyNow}
-        className="w-full flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg font-bold rounded-xl shadow-xl shadow-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/40 hover:-translate-y-0.5 transition-all duration-300"
+        onClick={handleAddToCart}
+        className="btn btn-primary w-full text-lg py-4"
       >
         <ShoppingCart className="w-5 h-5" />
-        Mua ngay - {formatCurrency(product.price * quantity)}
+        Mua ngay
+      </button>
+
+      <button
+        onClick={handleAddToCart}
+        className="btn btn-secondary w-full"
+      >
+        Thêm vào giỏ hàng
+        <ArrowRight className="w-5 h-5" />
       </button>
     </div>
   );
 }
-

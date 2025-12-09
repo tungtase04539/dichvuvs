@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { supabase, generateOrderCode } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
 import { Plus, Minus, Trash2, ShoppingCart, User, Phone, Mail, MessageSquare, Loader2 } from "lucide-react";
 
@@ -31,33 +32,27 @@ export default function OrderForm() {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  // Load products on mount
+  // Load products DIRECTLY from Supabase - NO serverless delay!
   useEffect(() => {
     const loadProducts = async () => {
-      try {
-        const res = await fetch("/api/products");
-        const data = await res.json();
-        if (data.products) {
-          setProducts(data.products);
-        }
-      } catch (error) {
-        console.error("Load products error:", error);
-      } finally {
-        setIsLoading(false);
+      const { data, error } = await supabase
+        .from("Service")
+        .select("id, name, slug, description, price, icon, featured")
+        .eq("active", true)
+        .order("featured", { ascending: false })
+        .order("name");
+
+      if (!error && data) {
+        setProducts(data);
       }
+      setIsLoading(false);
     };
 
     // Check sessionStorage for pre-selected cart
     const savedCart = sessionStorage.getItem("cart");
     if (savedCart) {
-      try {
-        const items = JSON.parse(savedCart);
-        // Will populate cart after products load
-        sessionStorage.setItem("pendingCart", savedCart);
-        sessionStorage.removeItem("cart");
-      } catch (e) {
-        console.error("Error loading cart:", e);
-      }
+      sessionStorage.setItem("pendingCart", savedCart);
+      sessionStorage.removeItem("cart");
     }
 
     loadProducts();
@@ -133,36 +128,40 @@ export default function OrderForm() {
     }
 
     setIsSubmitting(true);
+    const orderCode = generateOrderCode();
+    const mainProduct = cart[0].product;
+    const details = cart.map((item) => `${item.product.name} x${item.quantity}`).join(", ");
 
-    try {
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerName,
-          phone,
-          email: email || undefined,
-          notes: notes || undefined,
-          items: cart.map((item) => ({
-            serviceId: item.product.id,
-            quantity: item.quantity,
-          })),
-        }),
-      });
+    // Insert DIRECTLY to Supabase - INSTANT!
+    const { error } = await supabase.from("Order").insert({
+      id: crypto.randomUUID(),
+      orderCode,
+      serviceId: mainProduct.id,
+      quantity: totalItems,
+      unit: "bot",
+      customerName,
+      customerPhone: phone,
+      customerEmail: email || null,
+      address: "Online",
+      district: "Online",
+      scheduledDate: new Date().toISOString(),
+      scheduledTime: "Giao ngay",
+      notes: notes ? `${notes}\n---\n${details}` : details,
+      basePrice: mainProduct.price,
+      totalPrice,
+      status: "pending",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
 
-      const data = await res.json();
-
-      if (res.ok && data.order) {
-        router.push(`/dat-hang/thanh-cong?code=${data.order.orderCode}`);
-      } else {
-        alert(data.error || "Có lỗi xảy ra, vui lòng thử lại");
-      }
-    } catch (error) {
-      console.error("Submit error:", error);
+    if (error) {
+      console.error("Order error:", error);
       alert("Có lỗi xảy ra, vui lòng thử lại");
-    } finally {
       setIsSubmitting(false);
+      return;
     }
+
+    router.push(`/dat-hang/thanh-cong?code=${orderCode}`);
   };
 
   if (isLoading) {

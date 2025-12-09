@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
+import { supabase } from "@/lib/supabase";
 import { formatCurrency, formatDateTime, getStatusLabel, getStatusColor } from "@/lib/utils";
 import {
   Search,
@@ -241,23 +242,45 @@ function TrackOrderContent() {
     setIsLoading(true);
     setSearched(true);
 
-    try {
-      const res = await fetch(
-        `/api/orders?orderCode=${encodeURIComponent(orderCode)}&phone=${encodeURIComponent(phone)}`
-      );
-      const data = await res.json();
+    // Query Supabase DIRECTLY - INSTANT!
+    const { data, error: err } = await supabase
+      .from("Order")
+      .select(`
+        id,
+        orderCode,
+        customerName,
+        customerPhone,
+        customerEmail,
+        status,
+        totalPrice,
+        quantity,
+        unit,
+        notes,
+        createdAt,
+        serviceId
+      `)
+      .eq("orderCode", orderCode)
+      .eq("customerPhone", phone)
+      .single();
 
-      if (!res.ok) {
-        setError(data.error || "Không tìm thấy đơn hàng");
-        return;
-      }
-
-      setOrder(data.order);
-    } catch {
-      setError("Đã có lỗi xảy ra, vui lòng thử lại");
-    } finally {
+    if (err || !data) {
+      setError("Không tìm thấy đơn hàng");
       setIsLoading(false);
+      return;
     }
+
+    // Get service info
+    const { data: serviceData } = await supabase
+      .from("Service")
+      .select("name, icon")
+      .eq("id", data.serviceId)
+      .single();
+
+    setOrder({
+      ...data,
+      service: serviceData || { name: "ChatBot", icon: "🤖" },
+    });
+    setIsLoading(false);
   };
 
   const statusSteps = ["pending", "confirmed", "in_progress", "completed"];

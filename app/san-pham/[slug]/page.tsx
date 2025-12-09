@@ -1,6 +1,9 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import prisma from "@/lib/prisma";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -9,7 +12,6 @@ import AddToCartButton from "./AddToCartButton";
 import {
   ArrowLeft,
   Star,
-  CheckCircle,
   Zap,
   Shield,
   Clock,
@@ -17,45 +19,60 @@ import {
   Bot,
   Users,
   TrendingUp,
+  Loader2,
 } from "lucide-react";
 
-export const dynamic = "force-dynamic";
-
-async function getProduct(slug: string) {
-  return prisma.service.findUnique({
-    where: { slug },
-  });
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  longDescription: string | null;
+  price: number;
+  icon: string | null;
+  featured: boolean;
 }
 
-async function getRelatedProducts(currentSlug: string) {
-  return prisma.service.findMany({
-    where: { 
-      active: true,
-      slug: { not: currentSlug },
-    },
-    take: 4,
-  });
-}
-
-async function getSettings() {
-  const settings = await prisma.setting.findMany();
-  return settings.reduce((acc, s) => ({ ...acc, [s.key]: s.value }), {} as Record<string, string>);
-}
-
-export default async function ProductDetailPage({
+export default function ProductDetailPage({
   params,
 }: {
   params: { slug: string };
 }) {
-  const [product, relatedProducts, settings] = await Promise.all([
-    getProduct(params.slug),
-    getRelatedProducts(params.slug),
-    getSettings(),
-  ]);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
-  if (!product) {
-    notFound();
-  }
+  useEffect(() => {
+    const loadData = async () => {
+      // Load product
+      const { data: productData } = await supabase
+        .from("Service")
+        .select("*")
+        .eq("slug", params.slug)
+        .single();
+
+      if (!productData) {
+        router.push("/san-pham");
+        return;
+      }
+
+      setProduct(productData);
+
+      // Load related
+      const { data: relatedData } = await supabase
+        .from("Service")
+        .select("id, name, slug, price, icon")
+        .eq("active", true)
+        .neq("slug", params.slug)
+        .limit(4);
+
+      if (relatedData) setRelatedProducts(relatedData as Product[]);
+      setIsLoading(false);
+    };
+
+    loadData();
+  }, [params.slug, router]);
 
   const features = [
     { icon: Zap, text: "Cài đặt trong 5 phút" },
@@ -66,9 +83,19 @@ export default async function ProductDetailPage({
     { icon: TrendingUp, text: "Báo cáo chi tiết" },
   ];
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
+      </div>
+    );
+  }
+
+  if (!product) return null;
+
   return (
     <div className="min-h-screen bg-slate-950 text-white">
-      <Header settings={settings} />
+      <Header settings={{}} />
 
       <main className="pt-32 pb-20">
         <div className="container mx-auto px-4">
@@ -241,11 +268,11 @@ export default async function ProductDetailPage({
                   Liên hệ ngay để được hỗ trợ chọn ChatBot phù hợp
                 </p>
                 <a
-                  href={`tel:${settings.site_phone?.replace(/\s/g, "")}`}
+                  href="tel:19008686"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-white text-purple-600 rounded-xl font-semibold hover:bg-purple-50 transition-colors"
                 >
                   <Bot className="w-5 h-5" />
-                  {settings.site_phone}
+                  1900 8686
                 </a>
               </div>
             </div>
@@ -277,9 +304,8 @@ export default async function ProductDetailPage({
         </div>
       </main>
 
-      <Footer settings={settings} />
+      <Footer settings={{}} />
       <ChatWidget />
     </div>
   );
 }
-

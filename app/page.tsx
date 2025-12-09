@@ -22,7 +22,7 @@ import Header from "@/components/Header";
 import ChatWidget from "@/components/ChatWidget";
 import Footer from "@/components/Footer";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 async function getProducts() {
   return prisma.service.findMany({

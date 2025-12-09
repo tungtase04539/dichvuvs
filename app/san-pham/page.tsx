@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
 import { ArrowRight, Star, Bot, ShoppingCart } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 async function getProducts() {
   return prisma.service.findMany({
     where: { active: true },

@@ -19,6 +19,8 @@ import {
   TrendingUp,
 } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 async function getProduct(slug: string) {
   return prisma.service.findUnique({
     where: { slug },

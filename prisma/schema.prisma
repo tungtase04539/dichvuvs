@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("staff") // admin, staff
+  phone     String?
+  avatar    String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  assignedOrders Order[]   @relation("AssignedStaff")
+  messages       Message[]
+}
+
+model Service {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String
+  price       Float
+  unit        String   @default("m2") // m2, room, hour
+  icon        String?
+  image       String?
+  featured    Boolean  @default(false)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  orders Order[]
+}
+
+model Order {
+  id            String   @id @default(uuid())
+  orderCode     String   @unique
+  customerName  String
+  customerPhone String
+  customerEmail String?
+  address       String
+  district      String?
+  city          String   @default("Hồ Chí Minh")
+  
+  // Service details
+  serviceId     String
+  service       Service  @relation(fields: [serviceId], references: [id])
+  quantity      Float    @default(1)
+  unit          String
+  
+  // Scheduling
+  scheduledDate DateTime
+  scheduledTime String
+  
+  // Pricing
+  basePrice     Float
+  discount      Float    @default(0)
+  totalPrice    Float
+  
+  // Status
+  status        String   @default("pending") // pending, confirmed, in_progress, completed, cancelled
+  notes         String?
+  
+  // Assignment
+  assignedToId  String?
+  assignedTo    User?    @relation("AssignedStaff", fields: [assignedToId], references: [id])
+  
+  // Chat
+  chatSessionId String?
+  chatSession   ChatSession? @relation(fields: [chatSessionId], references: [id])
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ChatSession {
+  id           String    @id @default(uuid())
+  guestId      String    @unique // UUID for anonymous guest
+  guestName    String?
+  guestPhone   String?
+  status       String    @default("active") // active, closed
+  lastActivity DateTime  @default(now())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  // Relations
+  messages     Message[]
+  orders       Order[]
+}
+
+model Message {
+  id            String      @id @default(uuid())
+  chatSessionId String
+  chatSession   ChatSession @relation(fields: [chatSessionId], references: [id], onDelete: Cascade)
+  
+  senderId      String?     // null for guest messages
+  sender        User?       @relation(fields: [senderId], references: [id])
+  senderType    String      // guest, staff, admin, system
+  senderName    String
+  
+  content       String
+  type          String      @default("text") // text, image, file
+  read          Boolean     @default(false)
+  
+  createdAt     DateTime    @default(now())
+}
+
+model Setting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+

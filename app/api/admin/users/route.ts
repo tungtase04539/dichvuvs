@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     const role = searchParams.get("role");
 
     const supabaseAdmin = getSupabaseAdmin();
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+    const { data: authUsers, error } = await supabaseAdmin.rpc('get_all_users');
 
     if (error) {
       console.error("List users error:", error);
@@ -38,13 +38,19 @@ export async function GET(request: NextRequest) {
     }
 
     // Filter và format users
-    let users = data.users.map((u) => ({
+    let users = (authUsers || []).map((u: {
+      id: string;
+      email: string;
+      raw_user_meta_data: Record<string, unknown> | null;
+      created_at: string;
+      last_sign_in_at: string | null;
+    }) => ({
       id: u.id,
       email: u.email,
-      name: u.user_metadata?.name || u.email?.split("@")[0],
-      role: u.user_metadata?.role || "staff",
-      phone: u.user_metadata?.phone || "",
-      parentId: u.user_metadata?.parentId || null,
+      name: (u.raw_user_meta_data?.name as string) || u.email?.split("@")[0],
+      role: (u.raw_user_meta_data?.role as string) || "staff",
+      phone: (u.raw_user_meta_data?.phone as string) || "",
+      parentId: (u.raw_user_meta_data?.parentId as string) || null,
       active: true,
       createdAt: u.created_at,
     }));

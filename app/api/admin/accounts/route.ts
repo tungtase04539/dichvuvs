@@ -45,45 +45,33 @@ export async function GET() {
       return NextResponse.json({ error: "Chỉ Admin mới có quyền" }, { status: 403 });
     }
 
-    // Get all users using Supabase Auth REST API directly
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    // Get all users using database function (bypass Auth Admin API)
+    const supabaseAdmin = getSupabaseAdmin();
+    
+    const { data: authUsers, error: dbError } = await supabaseAdmin.rpc('get_all_users');
 
-    const response = await fetch(`${supabaseUrl}/auth/v1/admin/users`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${supabaseServiceKey}`,
-        'apikey': supabaseServiceKey!,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("[GET /api/admin/accounts] REST API error:", response.status, errorText);
+    if (dbError) {
+      console.error("[GET /api/admin/accounts] RPC error:", dbError);
       return NextResponse.json({ 
-        error: `Supabase Auth Error: ${response.status}`,
-        details: errorText 
+        error: dbError.message,
+        hint: "Đảm bảo đã chạy SQL tạo function get_all_users() trong Supabase"
       }, { status: 500 });
     }
 
-    const data = await response.json();
-    const authUsers = data.users || data || [];
-
     // Format users
-    const users = authUsers.map((u: {
+    const users = (authUsers || []).map((u: {
       id: string;
       email: string;
-      user_metadata?: Record<string, unknown>;
+      raw_user_meta_data: Record<string, unknown> | null;
       created_at: string;
       last_sign_in_at: string | null;
     }) => ({
       id: u.id,
       email: u.email,
-      name: (u.user_metadata?.name as string) || u.email?.split("@")[0],
-      role: (u.user_metadata?.role as string) || "staff",
-      phone: (u.user_metadata?.phone as string) || "",
-      parentId: (u.user_metadata?.parentId as string) || null,
+      name: (u.raw_user_meta_data?.name as string) || u.email?.split("@")[0],
+      role: (u.raw_user_meta_data?.role as string) || "staff",
+      phone: (u.raw_user_meta_data?.phone as string) || "",
+      parentId: (u.raw_user_meta_data?.parentId as string) || null,
       createdAt: u.created_at,
       lastSignIn: u.last_sign_in_at,
     }));

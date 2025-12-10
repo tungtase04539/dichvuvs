@@ -27,7 +27,7 @@ export async function GET() {
     }
 
     const supabaseAdmin = getSupabaseAdmin();
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+    const { data: authUsers, error } = await supabaseAdmin.rpc('get_all_users');
 
     if (error) {
       console.error("List users error:", error);
@@ -35,16 +35,21 @@ export async function GET() {
     }
 
     // Filter collaborators belonging to this agent
-    const collaborators = data.users
-      .filter((u) => 
-        u.user_metadata?.role === "collaborator" && 
-        u.user_metadata?.parentId === user.id
+    const collaborators = (authUsers || [])
+      .filter((u: { raw_user_meta_data: Record<string, unknown> | null }) => 
+        u.raw_user_meta_data?.role === "collaborator" && 
+        u.raw_user_meta_data?.parentId === user.id
       )
-      .map((u) => ({
+      .map((u: {
+        id: string;
+        email: string;
+        raw_user_meta_data: Record<string, unknown> | null;
+        created_at: string;
+      }) => ({
         id: u.id,
         email: u.email,
-        name: u.user_metadata?.name || u.email?.split("@")[0],
-        phone: u.user_metadata?.phone || "",
+        name: (u.raw_user_meta_data?.name as string) || u.email?.split("@")[0],
+        phone: (u.raw_user_meta_data?.phone as string) || "",
         active: true,
         createdAt: u.created_at,
       }));

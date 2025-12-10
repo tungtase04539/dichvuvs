@@ -4,6 +4,17 @@ import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
+interface FormattedUser {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  phone: string;
+  parentId: string | null;
+  active: boolean;
+  createdAt: string;
+}
+
 // Supabase Admin client
 function getSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -38,7 +49,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Filter và format users
-    let users = (authUsers || []).map((u: {
+    let users: FormattedUser[] = (authUsers || []).map((u: {
       id: string;
       email: string;
       raw_user_meta_data: Record<string, unknown> | null;
@@ -57,14 +68,14 @@ export async function GET(request: NextRequest) {
 
     // Filter by role if specified
     if (role) {
-      users = users.filter((u) => u.role === role);
+      users = users.filter((u: FormattedUser) => u.role === role);
     }
 
     // Filter based on current user's role
     if (user.role === "master_agent") {
-      users = users.filter((u) => u.parentId === user.id);
+      users = users.filter((u: FormattedUser) => u.parentId === user.id);
     } else if (user.role === "agent") {
-      users = users.filter((u) => u.parentId === user.id && u.role === "collaborator");
+      users = users.filter((u: FormattedUser) => u.parentId === user.id && u.role === "collaborator");
     } else if (user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

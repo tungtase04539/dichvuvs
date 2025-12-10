@@ -45,12 +45,9 @@ export async function GET() {
       return NextResponse.json({ error: "Chỉ Admin mới có quyền" }, { status: 403 });
     }
 
-    // Get all users from Supabase Auth with pagination
+    // Get all users from Supabase Auth
     const supabaseAdmin = getSupabaseAdmin();
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers({
-      page: 1,
-      perPage: 1000, // Get up to 1000 users
-    });
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers();
 
     if (error) {
       console.error("[GET /api/admin/accounts] List users error:", error);

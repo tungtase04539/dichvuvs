@@ -320,7 +320,7 @@ export default function HomePage() {
             {products.map((product) => (
               <div
                 key={product.id}
-                className="card-hover p-0 overflow-hidden flex flex-col h-full"
+                className="card-hover p-0 overflow-hidden flex flex-col h-full relative"
               >
                 {product.featured && (
                   <div className="absolute top-3 right-3 z-10">

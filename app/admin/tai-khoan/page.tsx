@@ -1,86 +1,139 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Key, Plus, Trash2, Edit, Eye, EyeOff, Loader2, Copy, Check, Package } from "lucide-react";
+import { 
+  Users, Plus, Trash2, Edit2, Loader2, Search, 
+  UserPlus, Shield, Building2, UserCheck, User,
+  Eye, EyeOff, X, Check
+} from "lucide-react";
 
-interface Service {
+interface Account {
   id: string;
+  email: string;
   name: string;
-  icon: string | null;
+  role: string;
+  phone: string;
+  parentId: string | null;
+  createdAt: string;
+  lastSignIn: string | null;
 }
 
-interface Credential {
-  id: string;
-  serviceId: string;
-  accountInfo: string;
-  password: string;
-  apiKey: string | null;
-  notes: string | null;
-  isUsed: boolean;
-  service: Service;
-  order?: {
-    orderCode: string;
-    customerName: string;
-  } | null;
-}
+const roleLabels: Record<string, string> = {
+  admin: "Quản trị viên",
+  master_agent: "Tổng đại lý",
+  agent: "Đại lý",
+  collaborator: "Cộng tác viên",
+  staff: "Nhân viên",
+};
 
-export default function CredentialsPage() {
-  const [credentials, setCredentials] = useState<Credential[]>([]);
-  const [services, setServices] = useState<Service[]>([]);
+const roleIcons: Record<string, React.ReactNode> = {
+  admin: <Shield className="w-4 h-4" />,
+  master_agent: <Building2 className="w-4 h-4" />,
+  agent: <UserCheck className="w-4 h-4" />,
+  collaborator: <User className="w-4 h-4" />,
+  staff: <User className="w-4 h-4" />,
+};
+
+const roleColors: Record<string, string> = {
+  admin: "bg-purple-100 text-purple-700",
+  master_agent: "bg-blue-100 text-blue-700",
+  agent: "bg-green-100 text-green-700",
+  collaborator: "bg-orange-100 text-orange-700",
+  staff: "bg-slate-100 text-slate-700",
+};
+
+export default function AccountsPage() {
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
-  const [copied, setCopied] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterRole, setFilterRole] = useState<string>("");
+  const [showModal, setShowModal] = useState(false);
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
+  // Form state
   const [formData, setFormData] = useState({
-    serviceId: "",
-    accountInfo: "",
+    email: "",
     password: "",
-    apiKey: "",
-    notes: "",
+    name: "",
+    role: "agent",
+    phone: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
+  // Load accounts
+  const loadAccounts = async () => {
     try {
-      const [credRes, prodRes] = await Promise.all([
-        fetch("/api/admin/credentials"),
-        fetch("/api/admin/products"),
-      ]);
-      const credData = await credRes.json();
-      const prodData = await prodRes.json();
-
-      if (credRes.ok) setCredentials(credData.credentials || []);
-      if (prodRes.ok) setServices(prodData.products || []);
+      const res = await fetch("/api/admin/accounts");
+      const data = await res.json();
+      if (data.users) {
+        setAccounts(data.users);
+      }
     } catch (error) {
-      console.error("Load error:", error);
+      console.error("Load accounts error:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
+  useEffect(() => {
+    loadAccounts();
+  }, []);
+
+  // Filter accounts
+  const filteredAccounts = accounts.filter((acc) => {
+    const matchSearch = 
+      acc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      acc.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      acc.phone.includes(searchQuery);
+    const matchRole = !filterRole || acc.role === filterRole;
+    return matchSearch && matchRole;
+  });
+
+  // Create/Update account
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const url = editingId
-      ? `/api/admin/credentials/${editingId}`
-      : "/api/admin/credentials";
-    const method = editingId ? "PUT" : "POST";
+    setError("");
+    setIsSubmitting(true);
 
     try {
+      const url = editingAccount 
+        ? `/api/admin/accounts/${editingAccount.id}`
+        : "/api/admin/accounts";
+      
       const res = await fetch(url, {
-        method,
+        method: editingAccount ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Có lỗi xảy ra");
+        return;
+      }
+
+      setShowModal(false);
+      setEditingAccount(null);
+      setFormData({ email: "", password: "", name: "", role: "agent", phone: "" });
+      loadAccounts();
+    } catch {
+      setError("Có lỗi xảy ra");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Delete account
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Xác nhận xóa tài khoản "${name}"?`)) return;
+
+    try {
+      const res = await fetch(`/api/admin/accounts/${id}`, { method: "DELETE" });
       if (res.ok) {
-        loadData();
-        resetForm();
+        loadAccounts();
       } else {
         const data = await res.json();
         alert(data.error || "Có lỗi xảy ra");
@@ -90,71 +143,25 @@ export default function CredentialsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Bạn có chắc muốn xóa?")) return;
-
-    try {
-      const res = await fetch(`/api/admin/credentials/${id}`, {
-        method: "DELETE",
-      });
-
-      if (res.ok) {
-        loadData();
-      } else {
-        const data = await res.json();
-        alert(data.error || "Không thể xóa");
-      }
-    } catch {
-      alert("Có lỗi xảy ra");
-    }
-  };
-
-  const handleEdit = (cred: Credential) => {
+  // Open edit modal
+  const openEdit = (account: Account) => {
+    setEditingAccount(account);
     setFormData({
-      serviceId: cred.serviceId,
-      accountInfo: cred.accountInfo,
-      password: cred.password,
-      apiKey: cred.apiKey || "",
-      notes: cred.notes || "",
-    });
-    setEditingId(cred.id);
-    setShowForm(true);
-  };
-
-  const resetForm = () => {
-    setFormData({
-      serviceId: "",
-      accountInfo: "",
+      email: account.email,
       password: "",
-      apiKey: "",
-      notes: "",
+      name: account.name,
+      role: account.role,
+      phone: account.phone || "",
     });
-    setEditingId(null);
-    setShowForm(false);
+    setShowModal(true);
   };
 
-  const togglePassword = (id: string) => {
-    setShowPasswords((prev) => ({ ...prev, [id]: !prev[id] }));
+  // Open create modal
+  const openCreate = () => {
+    setEditingAccount(null);
+    setFormData({ email: "", password: "", name: "", role: "agent", phone: "" });
+    setShowModal(true);
   };
-
-  const copyToClipboard = async (text: string, id: string) => {
-    await navigator.clipboard.writeText(text);
-    setCopied(id);
-    setTimeout(() => setCopied(null), 2000);
-  };
-
-  // Group by service
-  const groupedCredentials = credentials.reduce((acc, cred) => {
-    const key = cred.serviceId;
-    if (!acc[key]) {
-      acc[key] = {
-        service: cred.service,
-        items: [],
-      };
-    }
-    acc[key].items.push(cred);
-    return acc;
-  }, {} as Record<string, { service: Service; items: Credential[] }>);
 
   if (isLoading) {
     return (
@@ -166,256 +173,275 @@ export default function CredentialsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Quản lý Tài khoản</h1>
-          <p className="text-slate-600">Tài khoản/mật khẩu gán cho khách hàng sau thanh toán</p>
+          <h1 className="text-2xl font-bold text-slate-900">Quản lý tài khoản</h1>
+          <p className="text-slate-500 mt-1">Tổng: {accounts.length} tài khoản</p>
         </div>
-        <button
-          onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
-        >
-          <Plus className="w-5 h-5" />
+        <button onClick={openCreate} className="btn btn-primary">
+          <UserPlus className="w-5 h-5" />
           Thêm tài khoản
         </button>
       </div>
 
-      {/* Form */}
-      {showForm && (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
-          <h2 className="text-lg font-bold mb-4">
-            {editingId ? "Sửa tài khoản" : "Thêm tài khoản mới"}
-          </h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
+      {/* Filters */}
+      <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-200 mb-6">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Tìm theo tên, email, SĐT..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg"
+            />
+          </div>
+          <select
+            value={filterRole}
+            onChange={(e) => setFilterRole(e.target.value)}
+            className="px-4 py-2 border border-slate-200 rounded-lg"
+          >
+            <option value="">Tất cả vai trò</option>
+            <option value="master_agent">Tổng đại lý</option>
+            <option value="agent">Đại lý</option>
+            <option value="collaborator">Cộng tác viên</option>
+            <option value="staff">Nhân viên</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        {Object.entries(roleLabels).map(([role, label]) => {
+          const count = accounts.filter((a) => a.role === role).length;
+          return (
+            <div
+              key={role}
+              className={`p-4 rounded-xl border ${
+                filterRole === role ? "border-primary-500 bg-primary-50" : "border-slate-200 bg-white"
+              } cursor-pointer transition-all`}
+              onClick={() => setFilterRole(filterRole === role ? "" : role)}
+            >
+              <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-lg text-xs font-medium ${roleColors[role]}`}>
+                {roleIcons[role]}
+                {label}
+              </div>
+              <p className="text-2xl font-bold text-slate-900 mt-2">{count}</p>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Table */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600">Tài khoản</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600">Vai trò</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600">SĐT</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600">Ngày tạo</th>
+                <th className="px-6 py-3 text-center text-xs font-semibold text-slate-600">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredAccounts.map((account) => (
+                <tr key={account.id} className="hover:bg-slate-50">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${
+                        account.role === "admin" ? "bg-purple-500" :
+                        account.role === "master_agent" ? "bg-blue-500" :
+                        account.role === "agent" ? "bg-green-500" :
+                        account.role === "collaborator" ? "bg-orange-500" :
+                        "bg-slate-500"
+                      }`}>
+                        {account.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-medium text-slate-900">{account.name}</p>
+                        <p className="text-sm text-slate-500">{account.email}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium ${roleColors[account.role]}`}>
+                      {roleIcons[account.role]}
+                      {roleLabels[account.role]}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-slate-600">{account.phone || "-"}</td>
+                  <td className="px-6 py-4 text-slate-600 text-sm">
+                    {new Date(account.createdAt).toLocaleDateString("vi-VN")}
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => openEdit(account)}
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                        title="Sửa"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      {account.role !== "admin" && (
+                        <button
+                          onClick={() => handleDelete(account.id, account.name)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                          title="Xóa"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {filteredAccounts.length === 0 && (
+          <div className="text-center py-12 text-slate-500">
+            <Users className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+            <p>Không tìm thấy tài khoản nào</p>
+          </div>
+        )}
+      </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-2xl w-full max-w-md mx-4 shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b">
+              <h2 className="text-xl font-bold">
+                {editingAccount ? "Sửa tài khoản" : "Thêm tài khoản"}
+              </h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="p-2 hover:bg-slate-100 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Sản phẩm ChatBot *
+                  Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
+                  disabled={!!editingAccount}
+                  className="input disabled:bg-slate-100"
+                  placeholder="email@example.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Mật khẩu {!editingAccount && <span className="text-red-500">*</span>}
+                  {editingAccount && <span className="text-slate-400 text-xs">(để trống nếu không đổi)</span>}
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    required={!editingAccount}
+                    className="input pr-10"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Họ tên <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                  className="input"
+                  placeholder="Nguyễn Văn A"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Vai trò <span className="text-red-500">*</span>
                 </label>
                 <select
-                  value={formData.serviceId}
-                  onChange={(e) => setFormData({ ...formData, serviceId: e.target.value })}
-                  required
-                  disabled={!!editingId}
-                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-500 disabled:bg-slate-100"
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  className="input"
                 >
-                  <option value="">-- Chọn sản phẩm --</option>
-                  {services.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.icon} {s.name}
-                    </option>
-                  ))}
+                  <option value="master_agent">Tổng đại lý</option>
+                  <option value="agent">Đại lý</option>
+                  <option value="collaborator">Cộng tác viên</option>
+                  <option value="staff">Nhân viên</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Tài khoản/Email *
+                  Số điện thoại
                 </label>
                 <input
-                  type="text"
-                  value={formData.accountInfo}
-                  onChange={(e) => setFormData({ ...formData, accountInfo: e.target.value })}
-                  required
-                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-500"
-                  placeholder="user@email.com hoặc username"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="input"
+                  placeholder="0901234567"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Mật khẩu *
-                </label>
-                <input
-                  type="text"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required
-                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-500"
-                  placeholder="Mật khẩu"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  API Key (nếu có)
-                </label>
-                <input
-                  type="text"
-                  value={formData.apiKey}
-                  onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
-                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-500"
-                  placeholder="API Key"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Ghi chú
-              </label>
-              <textarea
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                rows={2}
-                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-500 resize-none"
-                placeholder="Link hướng dẫn, thông tin thêm..."
-              />
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                type="submit"
-                className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600"
-              >
-                {editingId ? "Cập nhật" : "Thêm mới"}
-              </button>
-              <button
-                type="button"
-                onClick={resetForm}
-                className="px-6 py-2 border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50"
-              >
-                Hủy
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Credentials List */}
-      {Object.keys(groupedCredentials).length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
-          <Key className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-500">Chưa có tài khoản nào</p>
-          <p className="text-sm text-slate-400 mt-1">
-            Thêm tài khoản để gán cho khách hàng sau thanh toán
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {Object.values(groupedCredentials).map(({ service, items }) => (
-            <div key={service.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-              <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center gap-3">
-                <span className="text-2xl">{service.icon}</span>
-                <div>
-                  <h3 className="font-semibold text-slate-900">{service.name}</h3>
-                  <p className="text-sm text-slate-500">
-                    {items.filter((i) => !i.isUsed).length} còn trống / {items.length} tổng
-                  </p>
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                  {error}
                 </div>
+              )}
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 px-4 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 btn btn-primary"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <Check className="w-5 h-5" />
+                      {editingAccount ? "Cập nhật" : "Tạo tài khoản"}
+                    </>
+                  )}
+                </button>
               </div>
-
-              <div className="divide-y divide-slate-100">
-                {items.map((cred) => (
-                  <div key={cred.id} className="p-4 hover:bg-slate-50">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 grid md:grid-cols-3 gap-4">
-                        {/* Account */}
-                        <div>
-                          <p className="text-xs text-slate-500 mb-1">Tài khoản</p>
-                          <div className="flex items-center gap-2">
-                            <code className="text-sm font-mono bg-slate-100 px-2 py-1 rounded">
-                              {cred.accountInfo}
-                            </code>
-                            <button
-                              onClick={() => copyToClipboard(cred.accountInfo, `acc-${cred.id}`)}
-                              className="p-1 hover:bg-slate-200 rounded"
-                            >
-                              {copied === `acc-${cred.id}` ? (
-                                <Check className="w-4 h-4 text-green-500" />
-                              ) : (
-                                <Copy className="w-4 h-4 text-slate-400" />
-                              )}
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Password */}
-                        <div>
-                          <p className="text-xs text-slate-500 mb-1">Mật khẩu</p>
-                          <div className="flex items-center gap-2">
-                            <code className="text-sm font-mono bg-slate-100 px-2 py-1 rounded">
-                              {showPasswords[cred.id] ? cred.password : "••••••••"}
-                            </code>
-                            <button
-                              onClick={() => togglePassword(cred.id)}
-                              className="p-1 hover:bg-slate-200 rounded"
-                            >
-                              {showPasswords[cred.id] ? (
-                                <EyeOff className="w-4 h-4 text-slate-400" />
-                              ) : (
-                                <Eye className="w-4 h-4 text-slate-400" />
-                              )}
-                            </button>
-                            <button
-                              onClick={() => copyToClipboard(cred.password, `pwd-${cred.id}`)}
-                              className="p-1 hover:bg-slate-200 rounded"
-                            >
-                              {copied === `pwd-${cred.id}` ? (
-                                <Check className="w-4 h-4 text-green-500" />
-                              ) : (
-                                <Copy className="w-4 h-4 text-slate-400" />
-                              )}
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Status */}
-                        <div>
-                          <p className="text-xs text-slate-500 mb-1">Trạng thái</p>
-                          {cred.isUsed ? (
-                            <div>
-                              <span className="inline-flex px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                                Đã gán
-                              </span>
-                              {cred.order && (
-                                <p className="text-xs text-slate-500 mt-1">
-                                  {cred.order.orderCode} - {cred.order.customerName}
-                                </p>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="inline-flex px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
-                              Còn trống
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleEdit(cred)}
-                          className="p-2 text-slate-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg"
-                          title="Sửa"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        {!cred.isUsed && (
-                          <button
-                            onClick={() => handleDelete(cred.id)}
-                            className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg"
-                            title="Xóa"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    {cred.notes && (
-                      <p className="text-sm text-slate-500 mt-2 pl-4 border-l-2 border-slate-200">
-                        {cred.notes}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+            </form>
+          </div>
         </div>
       )}
     </div>
   );
 }
-

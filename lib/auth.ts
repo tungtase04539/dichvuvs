@@ -1,9 +1,4 @@
-import { SignJWT, jwtVerify } from "jose";
-import { cookies } from "next/headers";
-
-const secretKey = new TextEncoder().encode(
-  process.env.JWT_SECRET || "your-secret-key-change-in-production"
-);
+import { createServerSupabaseClient } from "./supabase-server";
 
 export interface UserPayload {
   id: string;
@@ -13,43 +8,43 @@ export interface UserPayload {
   [key: string]: unknown;
 }
 
-export async function signToken(payload: UserPayload): Promise<string> {
-  return new SignJWT({ ...payload })
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime("7d")
-    .sign(secretKey);
-}
-
-export async function verifyToken(token: string): Promise<UserPayload | null> {
+// Lấy session từ Supabase Auth (thống nhất một hệ thống)
+export async function getSession(): Promise<UserPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, secretKey);
-    return payload as unknown as UserPayload;
-  } catch {
+    const supabase = createServerSupabaseClient();
+    if (!supabase) return null;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) return null;
+
+    return {
+      id: user.id,
+      email: user.email || "",
+      name: user.user_metadata?.name || user.email?.split("@")[0] || "User",
+      role: user.user_metadata?.role || "staff",
+    };
+  } catch (error) {
+    console.error("getSession error:", error);
     return null;
   }
 }
 
-export async function getSession(): Promise<UserPayload | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth-token")?.value;
-  if (!token) return null;
-  return verifyToken(token);
+// Các hàm cũ giữ lại để không break code khác (nhưng không dùng)
+export async function signToken(payload: UserPayload): Promise<string> {
+  // Không dùng nữa - Supabase Auth quản lý token
+  return "";
+}
+
+export async function verifyToken(token: string): Promise<UserPayload | null> {
+  // Không dùng nữa
+  return null;
 }
 
 export async function setSession(token: string): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.set("auth-token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7, // 7 days
-    path: "/",
-  });
+  // Không dùng nữa - Supabase Auth quản lý session
 }
 
 export async function clearSession(): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.delete("auth-token");
+  // Logout sẽ dùng supabase.auth.signOut()
 }
-

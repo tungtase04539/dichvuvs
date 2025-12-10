@@ -9,8 +9,13 @@ function getSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+  console.log("[getSupabaseAdmin] URL:", supabaseUrl ? "✓" : "✗ MISSING");
+  console.log("[getSupabaseAdmin] Service Key:", supabaseServiceKey ? "✓" : "✗ MISSING");
+
   if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error("Missing Supabase credentials");
+    throw new Error(
+      `Missing Supabase credentials: ${!supabaseUrl ? "NEXT_PUBLIC_SUPABASE_URL" : ""} ${!supabaseServiceKey ? "SUPABASE_SERVICE_ROLE_KEY" : ""}`.trim()
+    );
   }
 
   return createClient(supabaseUrl, supabaseServiceKey, {
@@ -75,7 +80,13 @@ export async function GET() {
     return NextResponse.json({ users });
   } catch (error) {
     console.error("[GET /api/admin/accounts] Error:", error);
-    return NextResponse.json({ error: "Lỗi hệ thống" }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : "Lỗi hệ thống";
+    return NextResponse.json({ 
+      error: errorMessage,
+      hint: errorMessage.includes("SUPABASE_SERVICE_ROLE_KEY") 
+        ? "Cần cấu hình SUPABASE_SERVICE_ROLE_KEY trong file .env.local" 
+        : undefined
+    }, { status: 500 });
   }
 }
 

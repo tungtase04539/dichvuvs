@@ -171,29 +171,6 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         })}
       </nav>
 
-      {/* User info */}
-      <div className="absolute bottom-0 left-0 right-0 p-4">
-        <div className="bg-white/5 rounded-xl p-4">
-          <div className="flex items-center gap-3">
-            <div className={cn(
-              "w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold",
-              user.role === "admin" ? "bg-purple-600" :
-              user.role === "master_agent" ? "bg-blue-600" :
-              user.role === "agent" ? "bg-green-600" :
-              user.role === "collaborator" ? "bg-orange-600" :
-              "bg-primary-600"
-            )}>
-              {user.name.charAt(0).toUpperCase()}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-white font-medium truncate">{user.name}</p>
-              <p className="text-xs text-slate-400">
-                {roleLabels[user.role]}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
     </aside>
   );
 }

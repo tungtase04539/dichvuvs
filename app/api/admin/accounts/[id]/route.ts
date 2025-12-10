@@ -32,7 +32,8 @@ export async function PUT(
     }
 
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user || user.user_metadata?.role !== "admin") {
+    const userRole = user?.user_metadata?.role || "admin";
+    if (!user || userRole !== "admin") {
       return NextResponse.json({ error: "Chỉ Admin mới có quyền" }, { status: 403 });
     }
 
@@ -92,7 +93,8 @@ export async function DELETE(
     }
 
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user || user.user_metadata?.role !== "admin") {
+    const userRole = user?.user_metadata?.role || "admin";
+    if (!user || userRole !== "admin") {
       return NextResponse.json({ error: "Chỉ Admin mới có quyền" }, { status: 403 });
     }
 

@@ -30,7 +30,9 @@ export async function GET() {
     }
 
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user || user.user_metadata?.role !== "admin") {
+    // Cho phép admin (role = admin hoặc chưa set role)
+    const userRole = user?.user_metadata?.role || "admin";
+    if (!user || userRole !== "admin") {
       return NextResponse.json({ error: "Chỉ Admin mới có quyền" }, { status: 403 });
     }
 
@@ -75,7 +77,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const currentRole = user.user_metadata?.role;
+    // Mặc định role là "admin" nếu chưa set (cho user đầu tiên)
+    const currentRole = user.user_metadata?.role || "admin";
 
     // Kiểm tra quyền tạo tài khoản
     if (!["admin", "master_agent", "agent"].includes(currentRole)) {

@@ -20,6 +20,7 @@ import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const roleLabels: Record<string, string> = {
   admin: "Admin",

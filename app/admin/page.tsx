@@ -8,8 +8,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-// Cache for 60 seconds
-export const revalidate = 60;
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
 
 async function getDashboardStats() {
   const now = new Date();

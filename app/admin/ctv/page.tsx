@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 async function getCollaborators(userId: string) {
   const collaborators = await prisma.user.findMany({

@@ -3,6 +3,7 @@ import { formatCurrency } from "@/lib/utils";
 import { Link2, MousePointer, ShoppingCart, DollarSign, TrendingUp, Users } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 async function getReferralStats() {
   const [referralLinks, stats, topPerformers] = await Promise.all([

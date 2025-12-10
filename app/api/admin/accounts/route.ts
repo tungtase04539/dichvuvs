@@ -26,24 +26,37 @@ export async function GET() {
   try {
     const supabase = createServerSupabaseClient();
     if (!supabase) {
+      console.log("[GET /api/admin/accounts] No supabase client");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { data: { user } } = await supabase.auth.getUser();
+    console.log("[GET /api/admin/accounts] Current user:", user?.id, user?.email, user?.user_metadata);
+    
     // Cho phép admin (role = admin hoặc chưa set role)
     const userRole = user?.user_metadata?.role || "admin";
     if (!user || userRole !== "admin") {
+      console.log("[GET /api/admin/accounts] Not admin, role:", userRole);
       return NextResponse.json({ error: "Chỉ Admin mới có quyền" }, { status: 403 });
     }
 
-    // Get all users from Supabase Auth
+    // Get all users from Supabase Auth with pagination
     const supabaseAdmin = getSupabaseAdmin();
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers({
+      page: 1,
+      perPage: 1000, // Get up to 1000 users
+    });
 
     if (error) {
-      console.error("List users error:", error);
+      console.error("[GET /api/admin/accounts] List users error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    console.log("[GET /api/admin/accounts] Raw users count:", data.users.length);
+    // Log all users' roles for debugging
+    data.users.forEach((u, i) => {
+      console.log(`[GET /api/admin/accounts] User ${i + 1}:`, u.email, "role:", u.user_metadata?.role, "meta:", JSON.stringify(u.user_metadata));
+    });
 
     // Format users
     const users = data.users.map((u) => ({
@@ -57,9 +70,11 @@ export async function GET() {
       lastSignIn: u.last_sign_in_at,
     }));
 
+    console.log("[GET /api/admin/accounts] Formatted users:", users.length);
+
     return NextResponse.json({ users });
   } catch (error) {
-    console.error("Get accounts error:", error);
+    console.error("[GET /api/admin/accounts] Error:", error);
     return NextResponse.json({ error: "Lỗi hệ thống" }, { status: 500 });
   }
 }
@@ -104,6 +119,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Tạo user trong Supabase Auth
+    console.log("[POST /api/admin/accounts] Creating user:", { email, name, role, phone });
+    
     const supabaseAdmin = getSupabaseAdmin();
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
       email,
@@ -118,12 +135,14 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      console.error("Create user error:", error);
+      console.error("[POST /api/admin/accounts] Create user error:", error);
       if (error.message.includes("already registered")) {
         return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 400 });
       }
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    console.log("[POST /api/admin/accounts] User created successfully:", data.user.id, data.user.email, data.user.user_metadata);
 
     return NextResponse.json({
       success: true,

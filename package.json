@@ -2,6 +2,9 @@
   "name": "dichvu-vesmith",
   "version": "1.0.0",
   "private": true,
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "npx prisma generate && next build",
@@ -17,6 +20,7 @@
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
+    "dotenv": "^17.2.3",
     "jose": "^5.3.0",
     "lucide-react": "^0.378.0",
     "next": "14.2.3",

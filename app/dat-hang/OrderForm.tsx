@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabase, generateOrderCode } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
-import { Plus, Minus, Trash2, ShoppingCart, User, Phone, Mail, MessageSquare, Loader2 } from "lucide-react";
+import { getCurrentReferralCode } from "@/components/ReferralTracker";
+import { Plus, Minus, Trash2, ShoppingCart, User, Phone, Mail, MessageSquare, Loader2, Gift } from "lucide-react";
 
 interface Product {
   id: string;
@@ -30,6 +31,8 @@ export default function OrderForm() {
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [referrerName, setReferrerName] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -60,6 +63,21 @@ export default function OrderForm() {
     }
 
     loadProducts();
+
+    // Load referral code from localStorage
+    const refCode = getCurrentReferralCode();
+    if (refCode) {
+      setReferralCode(refCode);
+      // Validate and get referrer name
+      fetch(`/api/referral/track?code=${refCode}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.valid) {
+            setReferrerName(data.referrerName);
+          }
+        })
+        .catch(() => {});
+    }
   }, []);
 
   useEffect(() => {
@@ -134,7 +152,7 @@ export default function OrderForm() {
     const mainProduct = cart[0].product;
     const details = cart.map((item) => `${item.product.name} x${item.quantity}`).join(", ");
 
-    const { error } = await supabase.from("Order").insert({
+    const orderData: Record<string, unknown> = {
       id: crypto.randomUUID(),
       orderCode,
       serviceId: mainProduct.id,
@@ -153,7 +171,14 @@ export default function OrderForm() {
       status: "pending",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-    });
+    };
+
+    // Thêm mã giới thiệu nếu có
+    if (referralCode) {
+      orderData.referralCode = referralCode;
+    }
+
+    const { error } = await supabase.from("Order").insert(orderData);
 
     if (error) {
       console.error("Order error:", error);
@@ -326,6 +351,24 @@ export default function OrderForm() {
               </div>
             </div>
           </div>
+
+          {/* Referral Code Display */}
+          {referralCode && (
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-200">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                  <Gift className="w-5 h-5 text-green-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-green-800">Mã giới thiệu đã áp dụng</p>
+                  <p className="text-xs text-green-600">
+                    <code className="font-mono font-bold">{referralCode}</code>
+                    {referrerName && <span> - Giới thiệu bởi {referrerName}</span>}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Submit */}
           <button

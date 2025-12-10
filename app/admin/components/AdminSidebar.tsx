@@ -7,11 +7,12 @@ import {
   Package,
   MessageCircle,
   Users,
-  Settings,
   Bot,
   ShoppingBag,
   Key,
   UserCheck,
+  Link2,
+  Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,21 +27,72 @@ interface AdminSidebarProps {
   user: User;
 }
 
+const roleLabels: Record<string, string> = {
+  admin: "Quản trị viên",
+  master_agent: "Tổng đại lý",
+  agent: "Đại lý",
+  collaborator: "Cộng tác viên",
+  staff: "Nhân viên",
+};
+
 export default function AdminSidebar({ user }: AdminSidebarProps) {
   const pathname = usePathname();
 
-  const navItems = [
-    { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/admin/don-hang", icon: Package, label: "Đơn hàng" },
-    { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" },
-    { href: "/admin/chat", icon: MessageCircle, label: "Chat" },
-    ...(user.role === "admin"
-      ? [
-          { href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" },
-          { href: "/admin/tai-khoan", icon: Key, label: "Tài khoản" },
-        ]
-      : []),
-  ];
+  // Navigation items based on role
+  const getNavItems = () => {
+    const baseItems = [
+      { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
+    ];
+
+    if (user.role === "admin") {
+      return [
+        ...baseItems,
+        { href: "/admin/don-hang", icon: Package, label: "Đơn hàng" },
+        { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" },
+        { href: "/admin/chat", icon: MessageCircle, label: "Chat" },
+        { href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" },
+        { href: "/admin/dai-ly", icon: Building2, label: "Đại lý" },
+        { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
+        { href: "/admin/tai-khoan", icon: Key, label: "Tài khoản" },
+      ];
+    }
+
+    if (user.role === "master_agent") {
+      return [
+        ...baseItems,
+        { href: "/admin/don-hang", icon: Package, label: "Đơn hàng của tôi" },
+        { href: "/admin/dai-ly", icon: Users, label: "Đại lý của tôi" },
+        { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
+      ];
+    }
+
+    if (user.role === "agent") {
+      return [
+        ...baseItems,
+        { href: "/admin/don-hang", icon: Package, label: "Đơn hàng của tôi" },
+        { href: "/admin/ctv", icon: Users, label: "CTV của tôi" },
+        { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
+      ];
+    }
+
+    if (user.role === "collaborator") {
+      return [
+        ...baseItems,
+        { href: "/admin/don-hang", icon: Package, label: "Đơn hàng của tôi" },
+        { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
+      ];
+    }
+
+    // Staff
+    return [
+      ...baseItems,
+      { href: "/admin/don-hang", icon: Package, label: "Đơn hàng" },
+      { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" },
+      { href: "/admin/chat", icon: MessageCircle, label: "Chat" },
+    ];
+  };
+
+  const navItems = getNavItems();
 
   return (
     <aside className="fixed left-0 top-0 bottom-0 w-64 bg-slate-900 hidden lg:block z-40">
@@ -53,7 +105,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
             <span className="text-xl font-bold text-white block">
               ChatBotVN
             </span>
-            <span className="text-xs text-slate-400">Quản trị viên</span>
+            <span className="text-xs text-slate-400">{roleLabels[user.role]}</span>
           </div>
         </Link>
       </div>
@@ -85,13 +137,20 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       <div className="absolute bottom-0 left-0 right-0 p-4">
         <div className="bg-white/5 rounded-xl p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary-600 flex items-center justify-center text-white font-semibold">
+            <div className={cn(
+              "w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold",
+              user.role === "admin" ? "bg-purple-600" :
+              user.role === "master_agent" ? "bg-blue-600" :
+              user.role === "agent" ? "bg-green-600" :
+              user.role === "collaborator" ? "bg-orange-600" :
+              "bg-primary-600"
+            )}>
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-white font-medium truncate">{user.name}</p>
-              <p className="text-xs text-slate-400 capitalize">
-                {user.role === "admin" ? "Quản trị viên" : "Nhân viên"}
+              <p className="text-xs text-slate-400">
+                {roleLabels[user.role]}
               </p>
             </div>
           </div>

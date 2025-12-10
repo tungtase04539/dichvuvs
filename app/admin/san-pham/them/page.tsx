@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import FileUpload from "@/components/FileUpload";
 
 const EMOJI_OPTIONS = ["🤖", "🛒", "🎧", "📅", "🏠", "📚", "🍽️", "✈️", "🏥", "👔", "💰", "💬", "🎯", "⚡", "🔒"];
 
@@ -19,6 +20,8 @@ export default function AddProductPage() {
     longDescription: "",
     price: "30000",
     icon: "🤖",
+    image: "",
+    videoUrl: "",
     featured: false,
     active: true,
   });
@@ -80,7 +83,7 @@ export default function AddProductPage() {
         <h1 className="text-2xl font-bold text-slate-900">Thêm ChatBot mới</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-2xl">
+      <form onSubmit={handleSubmit} className="max-w-3xl">
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
           {/* Name */}
           <div>
@@ -110,6 +113,38 @@ export default function AddProductPage() {
               className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm"
               placeholder="chatbot-ban-hang-pro"
             />
+          </div>
+
+          {/* Product Image */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Ảnh đại diện sản phẩm
+            </label>
+            <FileUpload
+              type="image"
+              value={formData.image}
+              onChange={(url) => setFormData({ ...formData, image: url || "" })}
+              folder="products/images"
+            />
+            <p className="text-xs text-slate-500 mt-2">
+              Ảnh này sẽ hiển thị trong card sản phẩm và trang chi tiết
+            </p>
+          </div>
+
+          {/* Video Demo */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Video Demo
+            </label>
+            <FileUpload
+              type="video"
+              value={formData.videoUrl}
+              onChange={(url) => setFormData({ ...formData, videoUrl: url || "" })}
+              folder="products/videos"
+            />
+            <p className="text-xs text-slate-500 mt-2">
+              Video giới thiệu sản phẩm. Khách hàng có thể xem video này từ trang sản phẩm.
+            </p>
           </div>
 
           {/* Description */}
@@ -175,7 +210,7 @@ VD:
           {/* Icon */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
-              Icon
+              Icon (hiển thị khi không có ảnh)
             </label>
             <div className="flex flex-wrap gap-2">
               {EMOJI_OPTIONS.map((emoji) => (
@@ -251,4 +286,3 @@ VD:
     </div>
   );
 }
-

@@ -8,21 +8,30 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// Roles: admin, master_agent (tổng đại lý), agent (đại lý), collaborator (cộng tác viên), staff
+// Phân cấp: Admin > Tổng đại lý > Đại lý > Cộng tác viên
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String
   name      String
-  role      String   @default("staff") // admin, staff
+  role      String   @default("staff") // admin, master_agent, agent, collaborator, staff
   phone     String?
   avatar    String?
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Phân cấp: Tổng đại lý > Đại lý > Cộng tác viên
+  parentId  String?  // ID của cấp trên (tổng đại lý/đại lý)
+  parent    User?    @relation("AgentHierarchy", fields: [parentId], references: [id])
+  subAgents User[]   @relation("AgentHierarchy") // Danh sách cấp dưới
+
   // Relations
-  assignedOrders Order[]   @relation("AssignedStaff")
+  assignedOrders Order[]       @relation("AssignedStaff")
   messages       Message[]
+  referralLinks  ReferralLink[]
+  referredOrders Order[]       @relation("ReferrerOrders")
 }
 
 model Service {
@@ -34,7 +43,8 @@ model Service {
   price           Float
   unit            String   @default("bot")
   icon            String?
-  image           String?
+  image           String?  // URL ảnh đại diện sản phẩm (Supabase Storage)
+  videoUrl        String?  // URL video demo (Supabase Storage)
   featured        Boolean  @default(false)
   active          Boolean  @default(true)
   createdAt       DateTime @default(now())
@@ -84,6 +94,11 @@ model Order {
   
   // Credential được gán khi thanh toán thành công
   credential    ProductCredential?
+  
+  // Referral tracking - đơn hàng từ link ref của ai
+  referrerId    String?
+  referrer      User?    @relation("ReferrerOrders", fields: [referrerId], references: [id])
+  referralCode  String?  // Mã ref được sử dụng
   
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -148,3 +163,39 @@ model ProductCredential {
   updatedAt   DateTime @updatedAt
 }
 
+// Hệ thống link giới thiệu (Referral)
+model ReferralLink {
+  id          String   @id @default(uuid())
+  code        String   @unique // Mã ref duy nhất (VD: REF-ABC123)
+  userId      String   // Thuộc về user nào (agent/master_agent)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Thống kê
+  clickCount  Int      @default(0) // Số lượt click
+  orderCount  Int      @default(0) // Số đơn thành công
+  revenue     Float    @default(0) // Tổng doanh thu từ ref
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  clicks      ReferralClick[]
+}
+
+// Lưu lại mỗi lượt click vào link ref
+model ReferralClick {
+  id             String       @id @default(uuid())
+  referralLinkId String
+  referralLink   ReferralLink @relation(fields: [referralLinkId], references: [id], onDelete: Cascade)
+  
+  ipAddress      String?
+  userAgent      String?
+  referer        String?      // Trang nguồn
+  
+  // Nếu tạo đơn hàng
+  converted      Boolean      @default(false)
+  orderId        String?
+  
+  createdAt      DateTime     @default(now())
+}

@@ -42,7 +42,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { name, slug, description, longDescription, price, icon, featured, active } = body;
+    const { name, slug, description, longDescription, price, icon, image, videoUrl, featured, active } = body;
 
     if (!name || !slug || !price) {
       return NextResponse.json(
@@ -74,6 +74,8 @@ export async function PUT(
         longDescription: longDescription || null,
         price: parseFloat(price),
         icon: icon || "🤖",
+        image: image || null,
+        videoUrl: videoUrl || null,
         featured: featured || false,
         active: active !== false,
       },
@@ -119,4 +121,3 @@ export async function DELETE(
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
-

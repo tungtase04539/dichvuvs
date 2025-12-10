@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, slug, description, longDescription, price, icon, featured, active } = body;
+    const { name, slug, description, longDescription, price, icon, image, videoUrl, featured, active } = body;
 
     if (!name || !slug || !price) {
       return NextResponse.json(
@@ -59,6 +59,8 @@ export async function POST(request: NextRequest) {
         price: parseFloat(price),
         unit: "bot",
         icon: icon || "🤖",
+        image: image || null,
+        videoUrl: videoUrl || null,
         featured: featured || false,
         active: active !== false,
       },
@@ -70,4 +72,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
-

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabase, generateOrderCode } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
@@ -38,12 +38,26 @@ export default function OrderForm() {
   const [referrerName, setReferrerName] = useState<string | null>(null);
   const [videoModal, setVideoModal] = useState({ isOpen: false, url: "", title: "" });
   const [searchQuery, setSearchQuery] = useState("");
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   // Filtered products based on search
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Scroll functions
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -320, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 320, behavior: "smooth" });
+    }
+  };
 
   const openVideoModal = (e: React.MouseEvent, product: Product) => {
     e.stopPropagation();
@@ -245,14 +259,37 @@ export default function OrderForm() {
           </div>
 
           {/* Product Scroll Container */}
-          <div className="relative">
-            <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+          <div className="relative group">
+            {/* Left Arrow */}
+            <button
+              type="button"
+              onClick={scrollLeft}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/95 shadow-lg rounded-full flex items-center justify-center hover:bg-primary-50 hover:scale-110 transition-all border border-slate-200"
+            >
+              <ChevronLeft className="w-5 h-5 text-slate-700" />
+            </button>
+
+            {/* Right Arrow */}
+            <button
+              type="button"
+              onClick={scrollRight}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/95 shadow-lg rounded-full flex items-center justify-center hover:bg-primary-50 hover:scale-110 transition-all border border-slate-200"
+            >
+              <ChevronRight className="w-5 h-5 text-slate-700" />
+            </button>
+
+            {/* Scroll Container */}
+            <div 
+              ref={scrollContainerRef}
+              className="flex gap-3 overflow-x-auto pb-4 px-12 snap-x snap-mandatory scroll-smooth"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
               {filteredProducts.map((product) => {
                 const inCart = cart.find((item) => item.product.id === product.id);
                 return (
                   <div
                     key={product.id}
-                    className={`flex-shrink-0 w-40 rounded-xl border-2 cursor-pointer transition-all overflow-hidden snap-start ${
+                    className={`flex-shrink-0 w-44 rounded-xl border-2 cursor-pointer transition-all overflow-hidden snap-start ${
                       inCart
                         ? "bg-primary-50 border-primary-500 shadow-md"
                         : "bg-slate-50 border-transparent hover:border-primary-200"
@@ -326,20 +363,12 @@ export default function OrderForm() {
                 );
               })}
             </div>
-            
-            {/* Scroll hint gradient */}
-            <div className="absolute right-0 top-0 bottom-4 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none" />
           </div>
 
           {/* No results */}
           {filteredProducts.length === 0 && (
             <p className="text-center text-slate-500 py-8">Không tìm thấy ChatBot phù hợp</p>
           )}
-
-          {/* Quick add hint */}
-          <p className="text-xs text-slate-400 mt-2 text-center">
-            👆 Nhấn để thêm • Vuốt ngang để xem thêm
-          </p>
         </div>
 
         {/* Order Summary & Customer Info */}

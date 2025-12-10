@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -27,6 +28,13 @@ interface AdminSidebarProps {
   user: User;
 }
 
+interface NavItem {
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  badge?: number;
+}
+
 const roleLabels: Record<string, string> = {
   admin: "Quản trị viên",
   master_agent: "Tổng đại lý",
@@ -37,10 +45,34 @@ const roleLabels: Record<string, string> = {
 
 export default function AdminSidebar({ user }: AdminSidebarProps) {
   const pathname = usePathname();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Fetch unread message count
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const res = await fetch("/api/admin/chat/unread");
+        if (res.ok) {
+          const data = await res.json();
+          setUnreadCount(data.count || 0);
+        }
+      } catch (error) {
+        console.error("Failed to fetch unread count:", error);
+      }
+    };
+
+    // Only fetch for admin and staff
+    if (user.role === "admin" || user.role === "staff") {
+      fetchUnreadCount();
+      // Refresh every 30 seconds
+      const interval = setInterval(fetchUnreadCount, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [user.role]);
 
   // Navigation items based on role
-  const getNavItems = () => {
-    const baseItems = [
+  const getNavItems = (): NavItem[] => {
+    const baseItems: NavItem[] = [
       { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
     ];
 
@@ -49,7 +81,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         ...baseItems,
         { href: "/admin/don-hang", icon: Package, label: "Đơn hàng" },
         { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" },
-        { href: "/admin/chat", icon: MessageCircle, label: "Chat" },
+        { href: "/admin/chat", icon: MessageCircle, label: "Chat", badge: unreadCount },
         { href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" },
         { href: "/admin/dai-ly", icon: Building2, label: "Đại lý" },
         { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
@@ -88,7 +120,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       ...baseItems,
       { href: "/admin/don-hang", icon: Package, label: "Đơn hàng" },
       { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" },
-      { href: "/admin/chat", icon: MessageCircle, label: "Chat" },
+      { href: "/admin/chat", icon: MessageCircle, label: "Chat", badge: unreadCount },
     ];
   };
 
@@ -120,14 +152,20 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl mb-1 transition-all",
+                "flex items-center gap-3 px-4 py-3 rounded-xl mb-1 transition-all relative",
                 isActive
                   ? "bg-primary-600 text-white shadow-lg shadow-primary-600/30"
                   : "text-slate-400 hover:text-white hover:bg-white/5"
               )}
             >
               <item.icon className="w-5 h-5" />
-              <span className="font-medium">{item.label}</span>
+              <span className="font-medium flex-1">{item.label}</span>
+              {/* Badge for unread messages - Green color */}
+              {item.badge !== undefined && item.badge > 0 && (
+                <span className="min-w-[22px] h-[22px] flex items-center justify-center bg-emerald-500 text-white text-xs font-bold rounded-full px-1.5 shadow-lg shadow-emerald-500/30">
+                  {item.badge > 99 ? "99+" : item.badge}
+                </span>
+              )}
             </Link>
           );
         })}

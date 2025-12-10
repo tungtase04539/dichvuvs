@@ -45,34 +45,48 @@ export async function GET() {
       return NextResponse.json({ error: "Chỉ Admin mới có quyền" }, { status: 403 });
     }
 
-    // Get all users from Supabase Auth
-    const supabaseAdmin = getSupabaseAdmin();
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+    // Get all users using Supabase Auth REST API directly
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (error) {
-      console.error("[GET /api/admin/accounts] List users error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    console.log("[GET /api/admin/accounts] Raw users count:", data.users.length);
-    // Log all users' roles for debugging
-    data.users.forEach((u, i) => {
-      console.log(`[GET /api/admin/accounts] User ${i + 1}:`, u.email, "role:", u.user_metadata?.role, "meta:", JSON.stringify(u.user_metadata));
+    const response = await fetch(`${supabaseUrl}/auth/v1/admin/users`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${supabaseServiceKey}`,
+        'apikey': supabaseServiceKey!,
+        'Content-Type': 'application/json',
+      },
     });
 
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("[GET /api/admin/accounts] REST API error:", response.status, errorText);
+      return NextResponse.json({ 
+        error: `Supabase Auth Error: ${response.status}`,
+        details: errorText 
+      }, { status: 500 });
+    }
+
+    const data = await response.json();
+    const authUsers = data.users || data || [];
+
     // Format users
-    const users = data.users.map((u) => ({
+    const users = authUsers.map((u: {
+      id: string;
+      email: string;
+      user_metadata?: Record<string, unknown>;
+      created_at: string;
+      last_sign_in_at: string | null;
+    }) => ({
       id: u.id,
       email: u.email,
-      name: u.user_metadata?.name || u.email?.split("@")[0],
-      role: u.user_metadata?.role || "staff",
-      phone: u.user_metadata?.phone || "",
-      parentId: u.user_metadata?.parentId || null,
+      name: (u.user_metadata?.name as string) || u.email?.split("@")[0],
+      role: (u.user_metadata?.role as string) || "staff",
+      phone: (u.user_metadata?.phone as string) || "",
+      parentId: (u.user_metadata?.parentId as string) || null,
       createdAt: u.created_at,
       lastSignIn: u.last_sign_in_at,
     }));
-
-    console.log("[GET /api/admin/accounts] Formatted users:", users.length);
 
     return NextResponse.json({ users });
   } catch (error) {

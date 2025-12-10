@@ -11,6 +11,18 @@ export async function GET(request: NextRequest) {
     // If admin/staff is requesting
     const user = await getSession();
     if (user && sessionId) {
+      // Mark all guest messages as read when admin views them
+      await prisma.message.updateMany({
+        where: {
+          chatSessionId: sessionId,
+          senderType: "guest",
+          read: false,
+        },
+        data: {
+          read: true,
+        },
+      });
+
       const messages = await prisma.message.findMany({
         where: { chatSessionId: sessionId },
         orderBy: { createdAt: "asc" },
@@ -58,6 +70,18 @@ export async function POST(request: NextRequest) {
     // Check if admin/staff is sending
     const user = await getSession();
     if (user && sessionId) {
+      // Mark all guest messages in this session as read
+      await prisma.message.updateMany({
+        where: {
+          chatSessionId: sessionId,
+          senderType: "guest",
+          read: false,
+        },
+        data: {
+          read: true,
+        },
+      });
+
       const message = await prisma.message.create({
         data: {
           chatSessionId: sessionId,
@@ -65,6 +89,7 @@ export async function POST(request: NextRequest) {
           senderType: user.role,
           senderName: user.name,
           content,
+          read: true, // Admin's own message is already read
         },
       });
 

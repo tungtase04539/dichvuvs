@@ -160,9 +160,9 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
             >
               <item.icon className="w-5 h-5" />
               <span className="font-medium flex-1">{item.label}</span>
-              {/* Badge for unread messages - Green color */}
+              {/* Badge for unread messages - Green color with animation */}
               {item.badge !== undefined && item.badge > 0 && (
-                <span className="min-w-[22px] h-[22px] flex items-center justify-center bg-emerald-500 text-white text-xs font-bold rounded-full px-1.5 shadow-lg shadow-emerald-500/30">
+                <span className="min-w-[24px] h-[24px] flex items-center justify-center bg-emerald-500 text-white text-xs font-bold rounded-full px-1.5 shadow-lg animate-bounce ring-2 ring-emerald-400 ring-opacity-50">
                   {item.badge > 99 ? "99+" : item.badge}
                 </span>
               )}

@@ -318,10 +318,9 @@ export default function HomePage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {products.map((product) => (
-              <Link
+              <div
                 key={product.id}
-                href={`/san-pham/${product.slug}`}
-                className="card-hover p-0 group overflow-hidden"
+                className="card-hover p-0 overflow-hidden flex flex-col h-full"
               >
                 {product.featured && (
                   <div className="absolute top-3 right-3 z-10">
@@ -332,51 +331,61 @@ export default function HomePage() {
                   </div>
                 )}
 
-                {/* Product Image */}
-                <div className="relative aspect-video bg-gradient-to-br from-primary-50 to-primary-100 overflow-hidden">
-                  {product.image ? (
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-6xl">{product.icon || "🤖"}</span>
-                    </div>
-                  )}
-                </div>
+                {/* Product Image - Clickable */}
+                <Link href={`/san-pham/${product.slug}`} className="group">
+                  <div className="relative aspect-video bg-gradient-to-br from-primary-50 to-primary-100 overflow-hidden">
+                    {product.image ? (
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-6xl">{product.icon || "🤖"}</span>
+                      </div>
+                    )}
+                  </div>
+                </Link>
 
                 {/* Product Info */}
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors">
-                    {product.name}
-                  </h3>
-                  <p className="text-slate-600 text-sm mb-4 line-clamp-2">{product.description}</p>
+                <div className="p-6 flex flex-col flex-grow">
+                  <Link href={`/san-pham/${product.slug}`} className="group">
+                    <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors">
+                      {product.name}
+                    </h3>
+                  </Link>
+                  <p className="text-slate-600 text-sm mb-4 line-clamp-2 flex-grow">{product.description}</p>
 
-                  <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                    <div>
-                      <span className="text-2xl font-bold text-primary-600">
-                        {formatCurrency(product.price)}
-                      </span>
+                  {/* Bottom Section - Always at bottom */}
+                  <div className="mt-auto">
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                      <div>
+                        <span className="text-2xl font-bold text-primary-600">
+                          {formatCurrency(product.price)}
+                        </span>
+                      </div>
+                      <Link 
+                        href={`/san-pham/${product.slug}`}
+                        className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center hover:bg-primary-600 transition-colors group"
+                      >
+                        <ArrowRight className="w-5 h-5 text-primary-600 group-hover:text-white transition-colors" />
+                      </Link>
                     </div>
-                    <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center group-hover:bg-primary-600 transition-colors">
-                      <ArrowRight className="w-5 h-5 text-primary-600 group-hover:text-white transition-colors" />
-                    </div>
+
+                    {/* Video Demo Button */}
+                    {product.videoUrl && (
+                      <button
+                        onClick={(e) => openVideoModal(e, product)}
+                        className="w-full mt-4 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all shadow-md hover:shadow-lg"
+                      >
+                        <Play className="w-4 h-4" />
+                        Xem Video Demo
+                      </button>
+                    )}
                   </div>
-
-                  {/* Video Demo Button */}
-                  {product.videoUrl && (
-                    <button
-                      onClick={(e) => openVideoModal(e, product)}
-                      className="w-full mt-4 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all shadow-md hover:shadow-lg"
-                    >
-                      <Play className="w-4 h-4" />
-                      Xem Video Demo
-                    </button>
-                  )}
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
 

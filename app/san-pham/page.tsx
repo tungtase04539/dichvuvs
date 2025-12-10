@@ -100,19 +100,19 @@ export default function ProductsPage() {
                 {products.map((product) => (
                   <div
                     key={product.id}
-                    className="group relative bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:border-primary-200 transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+                    className="group relative bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:border-primary-200 transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col h-full"
                   >
+                    {product.featured && (
+                      <div className="absolute top-3 right-3 z-10">
+                        <span className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-amber-400 to-orange-400 text-white text-xs font-bold rounded-full shadow-lg">
+                          <Star className="w-3 h-3 fill-current" />
+                          HOT
+                        </span>
+                      </div>
+                    )}
+                    
+                    {/* Product Image or Icon - Clickable */}
                     <Link href={`/san-pham/${product.slug}`} className="block">
-                      {product.featured && (
-                        <div className="absolute top-3 right-3 z-10">
-                          <span className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-amber-400 to-orange-400 text-white text-xs font-bold rounded-full shadow-lg">
-                            <Star className="w-3 h-3 fill-current" />
-                            HOT
-                          </span>
-                        </div>
-                      )}
-                      
-                      {/* Product Image or Icon */}
                       {product.image ? (
                         <div className="relative aspect-video bg-slate-100 overflow-hidden">
                           <img
@@ -120,7 +120,6 @@ export default function ProductsPage() {
                             alt={product.name}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
-                          {/* Overlay gradient */}
                           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                       ) : (
@@ -128,16 +127,22 @@ export default function ProductsPage() {
                           <span className="text-6xl">{product.icon}</span>
                         </div>
                       )}
+                    </Link>
 
-                      <div className="p-5">
+                    {/* Product Info */}
+                    <div className="p-5 flex flex-col flex-grow">
+                      <Link href={`/san-pham/${product.slug}`}>
                         <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors line-clamp-1">
                           {product.name}
                         </h3>
-                        
-                        <p className="text-slate-600 text-sm mb-4 line-clamp-2">
-                          {product.description}
-                        </p>
+                      </Link>
+                      
+                      <p className="text-slate-600 text-sm mb-4 line-clamp-2 flex-grow">
+                        {product.description}
+                      </p>
 
+                      {/* Bottom Section - Always aligned */}
+                      <div className="mt-auto">
                         <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                           <div>
                             <span className="text-xl font-bold text-primary-600">
@@ -147,25 +152,26 @@ export default function ProductsPage() {
                               {formatCurrency(product.price * 2)}
                             </span>
                           </div>
-                          <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center group-hover:bg-primary-600 transition-colors">
+                          <Link 
+                            href={`/san-pham/${product.slug}`}
+                            className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center hover:bg-primary-600 transition-colors"
+                          >
                             <ArrowRight className="w-4 h-4 text-primary-600 group-hover:text-white transition-colors" />
-                          </div>
+                          </Link>
                         </div>
-                      </div>
-                    </Link>
 
-                    {/* Video Demo Button */}
-                    {product.videoUrl && (
-                      <div className="px-5 pb-5 pt-0">
-                        <button
-                          onClick={(e) => openVideoModal(e, product)}
-                          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-xl font-medium hover:from-rose-600 hover:to-orange-600 transition-all shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40"
-                        >
-                          <Play className="w-4 h-4 fill-current" />
-                          Xem Video Demo
-                        </button>
+                        {/* Video Demo Button */}
+                        {product.videoUrl && (
+                          <button
+                            onClick={(e) => openVideoModal(e, product)}
+                            className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-xl font-medium hover:from-rose-600 hover:to-orange-600 transition-all shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40"
+                          >
+                            <Play className="w-4 h-4 fill-current" />
+                            Xem Video Demo
+                          </button>
+                        )}
                       </div>
-                    )}
+                    </div>
                   </div>
                 ))}
               </div>

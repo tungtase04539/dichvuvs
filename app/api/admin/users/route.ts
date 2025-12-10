@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { createClient } from "@supabase/supabase-js";
 import { getSession } from "@/lib/auth";
-import bcrypt from "bcryptjs";
 
 export const dynamic = "force-dynamic";
 
-// Get users
+// Supabase Admin client
+function getSupabaseAdmin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error("Missing Supabase credentials");
+  }
+
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
+
+// GET - Lấy danh sách users từ Supabase Auth
 export async function GET(request: NextRequest) {
   try {
     const user = await getSession();
@@ -16,49 +29,39 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const role = searchParams.get("role");
 
-    // Build where clause based on current user's role
-    let where: Record<string, unknown> = {};
+    const supabaseAdmin = getSupabaseAdmin();
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers();
 
-    if (user.role === "admin") {
-      // Admin can see all users
-      if (role) {
-        where = { role };
-      }
-    } else if (user.role === "master_agent") {
-      // Master agent can only see their sub-agents
-      where = { parentId: user.id };
-    } else {
-      // Others can't access this endpoint
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (error) {
+      console.error("List users error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    const users = await prisma.user.findMany({
-      where,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        phone: true,
-        active: true,
-        createdAt: true,
-        parent: {
-          select: { name: true, email: true },
-        },
-        referralLinks: {
-          select: {
-            code: true,
-            clickCount: true,
-            orderCount: true,
-            revenue: true,
-          },
-        },
-        _count: {
-          select: { subAgents: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    // Filter và format users
+    let users = data.users.map((u) => ({
+      id: u.id,
+      email: u.email,
+      name: u.user_metadata?.name || u.email?.split("@")[0],
+      role: u.user_metadata?.role || "staff",
+      phone: u.user_metadata?.phone || "",
+      parentId: u.user_metadata?.parentId || null,
+      active: true,
+      createdAt: u.created_at,
+    }));
+
+    // Filter by role if specified
+    if (role) {
+      users = users.filter((u) => u.role === role);
+    }
+
+    // Filter based on current user's role
+    if (user.role === "master_agent") {
+      users = users.filter((u) => u.parentId === user.id);
+    } else if (user.role === "agent") {
+      users = users.filter((u) => u.parentId === user.id && u.role === "collaborator");
+    } else if (user.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     return NextResponse.json({ users });
   } catch (error) {
@@ -67,16 +70,16 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Create user (agent/master_agent)
+// POST - Tạo user mới trong Supabase Auth
 export async function POST(request: NextRequest) {
   try {
-    const user = await getSession();
-    if (!user || user.role !== "admin") {
+    const currentUser = await getSession();
+    if (!currentUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
-    const { name, email, password, phone, role, parentId, createReferral } = body;
+    const { name, email, password, phone, role, parentId } = body;
 
     // Validate
     if (!name || !email || !password) {
@@ -86,110 +89,67 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!["master_agent", "agent", "collaborator", "staff"].includes(role)) {
+    if (password.length < 6) {
       return NextResponse.json(
-        { error: "Loại tài khoản không hợp lệ" },
+        { error: "Mật khẩu phải có ít nhất 6 ký tự" },
         { status: 400 }
       );
     }
 
-    // CTV bắt buộc phải có parent (đại lý)
-    if (role === "collaborator" && !parentId) {
+    // Kiểm tra quyền tạo role
+    const allowedRoles: Record<string, string[]> = {
+      admin: ["master_agent", "agent", "collaborator", "staff"],
+      master_agent: ["agent"],
+      agent: ["collaborator"],
+    };
+
+    if (!allowedRoles[currentUser.role]?.includes(role)) {
       return NextResponse.json(
-        { error: "Cộng tác viên bắt buộc phải thuộc một Đại lý" },
-        { status: 400 }
+        { error: `Bạn không có quyền tạo tài khoản ${role}` },
+        { status: 403 }
       );
     }
 
-    // Check email exists
-    const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) {
-      return NextResponse.json(
-        { error: "Email đã được sử dụng" },
-        { status: 400 }
-      );
+    // Xác định parentId
+    let finalParentId = parentId;
+    if (currentUser.role === "master_agent" && role === "agent") {
+      finalParentId = currentUser.id;
+    } else if (currentUser.role === "agent" && role === "collaborator") {
+      finalParentId = currentUser.id;
     }
 
-    // Validate parent if provided
-    if (parentId) {
-      const parent = await prisma.user.findUnique({ where: { id: parentId } });
-      if (!parent) {
-        return NextResponse.json(
-          { error: "Cấp trên không tồn tại" },
-          { status: 400 }
-        );
-      }
-      
-      // Validate hierarchy
-      if (role === "agent" && parent.role !== "master_agent") {
-        return NextResponse.json(
-          { error: "Đại lý chỉ có thể thuộc Tổng đại lý" },
-          { status: 400 }
-        );
-      }
-      
-      if (role === "collaborator" && parent.role !== "agent") {
-        return NextResponse.json(
-          { error: "Cộng tác viên chỉ có thể thuộc Đại lý" },
-          { status: 400 }
-        );
-      }
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create user
-    const newUser = await prisma.user.create({
-      data: {
+    // Tạo user trong Supabase Auth
+    const supabaseAdmin = getSupabaseAdmin();
+    const { data, error } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: {
         name,
-        email,
-        password: hashedPassword,
-        phone: phone || null,
         role,
-        parentId: parentId || null,
+        phone: phone || "",
+        parentId: finalParentId || null,
       },
     });
 
-    // Create referral link if requested
-    let referralLink = null;
-    if (createReferral && ["master_agent", "agent", "collaborator"].includes(role)) {
-      // Generate unique code
-      let code: string;
-      let attempts = 0;
-      do {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        code = "REF-";
-        for (let i = 0; i < 6; i++) {
-          code += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        const exists = await prisma.referralLink.findUnique({ where: { code } });
-        if (!exists) break;
-        attempts++;
-      } while (attempts < 10);
-
-      if (attempts < 10) {
-        referralLink = await prisma.referralLink.create({
-          data: {
-            code: code!,
-            userId: newUser.id,
-          },
-        });
+    if (error) {
+      console.error("Create user error:", error);
+      if (error.message.includes("already registered")) {
+        return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 400 });
       }
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({
       user: {
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
+        id: data.user.id,
+        name,
+        email: data.user.email,
+        role,
       },
-      referralLink,
     });
   } catch (error) {
     console.error("Create user error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
-

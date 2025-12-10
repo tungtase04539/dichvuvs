@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { createClient } from "@supabase/supabase-js";
 import { getSession } from "@/lib/auth";
-import bcrypt from "bcryptjs";
 
 export const dynamic = "force-dynamic";
 
-// Get agent's collaborators
+// Supabase Admin client
+function getSupabaseAdmin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error("Missing Supabase credentials");
+  }
+
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
+
+// GET - Lấy danh sách CTV của đại lý
 export async function GET() {
   try {
     const user = await getSession();
@@ -13,26 +26,28 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const collaborators = await prisma.user.findMany({
-      where: { parentId: user.id, role: "collaborator" },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
+    const supabaseAdmin = getSupabaseAdmin();
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+
+    if (error) {
+      console.error("List users error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Filter collaborators belonging to this agent
+    const collaborators = data.users
+      .filter((u) => 
+        u.user_metadata?.role === "collaborator" && 
+        u.user_metadata?.parentId === user.id
+      )
+      .map((u) => ({
+        id: u.id,
+        email: u.email,
+        name: u.user_metadata?.name || u.email?.split("@")[0],
+        phone: u.user_metadata?.phone || "",
         active: true,
-        createdAt: true,
-        referralLinks: {
-          select: {
-            code: true,
-            clickCount: true,
-            orderCount: true,
-            revenue: true,
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+        createdAt: u.created_at,
+      }));
 
     return NextResponse.json({ collaborators });
   } catch (error) {
@@ -41,16 +56,16 @@ export async function GET() {
   }
 }
 
-// Create collaborator (by agent)
+// POST - Tạo CTV mới (bởi Đại lý)
 export async function POST(request: NextRequest) {
   try {
     const user = await getSession();
     if (!user || user.role !== "agent") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Chỉ Đại lý mới có quyền tạo CTV" }, { status: 403 });
     }
 
     const body = await request.json();
-    const { name, email, password, phone, createReferral } = body;
+    const { name, email, password, phone } = body;
 
     // Validate
     if (!name || !email || !password) {
@@ -67,68 +82,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check email exists
-    const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) {
-      return NextResponse.json(
-        { error: "Email đã được sử dụng" },
-        { status: 400 }
-      );
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create collaborator
-    const collaborator = await prisma.user.create({
-      data: {
+    // Tạo CTV trong Supabase Auth
+    const supabaseAdmin = getSupabaseAdmin();
+    const { data, error } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: {
         name,
-        email,
-        password: hashedPassword,
-        phone: phone || null,
         role: "collaborator",
+        phone: phone || "",
         parentId: user.id, // CTV thuộc đại lý này
       },
     });
 
-    // Create referral link if requested
-    let referralLink = null;
-    if (createReferral !== false) {
-      // Generate unique code
-      let code: string;
-      let attempts = 0;
-      do {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        code = "REF-";
-        for (let i = 0; i < 6; i++) {
-          code += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        const exists = await prisma.referralLink.findUnique({ where: { code } });
-        if (!exists) break;
-        attempts++;
-      } while (attempts < 10);
-
-      if (attempts < 10) {
-        referralLink = await prisma.referralLink.create({
-          data: {
-            code: code!,
-            userId: collaborator.id,
-          },
-        });
+    if (error) {
+      console.error("Create collaborator error:", error);
+      if (error.message.includes("already registered")) {
+        return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 400 });
       }
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({
       collaborator: {
-        id: collaborator.id,
-        name: collaborator.name,
-        email: collaborator.email,
+        id: data.user.id,
+        name,
+        email: data.user.email,
+        role: "collaborator",
       },
-      referralLink,
     });
   } catch (error) {
     console.error("Create collaborator error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
-

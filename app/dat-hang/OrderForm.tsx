@@ -5,13 +5,16 @@ import { useRouter } from "next/navigation";
 import { getSupabase, generateOrderCode } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
 import { getCurrentReferralCode } from "@/components/ReferralTracker";
-import { Plus, Minus, Trash2, ShoppingCart, User, Phone, Mail, MessageSquare, Loader2, Gift } from "lucide-react";
+import VideoModal from "@/components/VideoModal";
+import { Plus, Minus, Trash2, ShoppingCart, User, Phone, Mail, MessageSquare, Loader2, Gift, Play } from "lucide-react";
 
 interface Product {
   id: string;
   name: string;
   price: number;
   icon: string | null;
+  image: string | null;
+  videoUrl: string | null;
   slug: string;
   description: string | null;
   featured: boolean;
@@ -33,7 +36,19 @@ export default function OrderForm() {
   const [isLoading, setIsLoading] = useState(true);
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [referrerName, setReferrerName] = useState<string | null>(null);
+  const [videoModal, setVideoModal] = useState({ isOpen: false, url: "", title: "" });
   const router = useRouter();
+
+  const openVideoModal = (e: React.MouseEvent, product: Product) => {
+    e.stopPropagation();
+    if (product.videoUrl) {
+      setVideoModal({
+        isOpen: true,
+        url: product.videoUrl,
+        title: `${product.name} - Video Demo`,
+      });
+    }
+  };
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -45,7 +60,7 @@ export default function OrderForm() {
       
       const { data, error } = await supabase
         .from("Service")
-        .select("id, name, slug, description, price, icon, featured")
+        .select("id, name, slug, description, price, icon, image, videoUrl, featured")
         .eq("active", true)
         .order("featured", { ascending: false })
         .order("name");
@@ -208,47 +223,85 @@ export default function OrderForm() {
             Chọn ChatBot
           </h2>
 
-          <div className="grid grid-cols-2 gap-4 max-h-[500px] overflow-y-auto pr-2">
+          <div className="grid grid-cols-2 gap-4 max-h-[600px] overflow-y-auto pr-2">
             {products.map((product) => {
               const inCart = cart.find((item) => item.product.id === product.id);
               return (
                 <div
                   key={product.id}
-                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                  className={`rounded-xl border-2 cursor-pointer transition-all overflow-hidden flex flex-col ${
                     inCart
                       ? "bg-primary-50 border-primary-500"
                       : "bg-slate-50 border-transparent hover:border-primary-200"
                   }`}
                   onClick={() => addToCart(product)}
                 >
-                  <div className="text-3xl mb-2">{product.icon}</div>
-                  <h3 className="font-semibold text-slate-900 text-sm mb-1 line-clamp-1">{product.name}</h3>
-                  <p className="text-primary-600 font-bold text-sm">{formatCurrency(product.price)}</p>
-                  {inCart && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          updateQuantity(product.id, -1);
-                        }}
-                        className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-100"
-                      >
-                        <Minus className="w-3 h-3" />
-                      </button>
-                      <span className="font-bold text-slate-900">{inCart.quantity}</span>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          updateQuantity(product.id, 1);
-                        }}
-                        className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-100"
-                      >
-                        <Plus className="w-3 h-3" />
-                      </button>
+                  {/* Product Image */}
+                  <div className="relative aspect-video bg-gradient-to-br from-primary-50 to-primary-100 overflow-hidden">
+                    {product.image ? (
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-4xl">{product.icon || "🤖"}</span>
+                      </div>
+                    )}
+                    {inCart && (
+                      <div className="absolute top-2 right-2 w-6 h-6 bg-primary-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                        {inCart.quantity}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Product Info */}
+                  <div className="p-3 flex flex-col flex-grow">
+                    <h3 className="font-semibold text-slate-900 text-sm mb-1 line-clamp-1">{product.name}</h3>
+                    <p className="text-primary-600 font-bold text-sm">{formatCurrency(product.price)}</p>
+                    
+                    {/* Bottom Actions */}
+                    <div className="mt-auto pt-2 space-y-2">
+                      {inCart && (
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateQuantity(product.id, -1);
+                            }}
+                            className="w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-100"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="font-bold text-slate-900 w-6 text-center">{inCart.quantity}</span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateQuantity(product.id, 1);
+                            }}
+                            className="w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-100"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
+                      
+                      {/* Video Demo Button */}
+                      {product.videoUrl && (
+                        <button
+                          type="button"
+                          onClick={(e) => openVideoModal(e, product)}
+                          className="w-full flex items-center justify-center gap-1.5 py-2 bg-gradient-to-r from-rose-500 to-orange-500 text-white text-xs font-medium rounded-lg hover:from-rose-600 hover:to-orange-600 transition-all"
+                        >
+                          <Play className="w-3 h-3 fill-current" />
+                          Video Demo
+                        </button>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
               );
             })}
@@ -390,6 +443,14 @@ export default function OrderForm() {
           </button>
         </div>
       </div>
+
+      {/* Video Modal */}
+      <VideoModal
+        isOpen={videoModal.isOpen}
+        onClose={() => setVideoModal({ ...videoModal, isOpen: false })}
+        youtubeUrl={videoModal.url}
+        title={videoModal.title}
+      />
     </form>
   );
 }

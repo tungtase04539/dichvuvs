@@ -7,6 +7,7 @@ import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
+import VideoModal from "@/components/VideoModal";
 import {
   Bot,
   Zap,
@@ -34,11 +35,18 @@ interface Product {
   description: string;
   price: number;
   icon: string | null;
+  image: string | null;
+  videoUrl: string | null;
   featured: boolean;
 }
 
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [videoModal, setVideoModal] = useState({
+    isOpen: false,
+    url: "",
+    title: "",
+  });
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -47,7 +55,7 @@ export default function HomePage() {
 
       const { data } = await supabase
         .from("Service")
-        .select("id, name, slug, description, price, icon, featured")
+        .select("id, name, slug, description, price, icon, image, videoUrl, featured")
         .eq("active", true)
         .order("featured", { ascending: false })
         .limit(6);
@@ -56,6 +64,18 @@ export default function HomePage() {
     };
     loadProducts();
   }, []);
+
+  const openVideoModal = (e: React.MouseEvent, product: Product) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (product.videoUrl) {
+      setVideoModal({
+        isOpen: true,
+        url: product.videoUrl,
+        title: `${product.name} - Video Demo`,
+      });
+    }
+  };
 
   const features = [
     {
@@ -301,10 +321,10 @@ export default function HomePage() {
               <Link
                 key={product.id}
                 href={`/san-pham/${product.slug}`}
-                className="card-hover p-6 group"
+                className="card-hover p-0 group overflow-hidden"
               >
                 {product.featured && (
-                  <div className="absolute -top-3 -right-3">
+                  <div className="absolute top-3 right-3 z-10">
                     <span className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-amber-400 to-orange-400 text-white text-xs font-bold rounded-full shadow-lg">
                       <Star className="w-3 h-3 fill-current" />
                       HOT
@@ -312,21 +332,49 @@ export default function HomePage() {
                   </div>
                 )}
 
-                <div className="text-5xl mb-4">{product.icon}</div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors">
-                  {product.name}
-                </h3>
-                <p className="text-slate-600 text-sm mb-4 line-clamp-2">{product.description}</p>
+                {/* Product Image */}
+                <div className="relative aspect-video bg-gradient-to-br from-primary-50 to-primary-100 overflow-hidden">
+                  {product.image ? (
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-6xl">{product.icon || "🤖"}</span>
+                    </div>
+                  )}
+                </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                  <div>
-                    <span className="text-2xl font-bold text-primary-600">
-                      {formatCurrency(product.price)}
-                    </span>
+                {/* Product Info */}
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors">
+                    {product.name}
+                  </h3>
+                  <p className="text-slate-600 text-sm mb-4 line-clamp-2">{product.description}</p>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                    <div>
+                      <span className="text-2xl font-bold text-primary-600">
+                        {formatCurrency(product.price)}
+                      </span>
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center group-hover:bg-primary-600 transition-colors">
+                      <ArrowRight className="w-5 h-5 text-primary-600 group-hover:text-white transition-colors" />
+                    </div>
                   </div>
-                  <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center group-hover:bg-primary-600 transition-colors">
-                    <ArrowRight className="w-5 h-5 text-primary-600 group-hover:text-white transition-colors" />
-                  </div>
+
+                  {/* Video Demo Button */}
+                  {product.videoUrl && (
+                    <button
+                      onClick={(e) => openVideoModal(e, product)}
+                      className="w-full mt-4 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all shadow-md hover:shadow-lg"
+                    >
+                      <Play className="w-4 h-4" />
+                      Xem Video Demo
+                    </button>
+                  )}
                 </div>
               </Link>
             ))}
@@ -489,6 +537,14 @@ export default function HomePage() {
 
       <Footer settings={{ site_phone: "1900 8686" }} />
       <ChatWidget />
+
+      {/* Video Modal */}
+      <VideoModal
+        isOpen={videoModal.isOpen}
+        onClose={() => setVideoModal({ ...videoModal, isOpen: false })}
+        youtubeUrl={videoModal.url}
+        title={videoModal.title}
+      />
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Youtube } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
 
 const EMOJI_OPTIONS = ["🤖", "🛒", "🎧", "📅", "🏠", "📚", "🍽️", "✈️", "🏥", "👔", "💰", "💬", "🎯", "⚡", "🔒"];
@@ -21,7 +21,7 @@ export default function AddProductPage() {
     price: "30000",
     icon: "🤖",
     image: "",
-    videoUrl: "",
+    videoUrl: "", // YouTube URL
     featured: false,
     active: true,
   });
@@ -121,29 +121,32 @@ export default function AddProductPage() {
               Ảnh đại diện sản phẩm
             </label>
             <FileUpload
-              type="image"
               value={formData.image}
               onChange={(url) => setFormData({ ...formData, image: url || "" })}
-              folder="products/images"
+              folder="products"
             />
             <p className="text-xs text-slate-500 mt-2">
               Ảnh này sẽ hiển thị trong card sản phẩm và trang chi tiết
             </p>
           </div>
 
-          {/* Video Demo */}
+          {/* YouTube Video URL */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
-              Video Demo
+              <span className="flex items-center gap-2">
+                <Youtube className="w-4 h-4 text-red-500" />
+                Link Video Demo (YouTube)
+              </span>
             </label>
-            <FileUpload
-              type="video"
+            <input
+              type="url"
               value={formData.videoUrl}
-              onChange={(url) => setFormData({ ...formData, videoUrl: url || "" })}
-              folder="products/videos"
+              onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              placeholder="https://www.youtube.com/watch?v=xxxxx hoặc https://youtu.be/xxxxx"
             />
             <p className="text-xs text-slate-500 mt-2">
-              Video giới thiệu sản phẩm. Khách hàng có thể xem video này từ trang sản phẩm.
+              Dán link YouTube video demo. Hỗ trợ: youtube.com/watch, youtu.be, youtube.com/shorts
             </p>
           </div>
 
@@ -181,14 +184,8 @@ VD:
 📦 Bạn sẽ nhận được:
 - 1 ChatBot đã cấu hình
 - Hướng dẫn cài đặt
-- Hỗ trợ kỹ thuật
-
-⚙️ Yêu cầu:
-- Fanpage Facebook hoặc Zalo OA`}
+- Hỗ trợ kỹ thuật`}
             />
-            <p className="text-xs text-slate-500 mt-1">
-              Hỗ trợ xuống dòng. Nội dung này hiển thị ở trang chi tiết sản phẩm.
-            </p>
           </div>
 
           {/* Price */}

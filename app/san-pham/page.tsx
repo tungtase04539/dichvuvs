@@ -60,7 +60,7 @@ export default function ProductsPage() {
       setVideoModal({
         isOpen: true,
         url: product.videoUrl,
-        title: `Video Demo - ${product.name}`,
+        title: `${product.name} - Video Demo`,
       });
     }
   };
@@ -209,7 +209,7 @@ export default function ProductsPage() {
       <VideoModal
         isOpen={videoModal.isOpen}
         onClose={() => setVideoModal({ ...videoModal, isOpen: false })}
-        videoUrl={videoModal.url}
+        youtubeUrl={videoModal.url}
         title={videoModal.title}
       />
     </div>

@@ -6,11 +6,25 @@ import { X } from "lucide-react";
 interface VideoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  videoUrl: string;
+  youtubeUrl: string;
   title?: string;
 }
 
-export default function VideoModal({ isOpen, onClose, videoUrl, title }: VideoModalProps) {
+// Extract YouTube video ID from various URL formats
+function getYouTubeVideoId(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+    /youtube\.com\/shorts\/([^&\n?#]+)/,
+  ];
+  
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+  return null;
+}
+
+export default function VideoModal({ isOpen, onClose, youtubeUrl, title }: VideoModalProps) {
   // Close on escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -29,6 +43,8 @@ export default function VideoModal({ isOpen, onClose, videoUrl, title }: VideoMo
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
+
+  const videoId = getYouTubeVideoId(youtubeUrl);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -53,19 +69,23 @@ export default function VideoModal({ isOpen, onClose, videoUrl, title }: VideoMo
           </button>
         </div>
         
-        {/* Video */}
+        {/* YouTube Embed */}
         <div className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl">
-          <video
-            src={videoUrl}
-            controls
-            autoPlay
-            className="w-full h-full object-contain"
-          >
-            Trình duyệt của bạn không hỗ trợ video.
-          </video>
+          {videoId ? (
+            <iframe
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}
+              title={title || "Video Demo"}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-white">
+              <p>Link YouTube không hợp lệ</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
-

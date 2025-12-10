@@ -23,7 +23,17 @@ const nextConfig = {
         protocol: "https",
         hostname: "qr.sepay.vn",
       },
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "*.supabase.in",
+      },
     ],
+    // Cho phép tất cả domain (fallback)
+    unoptimized: true,
   },
   
   // Headers for better caching

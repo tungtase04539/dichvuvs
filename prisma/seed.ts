@@ -269,9 +269,10 @@ async function main() {
   // Create settings
   const settings = [
     { key: "site_name", value: "ChatBotVN" },
-    { key: "site_phone", value: "1900 8686" },
+    { key: "site_phone", value: "0363 189 699 – 0345 501 969" },
     { key: "site_email", value: "contact@chatbotvn.com" },
-    { key: "site_address", value: "123 Nguyễn Văn Linh, Quận 7, TP.HCM" },
+    { key: "site_address", value: "RUBY CT1-2-3 PHÚC LỢI – HÀ NỘI" },
+    { key: "site_zalo_group", value: "https://zalo.me/g/ubarcp690" },
     { key: "working_hours", value: "24/7" },
   ];
 

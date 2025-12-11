@@ -89,10 +89,10 @@ function CredentialDisplay({ orderCode, phone }: { orderCode: string; phone: str
 
   if (isLoading) {
     return (
-      <div className="p-4 bg-primary-50 rounded-xl border border-primary-100">
+      <div className="p-4 bg-primary-400/20 rounded-xl border border-primary-400/30">
         <div className="flex items-center gap-2">
-          <Loader2 className="w-5 h-5 animate-spin text-primary-600" />
-          <span className="text-slate-600">Đang tải thông tin tài khoản...</span>
+          <Loader2 className="w-5 h-5 animate-spin text-primary-400" />
+          <span className="text-slate-300">Đang tải thông tin tài khoản...</span>
         </div>
       </div>
     );
@@ -100,12 +100,12 @@ function CredentialDisplay({ orderCode, phone }: { orderCode: string; phone: str
 
   if (!credential) {
     return (
-      <div className="p-4 bg-green-50 rounded-xl border border-green-200">
-        <div className="flex items-center gap-2 text-green-600 mb-2">
+      <div className="p-4 bg-green-900/30 rounded-xl border border-green-500/30">
+        <div className="flex items-center gap-2 text-green-400 mb-2">
           <CheckCircle className="w-5 h-5" />
           <span className="font-semibold">Đã thanh toán!</span>
         </div>
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-slate-300">
           {message || "Tài khoản đang được chuẩn bị, vui lòng liên hệ hỗ trợ."}
         </p>
       </div>
@@ -113,66 +113,66 @@ function CredentialDisplay({ orderCode, phone }: { orderCode: string; phone: str
   }
 
   return (
-    <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
-      <div className="flex items-center gap-2 text-green-600 mb-4">
+    <div className="p-4 bg-gradient-to-r from-green-900/30 to-emerald-900/30 rounded-xl border border-green-500/30">
+      <div className="flex items-center gap-2 text-green-400 mb-4">
         <Key className="w-5 h-5" />
         <span className="font-semibold">Thông tin tài khoản ChatBot</span>
       </div>
 
-      <div className="space-y-3 bg-white rounded-lg p-4">
+      <div className="space-y-3 bg-slate-800 rounded-lg p-4">
         <div>
-          <p className="text-xs text-slate-500 mb-1">Tài khoản</p>
+          <p className="text-xs text-slate-400 mb-1">Tài khoản</p>
           <div className="flex items-center gap-2">
-            <code className="flex-1 text-sm font-mono bg-slate-100 px-3 py-2 rounded text-green-600">
+            <code className="flex-1 text-sm font-mono bg-slate-700 px-3 py-2 rounded text-green-400">
               {credential.accountInfo}
             </code>
             <button
               onClick={() => copyToClipboard(credential.accountInfo, "acc")}
-              className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
             >
-              {copied === "acc" ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-slate-400" />}
+              {copied === "acc" ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-slate-400" />}
             </button>
           </div>
         </div>
 
         <div>
-          <p className="text-xs text-slate-500 mb-1">Mật khẩu</p>
+          <p className="text-xs text-slate-400 mb-1">Mật khẩu</p>
           <div className="flex items-center gap-2">
-            <code className="flex-1 text-sm font-mono bg-slate-100 px-3 py-2 rounded text-green-600">
+            <code className="flex-1 text-sm font-mono bg-slate-700 px-3 py-2 rounded text-green-400">
               {showPassword ? credential.password : "••••••••••"}
             </code>
-            <button onClick={() => setShowPassword(!showPassword)} className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
+            <button onClick={() => setShowPassword(!showPassword)} className="p-2 hover:bg-slate-700 rounded-lg transition-colors">
               {showPassword ? <EyeOff className="w-4 h-4 text-slate-400" /> : <Eye className="w-4 h-4 text-slate-400" />}
             </button>
-            <button onClick={() => copyToClipboard(credential.password, "pwd")} className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
-              {copied === "pwd" ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-slate-400" />}
+            <button onClick={() => copyToClipboard(credential.password, "pwd")} className="p-2 hover:bg-slate-700 rounded-lg transition-colors">
+              {copied === "pwd" ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-slate-400" />}
             </button>
           </div>
         </div>
 
         {credential.apiKey && (
           <div>
-            <p className="text-xs text-slate-500 mb-1">API Key</p>
+            <p className="text-xs text-slate-400 mb-1">API Key</p>
             <div className="flex items-center gap-2">
-              <code className="flex-1 text-sm font-mono bg-slate-100 px-3 py-2 rounded text-green-600 truncate">
+              <code className="flex-1 text-sm font-mono bg-slate-700 px-3 py-2 rounded text-green-400 truncate">
                 {credential.apiKey}
               </code>
-              <button onClick={() => copyToClipboard(credential.apiKey!, "api")} className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
-                {copied === "api" ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-slate-400" />}
+              <button onClick={() => copyToClipboard(credential.apiKey!, "api")} className="p-2 hover:bg-slate-700 rounded-lg transition-colors">
+                {copied === "api" ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-slate-400" />}
               </button>
             </div>
           </div>
         )}
 
         {credential.notes && (
-          <div className="pt-2 border-t border-slate-200">
-            <p className="text-xs text-slate-500 mb-1">Hướng dẫn</p>
-            <p className="text-sm text-slate-600 whitespace-pre-wrap">{credential.notes}</p>
+          <div className="pt-2 border-t border-slate-700">
+            <p className="text-xs text-slate-400 mb-1">Hướng dẫn</p>
+            <p className="text-sm text-slate-300 whitespace-pre-wrap">{credential.notes}</p>
           </div>
         )}
       </div>
 
-      <p className="text-xs text-slate-500 mt-3">
+      <p className="text-xs text-slate-400 mt-3">
         🔒 Vui lòng bảo mật thông tin này. Không chia sẻ cho người khác.
       </p>
     </div>
@@ -251,10 +251,10 @@ function TrackOrderContent() {
   return (
     <>
       {/* Search form */}
-      <div className="bg-white rounded-2xl p-6 mb-8 shadow-sm border border-slate-100">
+      <div className="bg-slate-800 rounded-2xl p-6 mb-8 shadow-sm border border-slate-700">
         <form onSubmit={handleSearch} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-medium text-slate-300 mb-2">
               Mã đơn hàng
             </label>
             <input
@@ -267,7 +267,7 @@ function TrackOrderContent() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-medium text-slate-300 mb-2">
               Số điện thoại
             </label>
             <input
@@ -280,21 +280,21 @@ function TrackOrderContent() {
           </div>
 
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+            <div className="p-3 bg-red-900/30 border border-red-500/30 rounded-xl text-red-400 text-sm">
               {error}
             </div>
           )}
 
-          <button type="submit" disabled={isLoading} className="btn btn-primary w-full">
+          <button type="submit" disabled={isLoading} className="btn btn-primary w-full uppercase">
             {isLoading ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                Đang tìm kiếm...
+                ĐANG TÌM KIẾM...
               </>
             ) : (
               <>
                 <Search className="w-5 h-5" />
-                Tra cứu
+                TRA CỨU
               </>
             )}
           </button>
@@ -303,11 +303,11 @@ function TrackOrderContent() {
 
       {/* Order result */}
       {searched && !isLoading && order && (
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 animate-fade-in">
+        <div className="bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-700 animate-fade-in">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <p className="text-sm text-slate-500">Mã đơn hàng</p>
-              <p className="text-xl font-bold font-mono text-primary-600">
+              <p className="text-sm text-slate-400">Mã đơn hàng</p>
+              <p className="text-xl font-bold font-mono text-primary-400">
                 {order.orderCode}
               </p>
             </div>
@@ -326,20 +326,20 @@ function TrackOrderContent() {
                       className={cn(
                         "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all",
                         getCurrentStep() >= index
-                          ? "bg-primary-600 border-primary-600 text-white"
-                          : "bg-white border-slate-200 text-slate-400"
+                          ? "bg-primary-400 border-primary-400 text-slate-900"
+                          : "bg-slate-700 border-slate-600 text-slate-400"
                       )}
                     >
                       {getCurrentStep() > index ? <CheckCircle className="w-5 h-5" /> : index + 1}
                     </div>
-                    <span className="text-xs text-slate-500 mt-2 text-center">
+                    <span className="text-xs text-slate-400 mt-2 text-center">
                       {getStatusLabel(step)}
                     </span>
                   </div>
                 ))}
-                <div className="absolute top-5 left-0 right-0 h-0.5 bg-slate-200 -z-0">
+                <div className="absolute top-5 left-0 right-0 h-0.5 bg-slate-600 -z-0">
                   <div
-                    className="h-full bg-primary-600 transition-all"
+                    className="h-full bg-primary-400 transition-all"
                     style={{ width: `${(getCurrentStep() / (statusSteps.length - 1)) * 100}%` }}
                   />
                 </div>
@@ -349,47 +349,47 @@ function TrackOrderContent() {
 
           {/* Order details */}
           <div className="space-y-4">
-            <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl">
+            <div className="flex items-start gap-3 p-4 bg-slate-700/50 rounded-xl">
               <span className="text-3xl">{order.service.icon}</span>
               <div className="flex-1">
-                <p className="font-semibold text-slate-900">{order.service.name}</p>
-                <p className="text-sm text-slate-500">Số lượng: {order.quantity} bot</p>
+                <p className="font-semibold text-white">{order.service.name}</p>
+                <p className="text-sm text-slate-400">Số lượng: {order.quantity} bot</p>
               </div>
-              <p className="text-primary-600 font-bold">{formatCurrency(order.totalPrice)}</p>
+              <p className="text-primary-400 font-bold">{formatCurrency(order.totalPrice)}</p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">
               <div className="flex items-start gap-3">
-                <User className="w-5 h-5 text-slate-400 mt-0.5" />
+                <User className="w-5 h-5 text-slate-500 mt-0.5" />
                 <div>
-                  <p className="text-sm text-slate-500">Khách hàng</p>
-                  <p className="font-medium text-slate-900">{order.customerName}</p>
+                  <p className="text-sm text-slate-400">Khách hàng</p>
+                  <p className="font-medium text-white">{order.customerName}</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <Phone className="w-5 h-5 text-slate-400 mt-0.5" />
+                <Phone className="w-5 h-5 text-slate-500 mt-0.5" />
                 <div>
-                  <p className="text-sm text-slate-500">Số điện thoại</p>
-                  <p className="font-medium text-slate-900">{order.customerPhone}</p>
+                  <p className="text-sm text-slate-400">Số điện thoại</p>
+                  <p className="font-medium text-white">{order.customerPhone}</p>
                 </div>
               </div>
 
               {order.customerEmail && (
                 <div className="flex items-start gap-3 md:col-span-2">
-                  <Mail className="w-5 h-5 text-slate-400 mt-0.5" />
+                  <Mail className="w-5 h-5 text-slate-500 mt-0.5" />
                   <div>
-                    <p className="text-sm text-slate-500">Email</p>
-                    <p className="font-medium text-slate-900">{order.customerEmail}</p>
+                    <p className="text-sm text-slate-400">Email</p>
+                    <p className="font-medium text-white">{order.customerEmail}</p>
                   </div>
                 </div>
               )}
 
               <div className="flex items-start gap-3 md:col-span-2">
-                <Calendar className="w-5 h-5 text-slate-400 mt-0.5" />
+                <Calendar className="w-5 h-5 text-slate-500 mt-0.5" />
                 <div>
-                  <p className="text-sm text-slate-500">Ngày đặt</p>
-                  <p className="font-medium text-slate-900">{formatDateTime(order.createdAt)}</p>
+                  <p className="text-sm text-slate-400">Ngày đặt</p>
+                  <p className="font-medium text-white">{formatDateTime(order.createdAt)}</p>
                 </div>
               </div>
             </div>
@@ -402,9 +402,9 @@ function TrackOrderContent() {
       )}
 
       {searched && !isLoading && !order && !error && (
-        <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-slate-100">
-          <Package className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-500">Không tìm thấy đơn hàng</p>
+        <div className="bg-slate-800 rounded-2xl p-8 text-center shadow-sm border border-slate-700">
+          <Package className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+          <p className="text-slate-400">Không tìm thấy đơn hàng</p>
         </div>
       )}
     </>
@@ -413,17 +413,17 @@ function TrackOrderContent() {
 
 export default function TrackOrderPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-900">
       <Header settings={{}} />
 
       {/* Hero */}
       <section className="bg-gradient-hero pt-32 pb-16">
         <div className="container mx-auto px-4 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm mb-4 border border-white/20">
-            <Search className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary-400/20 backdrop-blur-sm mb-4 border border-primary-400/30">
+            <Search className="w-8 h-8 text-primary-400" />
           </div>
-          <h1 className="text-4xl font-bold text-white mb-4">Tra cứu đơn hàng</h1>
-          <p className="text-blue-100">Nhập mã đơn hàng và số điện thoại để xem trạng thái</p>
+          <h1 className="text-4xl font-bold text-white mb-4 uppercase">TRA CỨU ĐƠN HÀNG</h1>
+          <p className="text-slate-300">Nhập mã đơn hàng và số điện thoại để xem trạng thái</p>
         </div>
       </section>
 
@@ -432,15 +432,15 @@ export default function TrackOrderPage() {
           <div className="max-w-2xl mx-auto">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-slate-500 hover:text-primary-600 mb-6 transition-colors"
+              className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 mb-6 transition-colors font-medium"
             >
               <ArrowLeft className="w-4 h-4" />
-              Về trang chủ
+              VỀ TRANG CHỦ
             </Link>
 
             <Suspense fallback={
               <div className="text-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-primary-600 mx-auto" />
+                <Loader2 className="w-8 h-8 animate-spin text-primary-400 mx-auto" />
               </div>
             }>
               <TrackOrderContent />

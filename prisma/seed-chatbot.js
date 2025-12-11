@@ -377,9 +377,10 @@ Chatbot chuyên biệt cho ngành tài chính, hỗ trợ tư vấn và bán s�
   // Update settings
   const settings = [
     { key: "site_name", value: "ChatBot VN Store" },
-    { key: "site_phone", value: "1900 8686" },
+    { key: "site_phone", value: "0363 189 699 – 0345 501 969" },
     { key: "site_email", value: "contact@chatbotvn.store" },
-    { key: "site_address", value: "Tầng 5, Tòa nhà ABC, Quận 1, TP.HCM" },
+    { key: "site_address", value: "RUBY CT1-2-3 PHÚC LỢI – HÀ NỘI" },
+    { key: "site_zalo_group", value: "https://zalo.me/g/ubarcp690" },
     { key: "working_hours", value: "8:00 - 22:00" },
     { key: "bank_name", value: "MB Bank" },
     { key: "bank_account", value: "0388950297" },

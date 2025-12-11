@@ -31,6 +31,7 @@ interface Product {
   description: string;
   longDescription: string | null;
   price: number;
+  image: string | null;
   featured: boolean;
 }
 
@@ -67,7 +68,7 @@ export default function ProductDetailPage({
 
       const { data: relatedData } = await supabase
         .from("Service")
-        .select("id, name, slug, price, icon")
+        .select("id, name, slug, price, image")
         .eq("active", true)
         .neq("slug", params.slug)
         .limit(4);

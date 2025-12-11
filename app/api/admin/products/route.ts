@@ -1,22 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { getSession } from "@/lib/auth";
+import { createServerSupabaseClient } from "@/lib/supabase-server";
 
 export const dynamic = "force-dynamic";
 
 // Get all products (admin)
 export async function GET() {
   try {
-    const user = await getSession();
-    if (!user || user.role !== "admin") {
+    const supabase = createServerSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+    }
+
+    // Check auth
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (!authUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const products = await prisma.service.findMany({
-      orderBy: { createdAt: "desc" },
-    });
+    // Check role
+    const { data: dbUser } = await supabase
+      .from("User")
+      .select("role")
+      .eq("email", authUser.email)
+      .single();
 
-    return NextResponse.json({ products });
+    if (!dbUser || dbUser.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { data: products, error } = await supabase
+      .from("Service")
+      .select("*")
+      .order("createdAt", { ascending: false });
+
+    if (error) {
+      console.error("Get products error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ products: products || [] });
   } catch (error) {
     console.error("Get products error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -26,8 +48,25 @@ export async function GET() {
 // Create new product
 export async function POST(request: NextRequest) {
   try {
-    const user = await getSession();
-    if (!user || user.role !== "admin") {
+    const supabase = createServerSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+    }
+
+    // Check auth
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (!authUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Check role
+    const { data: dbUser } = await supabase
+      .from("User")
+      .select("role")
+      .eq("email", authUser.email)
+      .single();
+
+    if (!dbUser || dbUser.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -42,7 +81,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if slug exists
-    const existing = await prisma.service.findUnique({ where: { slug } });
+    const { data: existing } = await supabase
+      .from("Service")
+      .select("id")
+      .eq("slug", slug)
+      .single();
+
     if (existing) {
       return NextResponse.json(
         { error: "Slug đã tồn tại" },
@@ -50,8 +94,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const product = await prisma.service.create({
-      data: {
+    const { data: product, error } = await supabase
+      .from("Service")
+      .insert({
+        id: crypto.randomUUID(),
         name,
         slug,
         description: description || null,
@@ -62,8 +108,16 @@ export async function POST(request: NextRequest) {
         videoUrl: videoUrl || null,
         featured: featured || false,
         active: active !== false,
-      },
-    });
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Create product error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
     return NextResponse.json({ product });
   } catch (error) {

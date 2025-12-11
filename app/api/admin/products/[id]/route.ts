@@ -1,8 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { getSession } from "@/lib/auth";
+import { createServerSupabaseClient } from "@/lib/supabase-server";
 
 export const dynamic = "force-dynamic";
+
+// Helper to check admin auth
+async function checkAdminAuth(supabase: ReturnType<typeof createServerSupabaseClient>) {
+  if (!supabase) return null;
+  
+  const { data: { user: authUser } } = await supabase.auth.getUser();
+  if (!authUser) return null;
+
+  const { data: dbUser } = await supabase
+    .from("User")
+    .select("role")
+    .eq("email", authUser.email)
+    .single();
+
+  if (!dbUser || dbUser.role !== "admin") return null;
+  return dbUser;
+}
 
 // Get single product
 export async function GET(
@@ -10,16 +26,23 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getSession();
-    if (!user || user.role !== "admin") {
+    const supabase = createServerSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+    }
+
+    const user = await checkAdminAuth(supabase);
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const product = await prisma.service.findUnique({
-      where: { id: params.id },
-    });
+    const { data: product, error } = await supabase
+      .from("Service")
+      .select("*")
+      .eq("id", params.id)
+      .single();
 
-    if (!product) {
+    if (error || !product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
@@ -36,8 +59,13 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getSession();
-    if (!user || user.role !== "admin") {
+    const supabase = createServerSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+    }
+
+    const user = await checkAdminAuth(supabase);
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -52,12 +80,13 @@ export async function PUT(
     }
 
     // Check if slug exists (excluding current product)
-    const existing = await prisma.service.findFirst({
-      where: {
-        slug,
-        id: { not: params.id },
-      },
-    });
+    const { data: existing } = await supabase
+      .from("Service")
+      .select("id")
+      .eq("slug", slug)
+      .neq("id", params.id)
+      .single();
+
     if (existing) {
       return NextResponse.json(
         { error: "Slug đã tồn tại" },
@@ -65,9 +94,9 @@ export async function PUT(
       );
     }
 
-    const product = await prisma.service.update({
-      where: { id: params.id },
-      data: {
+    const { data: product, error } = await supabase
+      .from("Service")
+      .update({
         name,
         slug,
         description: description || null,
@@ -77,8 +106,16 @@ export async function PUT(
         videoUrl: videoUrl || null,
         featured: featured || false,
         active: active !== false,
-      },
-    });
+        updatedAt: new Date().toISOString(),
+      })
+      .eq("id", params.id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Update product error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
     return NextResponse.json({ product });
   } catch (error) {
@@ -93,26 +130,38 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getSession();
-    if (!user || user.role !== "admin") {
+    const supabase = createServerSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+    }
+
+    const user = await checkAdminAuth(supabase);
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if product has orders
-    const ordersCount = await prisma.order.count({
-      where: { serviceId: params.id },
-    });
+    const { count } = await supabase
+      .from("Order")
+      .select("id", { count: "exact", head: true })
+      .eq("serviceId", params.id);
 
-    if (ordersCount > 0) {
+    if (count && count > 0) {
       return NextResponse.json(
-        { error: `Không thể xóa sản phẩm đã có ${ordersCount} đơn hàng` },
+        { error: `Không thể xóa sản phẩm đã có ${count} đơn hàng` },
         { status: 400 }
       );
     }
 
-    await prisma.service.delete({
-      where: { id: params.id },
-    });
+    const { error } = await supabase
+      .from("Service")
+      .delete()
+      .eq("id", params.id);
+
+    if (error) {
+      console.error("Delete product error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

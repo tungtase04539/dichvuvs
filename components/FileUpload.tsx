@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import { X, Loader2, Image as ImageIcon } from "lucide-react";
-import { getSupabase } from "@/lib/supabase";
 
 interface FileUploadProps {
   value?: string;
@@ -43,32 +42,23 @@ export default function FileUpload({
     setIsUploading(true);
 
     try {
-      const supabase = getSupabase();
-      if (!supabase) {
-        throw new Error("Không thể kết nối Supabase");
+      // Upload via API to bypass RLS
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", folder);
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Upload failed");
       }
 
-      // Generate unique filename
-      const timestamp = Date.now();
-      const randomId = Math.random().toString(36).substring(2, 8);
-      const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
-      const fileName = `${folder}/${timestamp}-${randomId}.${extension}`;
-
-      // Upload to Supabase Storage
-      const { error: uploadError } = await supabase.storage
-        .from("images")
-        .upload(fileName, file, {
-          cacheControl: "3600",
-          upsert: false,
-        });
-
-      if (uploadError) {
-        throw new Error(uploadError.message);
-      }
-
-      // Get public URL
-      const { data: urlData } = supabase.storage.from("images").getPublicUrl(fileName);
-      onChange(urlData.publicUrl);
+      onChange(data.url);
     } catch (err) {
       console.error("Upload failed:", err);
       setError(err instanceof Error ? err.message : "Có lỗi xảy ra khi tải ảnh");
@@ -85,14 +75,10 @@ export default function FileUpload({
     
     setIsUploading(true);
     try {
-      const supabase = getSupabase();
-      if (supabase) {
-        const urlParts = value.split("/storage/v1/object/public/images/");
-        if (urlParts.length >= 2) {
-          const filePath = decodeURIComponent(urlParts[1]);
-          await supabase.storage.from("images").remove([filePath]);
-        }
-      }
+      // Delete via API
+      await fetch(`/api/admin/upload?url=${encodeURIComponent(value)}`, {
+        method: "DELETE",
+      });
       onChange(null);
     } catch (error) {
       console.error("Delete error:", error);

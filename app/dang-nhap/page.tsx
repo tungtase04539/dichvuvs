@@ -4,12 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Bot, Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft } from "lucide-react";
-import { getSupabase } from "@/lib/supabase";
-import { useAuth } from "@/contexts/AuthContext";
+import { createClient } from "@/lib/supabase-auth";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { refetch } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -19,15 +17,16 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (!email || !password) {
+      setError("Vui lòng nhập đầy đủ thông tin");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const supabase = getSupabase();
-      if (!supabase) {
-        setError("Lỗi kết nối. Vui lòng thử lại.");
-        setIsLoading(false);
-        return;
-      }
+      const supabase = createClient();
 
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
@@ -35,11 +34,7 @@ export default function LoginPage() {
       });
 
       if (authError) {
-        if (authError.message.includes("Invalid login")) {
-          setError("Email hoặc mật khẩu không đúng");
-        } else {
-          setError("Đăng nhập thất bại. Vui lòng thử lại.");
-        }
+        setError("Email hoặc mật khẩu không đúng");
         setIsLoading(false);
         return;
       }
@@ -50,27 +45,24 @@ export default function LoginPage() {
         return;
       }
 
-      // Get user role from database directly using email
+      // Get user role from database
       const { data: dbUser } = await supabase
         .from("User")
         .select("role")
         .eq("email", authData.user.email)
         .single();
 
-      // Refresh auth context
-      await refetch();
-
       // Redirect based on role
       if (dbUser?.role === "admin" || dbUser?.role === "ctv" || dbUser?.role === "collaborator") {
-        router.replace("/admin");
+        router.push("/admin");
       } else if (dbUser?.role === "customer") {
-        router.replace("/tai-khoan");
+        router.push("/tai-khoan");
       } else {
-        router.replace("/");
+        router.push("/");
       }
+      router.refresh();
     } catch {
       setError("Có lỗi xảy ra. Vui lòng thử lại.");
-    } finally {
       setIsLoading(false);
     }
   };

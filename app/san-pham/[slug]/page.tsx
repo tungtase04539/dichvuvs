@@ -307,7 +307,7 @@ export default function ProductDetailPage({
                     href={`/san-pham/${item.slug}`}
                     className="group bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-sm hover:shadow-lg hover:border-primary-400/50 transition-all hover:-translate-y-1"
                   >
-                    <div className="text-4xl mb-3">{item.icon}</div>
+                    <div className="text-4xl mb-3">🤖</div>
                     <h3 className="font-bold text-white mb-2 group-hover:text-primary-400 transition-colors">
                       {item.name}
                     </h3>

@@ -27,12 +27,21 @@ export default async function AdminLayout({
     .eq("email", user.email)
     .single();
 
+  const userRole = dbUser?.role || "customer";
+
+  // Chỉ cho phép admin, ctv (đã duyệt), staff vào admin panel
+  // customer hoặc không có role = không được vào
+  const allowedRoles = ["admin", "ctv", "staff", "master_agent", "agent", "collaborator"];
+  if (!allowedRoles.includes(userRole)) {
+    redirect("/");
+  }
+
   // Get user metadata
   const session = {
     id: user.id,
     email: user.email || "",
     name: dbUser?.name || user.user_metadata?.name || user.email?.split("@")[0] || "Admin",
-    role: dbUser?.role || user.user_metadata?.role || "admin",
+    role: userRole,
   };
 
   return (

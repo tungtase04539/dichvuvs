@@ -14,6 +14,7 @@ import {
   UserCheck,
   Link2,
   Building2,
+  RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -175,6 +176,35 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         })}
       </nav>
 
+      {/* Reset Button - Admin only */}
+      {user.role === "admin" && (
+        <div className="absolute bottom-4 left-4 right-4">
+          <button
+            onClick={async () => {
+              if (confirm("⚠️ CẢNH BÁO: Bạn có chắc muốn RESET tất cả dữ liệu?\n\nSẽ xóa:\n- Tất cả đơn hàng\n- Tất cả khách hàng\n- Tất cả CTV\n- Tất cả đăng ký CTV\n\nGiữ lại:\n- Tài khoản Admin\n- Dữ liệu ChatBot/Service")) {
+                if (confirm("🔴 XÁC NHẬN LẦN CUỐI: Hành động này KHÔNG THỂ hoàn tác!")) {
+                  try {
+                    const res = await fetch("/api/admin/reset", { method: "POST" });
+                    const data = await res.json();
+                    if (res.ok) {
+                      alert("✅ " + data.message);
+                      window.location.reload();
+                    } else {
+                      alert("❌ Lỗi: " + data.error);
+                    }
+                  } catch {
+                    alert("❌ Lỗi kết nối");
+                  }
+                }
+              }
+            }}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 border border-red-600/30 transition-colors text-sm"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Reset Data
+          </button>
+        </div>
+      )}
     </aside>
   );
 }

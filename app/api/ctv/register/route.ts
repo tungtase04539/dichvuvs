@@ -60,41 +60,19 @@ export async function POST(request: Request) {
 
       userId = existingUser.id;
     } else {
-      // Create new user in Supabase Auth first
-      const { createClient } = await import("@supabase/supabase-js");
-      const supabaseAdmin = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
-      );
-
-      const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
-        email,
-        password: phone, // Mật khẩu = số điện thoại
-        email_confirm: true,
-        user_metadata: {
-          name,
-          role: "customer",
-        },
-      });
-
-      if (authError) {
-        console.error("Error creating auth user:", authError);
-        return NextResponse.json(
-          { error: `Không thể tạo tài khoản: ${authError.message}` },
-          { status: 500 }
-        );
-      }
-
-      // Create user in database with same ID
+      // CHỈ tạo record trong bảng User, KHÔNG tạo Auth user
+      // Auth user sẽ được tạo khi admin DUYỆT đơn đăng ký CTV
+      const newUserId = crypto.randomUUID();
+      
       const { error: userError } = await supabase
         .from("User")
         .insert({
-          id: authUser.user.id,
+          id: newUserId,
           email,
-          password: phone,
+          password: phone, // Lưu tạm, sẽ dùng khi tạo Auth user
           name,
           phone,
-          role: "customer",
+          role: "customer", // Vẫn là customer cho đến khi được duyệt
           active: true,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -102,15 +80,13 @@ export async function POST(request: Request) {
 
       if (userError) {
         console.error("Error creating db user:", userError);
-        // Try to delete auth user if db insert fails
-        await supabaseAdmin.auth.admin.deleteUser(authUser.user.id);
         return NextResponse.json(
           { error: `Không thể tạo tài khoản: ${userError.message}` },
           { status: 500 }
         );
       }
 
-      userId = authUser.user.id;
+      userId = newUserId;
     }
 
     // Create CTV application

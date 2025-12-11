@@ -55,8 +55,45 @@ export async function PATCH(
       return NextResponse.json({ error: "Lỗi cập nhật" }, { status: 500 });
     }
 
-    // If approved, update user role to CTV and create referral link
+    // If approved, create Auth user, update role to CTV and create referral link
     if (action === "approve") {
+      // Get user data for creating Auth account
+      const { data: userData } = await supabase
+        .from("User")
+        .select("email, password, name")
+        .eq("id", application.userId)
+        .single();
+
+      if (userData) {
+        // Create user in Supabase Auth
+        const { createClient } = await import("@supabase/supabase-js");
+        const supabaseAdmin = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+
+        // Check if auth user already exists
+        const { data: existingAuthUsers } = await supabaseAdmin.auth.admin.listUsers();
+        const authUserExists = existingAuthUsers?.users?.some(u => u.email === userData.email);
+
+        if (!authUserExists) {
+          const { error: authError } = await supabaseAdmin.auth.admin.createUser({
+            email: userData.email,
+            password: userData.password, // Mật khẩu = số điện thoại
+            email_confirm: true,
+            user_metadata: {
+              name: userData.name,
+              role: "ctv",
+            },
+          });
+
+          if (authError) {
+            console.error("Error creating auth user:", authError);
+            return NextResponse.json({ error: `Không thể tạo tài khoản: ${authError.message}` }, { status: 500 });
+          }
+        }
+      }
+
       // Mã giới thiệu mặc định = số điện thoại của CTV
       const refCode = application.phone.replace(/\D/g, ''); // Chỉ lấy số
       

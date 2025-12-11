@@ -55,12 +55,30 @@ export async function PATCH(
       return NextResponse.json({ error: "Lỗi cập nhật" }, { status: 500 });
     }
 
-    // If approved, update user role to CTV
+    // If approved, update user role to CTV and create referral link
     if (action === "approve") {
+      // Generate random 5-character referral code
+      const refCode = Math.random().toString(36).substring(2, 7).toUpperCase();
+      
       await supabase
         .from("User")
         .update({ role: "ctv", updatedAt: new Date().toISOString() })
         .eq("id", application.userId);
+
+      // Create referral link for the new CTV
+      await supabase
+        .from("ReferralLink")
+        .insert({
+          id: crypto.randomUUID(),
+          code: refCode,
+          userId: application.userId,
+          clickCount: 0,
+          orderCount: 0,
+          revenue: 0,
+          isActive: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
     }
 
     return NextResponse.json({

@@ -83,8 +83,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" },
         { href: "/admin/chat", icon: MessageCircle, label: "Chat", badge: unreadCount },
         { href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" },
-        { href: "/admin/ctv/duyet", icon: Users, label: "Duyệt CTV" },
-        { href: "/admin/dai-ly", icon: Building2, label: "Đại lý" },
+        { href: "/admin/ctv", icon: Users, label: "Quản lý CTV" },
         { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
         { href: "/admin/tai-khoan", icon: Key, label: "Tài khoản" },
       ];

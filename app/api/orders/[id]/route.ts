@@ -139,9 +139,12 @@ export async function PATCH(
           );
 
           // Check if user already exists in Supabase Auth
+          const customerEmail = currentOrder.customerEmail!;
+          const customerPhone = currentOrder.customerPhone!;
+          
           const { data: existingAuthUsers } = await supabaseAdmin.auth.admin.listUsers();
           const authUserExists = existingAuthUsers?.users?.some(
-            (u) => u.email === currentOrder.customerEmail
+            (u) => u.email === customerEmail
           );
 
           let authUserId: string | null = null;
@@ -149,15 +152,15 @@ export async function PATCH(
           if (authUserExists) {
             // Get existing auth user ID
             const existingAuthUser = existingAuthUsers?.users?.find(
-              (u) => u.email === currentOrder.customerEmail
+              (u) => u.email === customerEmail
             );
             authUserId = existingAuthUser?.id || null;
             console.log("Auth user already exists:", authUserId);
           } else {
             // Create user in Supabase Auth
             const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
-              email: currentOrder.customerEmail,
-              password: currentOrder.customerPhone, // Mật khẩu = số điện thoại
+              email: customerEmail,
+              password: customerPhone, // Mật khẩu = số điện thoại
               email_confirm: true,
               user_metadata: {
                 name: currentOrder.customerName,
@@ -176,7 +179,7 @@ export async function PATCH(
           // Check if user exists in database
           if (authUserId) {
             const existingDbUser = await prisma.user.findUnique({
-              where: { email: currentOrder.customerEmail },
+              where: { email: customerEmail },
             });
 
             if (!existingDbUser) {
@@ -184,16 +187,16 @@ export async function PATCH(
               await prisma.user.create({
                 data: {
                   id: authUserId,
-                  email: currentOrder.customerEmail,
-                  password: currentOrder.customerPhone,
+                  email: customerEmail,
+                  password: customerPhone,
                   name: currentOrder.customerName,
-                  phone: currentOrder.customerPhone,
+                  phone: customerPhone,
                   role: "customer",
                 },
               });
-              console.log("Created database user for:", currentOrder.customerEmail);
+              console.log("Created database user for:", customerEmail);
             } else {
-              console.log("Database user already exists:", currentOrder.customerEmail);
+              console.log("Database user already exists:", customerEmail);
             }
           }
         }

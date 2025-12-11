@@ -1,308 +1,241 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  Users, 
-  Plus, 
-  Loader2, 
+import Link from "next/link";
+import {
+  Users,
+  TrendingUp,
+  ShoppingCart,
+  DollarSign,
   Search,
-  UserPlus,
-  X,
-  Check,
   Eye,
-  EyeOff
+  Link2,
+  Copy,
+  Check,
+  Loader2,
+  UserPlus,
 } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
 
-interface Collaborator {
+interface CTV {
   id: string;
-  email: string;
   name: string;
-  phone: string;
+  email: string;
+  phone: string | null;
   createdAt: string;
+  referralCode: string | null;
+  orderCount: number;
+  revenue: number;
+  clickCount: number;
 }
 
-export default function CollaboratorsPage() {
-  const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export default function CTVManagementPage() {
+  const [ctvs, setCtvs] = useState<CTV[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    phone: "",
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [stats, setStats] = useState({
+    totalCTVs: 0,
+    totalOrders: 0,
+    totalRevenue: 0,
+    pendingApplications: 0,
   });
 
-  // Load collaborators
-  const loadCollaborators = async () => {
-    try {
-      const res = await fetch("/api/agent/collaborators");
-      const data = await res.json();
-      if (data.collaborators) {
-        setCollaborators(data.collaborators);
-      }
-    } catch (error) {
-      console.error("Load collaborators error:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadCollaborators();
+    fetchCTVs();
   }, []);
 
-  // Create collaborator
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsSubmitting(true);
-
+  const fetchCTVs = async () => {
     try {
-      const res = await fetch("/api/agent/collaborators", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
+      const res = await fetch("/api/admin/ctv/list");
       const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Có lỗi xảy ra");
-        return;
+      if (data.ctvs) {
+        setCtvs(data.ctvs);
+        setStats(data.stats || stats);
       }
-
-      setShowModal(false);
-      setFormData({ name: "", email: "", password: "", phone: "" });
-      loadCollaborators();
-    } catch {
-      setError("Có lỗi xảy ra");
-    } finally {
-      setIsSubmitting(false);
+    } catch (error) {
+      console.error("Fetch error:", error);
     }
+    setLoading(false);
   };
 
-  // Filter
-  const filteredCollaborators = collaborators.filter((c) =>
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const copyToClipboard = async (code: string) => {
+    await navigator.clipboard.writeText(`${window.location.origin}?ref=${code}`);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
-      </div>
-    );
-  }
+  const filteredCTVs = ctvs.filter(
+    (ctv) =>
+      ctv.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ctv.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (ctv.phone && ctv.phone.includes(searchQuery)) ||
+      (ctv.referralCode && ctv.referralCode.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Cộng tác viên của tôi</h1>
-          <p className="text-slate-500">Quản lý các CTV thuộc quyền của bạn</p>
-        </div>
-        <button
-          onClick={() => setShowModal(true)}
-          className="btn btn-primary"
+        <h1 className="text-2xl font-bold text-slate-900">Quản lý CTV</h1>
+        <Link
+          href="/admin/ctv/duyet"
+          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
         >
-          <UserPlus className="w-5 h-5" />
-          Thêm CTV
-        </button>
+          <UserPlus className="w-4 h-4" />
+          Duyệt đăng ký ({stats.pendingApplications})
+        </Link>
       </div>
 
-      {/* Stats */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 mb-6">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-xl bg-orange-100 flex items-center justify-center">
-            <Users className="w-7 h-7 text-orange-600" />
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-xl p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+              <Users className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm text-slate-500">Tổng CTV</p>
+              <p className="text-xl font-bold text-slate-900">{stats.totalCTVs}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-3xl font-bold text-slate-900">{collaborators.length}</p>
-            <p className="text-slate-500">Tổng số CTV</p>
+        </div>
+        <div className="bg-white rounded-xl p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+              <ShoppingCart className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <p className="text-sm text-slate-500">Đơn từ CTV</p>
+              <p className="text-xl font-bold text-slate-900">{stats.totalOrders}</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+              <DollarSign className="w-5 h-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-sm text-slate-500">Doanh thu CTV</p>
+              <p className="text-xl font-bold text-slate-900">{formatCurrency(stats.totalRevenue)}</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-sm text-slate-500">Chờ duyệt</p>
+              <p className="text-xl font-bold text-slate-900">{stats.pendingApplications}</p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-200 mb-6">
+      <div className="bg-white rounded-xl p-4 mb-6 shadow-sm">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
           <input
             type="text"
-            placeholder="Tìm theo tên, email..."
+            placeholder="Tìm kiếm theo tên, email, SĐT, mã ref..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg"
+            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-500"
           />
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-slate-50 border-b border-slate-200">
-            <tr>
-              <th className="text-left px-6 py-3 text-sm font-semibold text-slate-600">CTV</th>
-              <th className="text-center px-6 py-3 text-sm font-semibold text-slate-600">SĐT</th>
-              <th className="text-center px-6 py-3 text-sm font-semibold text-slate-600">Ngày tạo</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {filteredCollaborators.map((ctv) => (
-              <tr key={ctv.id} className="hover:bg-slate-50">
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white font-semibold">
-                      {ctv.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-slate-900">{ctv.name}</p>
-                      <p className="text-sm text-slate-500">{ctv.email}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-center text-slate-600">
-                  {ctv.phone || "-"}
-                </td>
-                <td className="px-6 py-4 text-center text-slate-600 text-sm">
-                  {new Date(ctv.createdAt).toLocaleDateString("vi-VN")}
-                </td>
+      {/* CTV List */}
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        </div>
+      ) : filteredCTVs.length === 0 ? (
+        <div className="bg-white rounded-xl p-12 text-center shadow-sm">
+          <Users className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+          <p className="text-slate-500">Chưa có CTV nào</p>
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th className="px-4 py-3 text-left text-sm font-medium text-slate-600">CTV</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-slate-600">Mã Ref</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-slate-600">Clicks</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-slate-600">Đơn hàng</th>
+                <th className="px-4 py-3 text-right text-sm font-medium text-slate-600">Doanh thu</th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-slate-600">Thao tác</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {filteredCollaborators.length === 0 && (
-          <div className="text-center py-12">
-            <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <p className="text-slate-500">Chưa có CTV nào</p>
-            <button
-              onClick={() => setShowModal(true)}
-              className="mt-4 text-primary-600 hover:underline"
-            >
-              Thêm CTV đầu tiên
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-2xl w-full max-w-md mx-4 shadow-2xl">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-bold">Thêm Cộng tác viên</h2>
-              <button
-                onClick={() => setShowModal(false)}
-                className="p-2 hover:bg-slate-100 rounded-lg"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Họ tên <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                  className="input"
-                  placeholder="Nguyễn Văn A"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Email <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                  className="input"
-                  placeholder="email@example.com"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Mật khẩu <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    required
-                    minLength={6}
-                    className="input pr-10"
-                    placeholder="Ít nhất 6 ký tự"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Số điện thoại
-                </label>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="input"
-                  placeholder="0901234567"
-                />
-              </div>
-
-              {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
-                  {error}
-                </div>
-              )}
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 px-4 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex-1 btn btn-primary"
-                >
-                  {isSubmitting ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <>
-                      <Check className="w-5 h-5" />
-                      Tạo CTV
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredCTVs.map((ctv) => (
+                <tr key={ctv.id} className="hover:bg-slate-50">
+                  <td className="px-4 py-3">
+                    <div>
+                      <p className="font-medium text-slate-900">{ctv.name}</p>
+                      <p className="text-sm text-slate-500">{ctv.email}</p>
+                      {ctv.phone && <p className="text-sm text-slate-400">{ctv.phone}</p>}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    {ctv.referralCode ? (
+                      <div className="flex items-center gap-2">
+                        <code className="px-2 py-1 bg-slate-100 rounded text-sm font-mono font-bold text-primary-600">
+                          {ctv.referralCode}
+                        </code>
+                        <button
+                          onClick={() => copyToClipboard(ctv.referralCode!)}
+                          className="p-1 hover:bg-slate-100 rounded"
+                          title="Copy link ref"
+                        >
+                          {copiedCode === ctv.referralCode ? (
+                            <Check className="w-4 h-4 text-green-500" />
+                          ) : (
+                            <Copy className="w-4 h-4 text-slate-400" />
+                          )}
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-slate-400 text-sm">Chưa có</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className="text-slate-600">{ctv.clickCount}</span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                      {ctv.orderCount}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <span className="font-medium text-slate-900">{formatCurrency(ctv.revenue)}</span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <Link
+                        href={`/admin/ctv/${ctv.id}`}
+                        className="p-2 hover:bg-slate-100 rounded-lg text-slate-600"
+                        title="Xem chi tiết"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Link>
+                      <button
+                        onClick={() => ctv.referralCode && copyToClipboard(ctv.referralCode)}
+                        className="p-2 hover:bg-slate-100 rounded-lg text-slate-600"
+                        title="Copy link ref"
+                      >
+                        <Link2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

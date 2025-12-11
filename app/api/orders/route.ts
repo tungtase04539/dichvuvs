@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { customerName, customerPhone, phone, email, notes, items } = body;
+    const { customerName, customerPhone, phone, email, notes, items, referralCode } = body;
 
     const finalPhone = customerPhone || phone;
 
@@ -133,6 +133,18 @@ export async function POST(request: NextRequest) {
     const mainProduct = productMap.get(items[0].serviceId);
     const orderCode = generateOrderCode();
 
+    // Find referrer if referral code provided
+    let referrerId: string | null = null;
+    if (referralCode) {
+      const referralLink = await prisma.referralLink.findUnique({
+        where: { code: referralCode },
+        select: { userId: true },
+      });
+      if (referralLink) {
+        referrerId = referralLink.userId;
+      }
+    }
+
     // Single insert query - Tài khoản sẽ được tạo sau khi thanh toán thành công
     const order = await prisma.order.create({
       data: {
@@ -151,6 +163,8 @@ export async function POST(request: NextRequest) {
         basePrice: mainProduct?.price || 29000,
         totalPrice,
         status: "pending",
+        referralCode: referralCode || null,
+        referrerId: referrerId,
       },
       select: {
         id: true,
@@ -161,6 +175,17 @@ export async function POST(request: NextRequest) {
         service: { select: { name: true, icon: true } },
       },
     });
+
+    // Update referral stats if code was used
+    if (referralCode && referrerId) {
+      await prisma.referralLink.update({
+        where: { code: referralCode },
+        data: {
+          orderCount: { increment: 1 },
+          revenue: { increment: totalPrice },
+        },
+      });
+    }
 
     return NextResponse.json({ order });
   } catch (error) {

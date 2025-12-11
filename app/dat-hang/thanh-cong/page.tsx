@@ -8,7 +8,6 @@ import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
 import QRPayment from "./QRPayment";
 import CopyButton from "./CopyButton";
-import { getSupabase } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
 import {
   CheckCircle,
@@ -151,29 +150,13 @@ function OrderSuccessContent() {
         return;
       }
 
-      const supabase = getSupabase();
-      if (!supabase) {
-        setOrder({
-          orderCode,
-          totalPrice: 29000,
-          status: "pending",
-          customerName: "Khách hàng",
-          customerPhone: "",
-        });
-        setIsLoading(false);
-        return;
-      }
-
       try {
-        const { data } = await supabase
-          .from("Order")
-          .select("orderCode, totalPrice, status, customerName, customerPhone")
-          .eq("orderCode", orderCode)
-          .single();
+        const res = await fetch(`/api/orders/by-code?code=${encodeURIComponent(orderCode)}`);
+        const data = await res.json();
 
-        if (data) {
-          setOrder(data);
-          if (data.status === "confirmed" || data.status === "completed") {
+        if (data.order) {
+          setOrder(data.order);
+          if (data.order.status === "confirmed" || data.order.status === "completed") {
             setIsPaid(true);
           }
         } else {
@@ -187,6 +170,13 @@ function OrderSuccessContent() {
         }
       } catch (e) {
         console.error("Fetch order error:", e);
+        setOrder({
+          orderCode,
+          totalPrice: 29000,
+          status: "pending",
+          customerName: "Khách hàng",
+          customerPhone: "",
+        });
       }
       
       setIsLoading(false);

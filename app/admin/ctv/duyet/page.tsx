@@ -35,17 +35,41 @@ interface CTVApplication {
   };
 }
 
+interface CurrentUser {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+}
+
 export default function CTVApprovalPage() {
   const [applications, setApplications] = useState<CTVApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("pending");
   const [searchQuery, setSearchQuery] = useState("");
   const [processing, setProcessing] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    fetchApplications();
-  }, [filter]);
+    // Fetch current user
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) {
+          setCurrentUser(data.user);
+        } else {
+          router.push("/admin/login");
+        }
+      })
+      .catch(() => router.push("/admin/login"));
+  }, [router]);
+
+  useEffect(() => {
+    if (currentUser) {
+      fetchApplications();
+    }
+  }, [filter, currentUser]);
 
   const fetchApplications = async () => {
     try {
@@ -116,9 +140,17 @@ export default function CTVApprovalPage() {
     }
   };
 
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-100">
-      <AdminSidebar />
+      <AdminSidebar user={currentUser} />
 
       <div className="lg:pl-64">
         <AdminHeader title="Duyệt đăng ký CTV" />

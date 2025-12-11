@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
     const order = await prisma.order.findUnique({
       where: { orderCode },
       include: { service: true },
+      // Include all fields needed for account creation
     });
 
     if (!order) {
@@ -97,6 +98,91 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`✅ Order ${orderCode} confirmed with payment ${transaction.transferAmount}`);
+
+    // Tạo tài khoản khách hàng sau khi thanh toán thành công
+    if (order.customerEmail && order.customerPhone) {
+      try {
+        const { createClient } = await import("@supabase/supabase-js");
+        
+        if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+          const supabaseAdmin = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+          );
+
+          const customerEmail = order.customerEmail;
+          const customerPhone = order.customerPhone;
+
+          // Check if user already exists in Supabase Auth
+          const { data: existingAuthUsers } = await supabaseAdmin.auth.admin.listUsers();
+          const authUserExists = existingAuthUsers?.users?.some(
+            (u) => u.email === customerEmail
+          );
+
+          let authUserId: string | null = null;
+
+          if (authUserExists) {
+            const existingAuthUser = existingAuthUsers?.users?.find(
+              (u) => u.email === customerEmail
+            );
+            authUserId = existingAuthUser?.id || null;
+            console.log("Auth user already exists:", authUserId);
+          } else {
+            // Create user in Supabase Auth
+            const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+              email: customerEmail,
+              password: customerPhone, // Mật khẩu = số điện thoại
+              email_confirm: true,
+              user_metadata: {
+                name: order.customerName,
+                role: "customer",
+              },
+            });
+
+            if (authError) {
+              console.error("Error creating auth user:", authError.message);
+            } else if (authUser.user) {
+              authUserId = authUser.user.id;
+              console.log("Created auth user:", authUserId);
+            }
+          }
+
+          // Create user in database if not exists
+          if (authUserId) {
+            const existingDbUser = await prisma.user.findUnique({
+              where: { email: customerEmail },
+            });
+
+            if (!existingDbUser) {
+              await prisma.user.create({
+                data: {
+                  id: authUserId,
+                  email: customerEmail,
+                  password: customerPhone,
+                  name: order.customerName,
+                  phone: customerPhone,
+                  role: "customer",
+                },
+              });
+              console.log("Created database user for:", customerEmail);
+            }
+          }
+
+          // Update referral stats if applicable
+          if (order.referralCode) {
+            await prisma.referralLink.update({
+              where: { code: order.referralCode },
+              data: {
+                orderCount: { increment: 1 },
+                revenue: { increment: order.totalPrice },
+              },
+            }).catch(e => console.error("Referral update error:", e));
+          }
+        }
+      } catch (accountError) {
+        console.error("Error creating customer account:", accountError);
+      }
+    }
 
     return NextResponse.json({ 
       success: true, 

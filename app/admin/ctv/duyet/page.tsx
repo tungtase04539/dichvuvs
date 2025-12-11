@@ -153,7 +153,7 @@ export default function CTVApprovalPage() {
       <AdminSidebar user={currentUser} />
 
       <div className="lg:pl-64">
-        <AdminHeader title="Duyệt đăng ký CTV" />
+        <AdminHeader user={currentUser} />
 
         <main className="p-6">
           {/* Filters */}

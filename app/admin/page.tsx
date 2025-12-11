@@ -7,11 +7,17 @@ import {
   MessageCircle,
 } from "lucide-react";
 import Link from "next/link";
+import { unstable_noStore as noStore } from "next/cache";
 
-// Force dynamic rendering
+// Force dynamic rendering - no caching
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 async function getDashboardStats() {
+  // Prevent any caching
+  noStore();
+  
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 

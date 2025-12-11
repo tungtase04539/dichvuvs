@@ -26,7 +26,6 @@ export default function Header({ settings }: HeaderProps) {
     { href: "/san-pham", label: "SẢN PHẨM" },
     { href: "/tin-tuc", label: "TIN TỨC" },
     { href: "/dang-ky-ctv", label: "ĐĂNG KÝ CTV" },
-    { href: "/tra-cuu", label: "TRA CỨU ĐƠN" },
   ];
 
   return (

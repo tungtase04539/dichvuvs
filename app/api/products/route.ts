@@ -1,47 +1,26 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { getCache, setCache } from "@/lib/cache";
+import { createServerSupabaseClient } from "@/lib/supabase-server";
 
 export const dynamic = "force-dynamic";
 
-interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  price: number;
-  image: string | null;
-  featured: boolean;
-}
-
-// Fast products API with caching
+// Fast products API using Supabase directly
 export async function GET() {
   try {
-    // Check cache first
-    const cached = getCache<Product[]>("products");
-    if (cached) {
-      return NextResponse.json({ products: cached, cached: true });
+    const supabase = createServerSupabaseClient();
+
+    const { data: products, error } = await supabase
+      .from("Service")
+      .select("id, name, slug, description, price, image, featured")
+      .eq("active", true)
+      .order("featured", { ascending: false })
+      .order("name", { ascending: true });
+
+    if (error) {
+      console.error("Get products error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Query only needed fields
-    const products = await prisma.service.findMany({
-      where: { active: true },
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        description: true,
-        price: true,
-        image: true,
-        featured: true,
-      },
-      orderBy: [{ featured: "desc" }, { name: "asc" }],
-    });
-
-    // Cache for 5 minutes
-    setCache("products", products, 300);
-
-    return NextResponse.json({ products, cached: false });
+    return NextResponse.json({ products: products || [] });
   } catch (error) {
     console.error("Get products error:", error);
     return NextResponse.json({ error: "Error" }, { status: 500 });

@@ -57,7 +57,7 @@ export default function HomePage() {
 
       const { data } = await supabase
         .from("Service")
-        .select("id, name, slug, description, price, icon, image, videoUrl, featured")
+        .select("id, name, slug, description, price, image, videoUrl, featured")
         .eq("active", true)
         .order("featured", { ascending: false })
         .limit(6);

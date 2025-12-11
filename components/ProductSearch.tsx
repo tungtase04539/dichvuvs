@@ -49,7 +49,7 @@ export default function ProductSearch() {
 
       const { data } = await supabase
         .from("Service")
-        .select("id, name, slug, description, price, icon, image")
+        .select("id, name, slug, description, price, image")
         .eq("active", true)
         .ilike("name", `%${query}%`)
         .limit(6);

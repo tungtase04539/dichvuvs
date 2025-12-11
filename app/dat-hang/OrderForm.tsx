@@ -79,7 +79,7 @@ export default function OrderForm() {
       
       const { data, error } = await supabase
         .from("Service")
-        .select("id, name, slug, description, price, icon, image, videoUrl, featured")
+        .select("id, name, slug, description, price, image, videoUrl, featured")
         .eq("active", true)
         .order("featured", { ascending: false })
         .order("name");

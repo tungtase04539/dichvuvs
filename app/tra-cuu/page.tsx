@@ -229,7 +229,7 @@ function TrackOrderContent() {
 
     const { data: serviceData } = await supabase
       .from("Service")
-      .select("name, icon")
+      .select("name")
       .eq("id", data.serviceId)
       .single();
 

@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, Phone, Bot, ShoppingCart } from "lucide-react";
+import { Menu, X, Phone, Bot, ShoppingCart, User, LogIn, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface HeaderProps {
   settings: Record<string, string>;
@@ -12,6 +13,8 @@ interface HeaderProps {
 export default function Header({ settings }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const { user, isAuthenticated, isLoading, isAdmin, isCTV } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,6 +35,12 @@ export default function Header({ settings }: HeaderProps) {
       document.body.style.overflow = "";
     };
   }, [isMobileMenuOpen]);
+
+  // Get dashboard link based on role
+  const getDashboardLink = () => {
+    if (isAdmin || isCTV) return "/admin";
+    return "/tai-khoan";
+  };
 
   const navLinks = [
     { href: "/", label: "TRANG CHỦ" },
@@ -84,6 +93,58 @@ export default function Header({ settings }: HeaderProps) {
                 <Phone className="w-5 h-5" />
                 {settings.site_phone || "0363 189 699"}
               </a>
+              
+              {/* User Account */}
+              {!isLoading && (
+                isAuthenticated && user ? (
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowUserMenu(!showUserMenu)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-primary-400 flex items-center justify-center text-slate-900 font-bold text-sm">
+                        {user.name?.charAt(0).toUpperCase() || "U"}
+                      </div>
+                      <span className="text-white text-sm font-medium max-w-[100px] truncate">
+                        {user.name}
+                      </span>
+                      <ChevronDown className="w-4 h-4 text-white/70" />
+                    </button>
+                    
+                    {showUserMenu && (
+                      <>
+                        <div 
+                          className="fixed inset-0 z-40" 
+                          onClick={() => setShowUserMenu(false)}
+                        />
+                        <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 py-2 z-50">
+                          <div className="px-4 py-2 border-b border-slate-100">
+                            <p className="text-sm font-medium text-slate-900 truncate">{user.name}</p>
+                            <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                          </div>
+                          <Link
+                            href={getDashboardLink()}
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                            onClick={() => setShowUserMenu(false)}
+                          >
+                            <User className="w-4 h-4" />
+                            {isAdmin ? "Quản trị" : isCTV ? "Dashboard CTV" : "Tài khoản"}
+                          </Link>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  <Link
+                    href="/dang-nhap"
+                    className="flex items-center gap-2 px-4 py-2 text-primary-400 hover:text-primary-300 font-medium transition-colors"
+                  >
+                    <LogIn className="w-5 h-5" />
+                    Đăng nhập
+                  </Link>
+                )
+              )}
+              
               <Link
                 href="/dat-hang"
                 className="flex items-center gap-2 px-5 py-2.5 bg-primary-400 text-slate-900 font-bold rounded-xl hover:bg-primary-300 shadow-lg shadow-primary-400/30 hover:shadow-xl transition-all uppercase"
@@ -132,6 +193,29 @@ export default function Header({ settings }: HeaderProps) {
         )}
       >
         <div className="flex flex-col h-full pt-20 pb-6 px-4">
+          {/* User info on mobile */}
+          {!isLoading && isAuthenticated && user && (
+            <div className="mb-4 p-4 bg-white/5 rounded-xl">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary-400 flex items-center justify-center text-slate-900 font-bold">
+                  {user.name?.charAt(0).toUpperCase() || "U"}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-medium truncate">{user.name}</p>
+                  <p className="text-xs text-slate-400 truncate">{user.email}</p>
+                </div>
+              </div>
+              <Link
+                href={getDashboardLink()}
+                className="mt-3 flex items-center justify-center gap-2 w-full px-4 py-2 bg-primary-400/20 text-primary-400 rounded-lg text-sm font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <User className="w-4 h-4" />
+                {isAdmin ? "Quản trị" : isCTV ? "Dashboard" : "Tài khoản"}
+              </Link>
+            </div>
+          )}
+
           <nav className="flex flex-col gap-1">
             {navLinks.map((link) => (
               <Link
@@ -146,6 +230,17 @@ export default function Header({ settings }: HeaderProps) {
           </nav>
 
           <div className="mt-auto space-y-3">
+            {/* Login button for guests */}
+            {!isLoading && !isAuthenticated && (
+              <Link
+                href="/dang-nhap"
+                className="flex items-center justify-center gap-2 w-full px-5 py-3 border-2 border-white/30 text-white font-bold rounded-xl"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <LogIn className="w-5 h-5" />
+                ĐĂNG NHẬP
+              </Link>
+            )}
             <a
               href={`tel:${settings.site_phone?.replace(/[\s–]/g, "").split("–")[0] || "0363189699"}`}
               className="flex items-center justify-center gap-2 w-full px-5 py-3 border-2 border-primary-400 text-primary-400 font-bold rounded-xl"

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { getSupabase, generateOrderCode } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
 import { getCurrentReferralCode } from "@/components/ReferralTracker";
+import { useAuth } from "@/contexts/AuthContext";
 import VideoModal from "@/components/VideoModal";
 import { Plus, Minus, Trash2, ShoppingCart, User, Phone, Mail, MessageSquare, Loader2, Gift, Play, Search, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -39,6 +40,16 @@ export default function OrderForm() {
   const [searchQuery, setSearchQuery] = useState("");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { user, isAuthenticated } = useAuth();
+
+  // Pre-fill form data if user is logged in
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.name && !customerName) setCustomerName(user.name);
+      if (user.email && !email) setEmail(user.email);
+      if (user.phone && !phone) setPhone(user.phone);
+    }
+  }, [isAuthenticated, user]);
 
   // Filtered products based on search
   const filteredProducts = products.filter((p) =>

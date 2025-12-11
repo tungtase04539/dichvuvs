@@ -1,0 +1,193 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Bot, Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { getSupabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
+
+export default function LoginPage() {
+  const router = useRouter();
+  const { refetch } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const supabase = getSupabase();
+      if (!supabase) {
+        setError("Lỗi kết nối. Vui lòng thử lại.");
+        setIsLoading(false);
+        return;
+      }
+
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError) {
+        if (authError.message.includes("Invalid login")) {
+          setError("Email hoặc mật khẩu không đúng");
+        } else {
+          setError("Đăng nhập thất bại. Vui lòng thử lại.");
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      // Refresh auth context
+      await refetch();
+
+      // Get user role to redirect appropriately
+      const res = await fetch("/api/auth/me");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user?.role === "admin" || data.user?.role === "ctv" || data.user?.role === "collaborator") {
+          router.push("/admin");
+        } else {
+          router.push("/tai-khoan");
+        }
+      } else {
+        router.push("/");
+      }
+    } catch {
+      setError("Có lỗi xảy ra. Vui lòng thử lại.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Back button */}
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-8 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Về trang chủ
+        </Link>
+
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-flex items-center gap-2">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-lg">
+              <Bot className="w-7 h-7 text-slate-900" />
+            </div>
+            <span className="text-2xl font-bold text-white">
+              ChatBot<span className="text-primary-400">VN</span>
+            </span>
+          </Link>
+        </div>
+
+        {/* Login Form */}
+        <div className="bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-700">
+          <h1 className="text-2xl font-bold text-white text-center mb-2">
+            Đăng nhập
+          </h1>
+          <p className="text-slate-400 text-center text-sm mb-6">
+            Đăng nhập để quản lý tài khoản của bạn
+          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm text-center">
+                {error}
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Email
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="email@example.com"
+                  required
+                  className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 outline-none transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Mật khẩu
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  className="w-full pl-10 pr-12 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 outline-none transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-3 bg-primary-400 text-slate-900 font-bold rounded-xl hover:bg-primary-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Đang đăng nhập...
+                </>
+              ) : (
+                "Đăng nhập"
+              )}
+            </button>
+          </form>
+
+          <div className="mt-6 pt-6 border-t border-slate-700">
+            <p className="text-center text-sm text-slate-400">
+              Chưa có tài khoản?{" "}
+              <Link href="/dat-hang" className="text-primary-400 hover:text-primary-300 font-medium">
+                Mua ChatBot để nhận tài khoản
+              </Link>
+            </p>
+            <p className="text-center text-xs text-slate-500 mt-2">
+              Hoặc{" "}
+              <Link href="/dang-ky-ctv" className="text-primary-400 hover:text-primary-300">
+                đăng ký làm CTV
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        {/* Help */}
+        <p className="text-center text-sm text-slate-500 mt-6">
+          Cần hỗ trợ?{" "}
+          <a href="tel:0363189699" className="text-primary-400 hover:text-primary-300">
+            0363 189 699
+          </a>
+        </p>
+      </div>
+    </div>
+  );
+}
+

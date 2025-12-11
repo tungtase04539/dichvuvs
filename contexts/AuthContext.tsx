@@ -18,6 +18,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isCTV: boolean;
   isAdmin: boolean;
+  isCustomer: boolean;
   refetch: () => Promise<void>;
 }
 
@@ -27,6 +28,7 @@ const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   isCTV: false,
   isAdmin: false,
+  isCustomer: false,
   refetch: async () => {},
 });
 
@@ -93,6 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: !!user,
     isCTV: user?.role === "ctv" || user?.role === "collaborator",
     isAdmin: user?.role === "admin",
+    isCustomer: user?.role === "customer",
     refetch: fetchUser,
   };
 

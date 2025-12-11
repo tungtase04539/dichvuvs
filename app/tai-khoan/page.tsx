@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Package,
-  User,
   LogOut,
   Loader2,
   Bot,
@@ -14,6 +13,9 @@ import {
   Clock,
   ExternalLink,
   Key,
+  Copy,
+  Check,
+  Link2,
 } from "lucide-react";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 
@@ -27,10 +29,31 @@ interface Order {
     name: string;
   };
   credential?: {
-    username: string;
-    password: string;
-    note: string;
+    accountInfo: string;  // Đường link
+    password: string;     // Mã đăng nhập
+    notes: string;        // Ghi chú
   } | null;
+}
+
+// Copy button component
+function CopyBtn({ text, label }: { text: string; label?: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="p-1.5 rounded-lg hover:bg-slate-600 text-slate-400 hover:text-white transition-colors"
+      title={label || "Sao chép"}
+    >
+      {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+    </button>
+  );
 }
 
 interface UserInfo {
@@ -242,19 +265,39 @@ export default function CustomerDashboard() {
                       <Key className="w-4 h-4" />
                       Thông tin đăng nhập ChatBot
                     </h4>
-                    <div className="grid sm:grid-cols-2 gap-3 text-sm">
-                      <div>
-                        <span className="text-slate-400">Tài khoản:</span>
-                        <p className="font-mono font-bold text-white">{order.credential.username}</p>
+                    <div className="space-y-3 text-sm">
+                      {/* Đường link */}
+                      <div className="bg-slate-800 rounded-lg p-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-slate-400 flex items-center gap-1.5">
+                            <Link2 className="w-3.5 h-3.5" />
+                            Đường link
+                          </span>
+                          <CopyBtn text={order.credential.accountInfo} label="Sao chép link" />
+                        </div>
+                        <p className="font-mono text-primary-400 break-all">{order.credential.accountInfo}</p>
                       </div>
-                      <div>
-                        <span className="text-slate-400">Mật khẩu:</span>
+                      
+                      {/* Mã đăng nhập */}
+                      <div className="bg-slate-800 rounded-lg p-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-slate-400 flex items-center gap-1.5">
+                            <Key className="w-3.5 h-3.5" />
+                            Mã đăng nhập
+                          </span>
+                          <CopyBtn text={order.credential.password} label="Sao chép mã" />
+                        </div>
                         <p className="font-mono font-bold text-white">{order.credential.password}</p>
                       </div>
-                      {order.credential.note && (
-                        <div className="sm:col-span-2">
-                          <span className="text-slate-400">Ghi chú:</span>
-                          <p className="text-white">{order.credential.note}</p>
+                      
+                      {/* Ghi chú */}
+                      {order.credential.notes && (
+                        <div className="bg-slate-800 rounded-lg p-3">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-slate-400">Ghi chú</span>
+                            <CopyBtn text={order.credential.notes} label="Sao chép ghi chú" />
+                          </div>
+                          <p className="text-white whitespace-pre-wrap">{order.credential.notes}</p>
                         </div>
                       )}
                     </div>

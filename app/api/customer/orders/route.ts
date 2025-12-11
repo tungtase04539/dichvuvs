@@ -33,11 +33,11 @@ export async function GET() {
             icon: true,
           },
         },
-        credentials: {
+        credential: {
           select: {
-            username: true,
+            accountInfo: true,
             password: true,
-            note: true,
+            notes: true,
           },
         },
       },
@@ -47,8 +47,11 @@ export async function GET() {
     // Format orders with credentials
     const formattedOrders = orders.map((order) => ({
       ...order,
-      credential: order.credentials?.[0] || null,
-      credentials: undefined,
+      credential: order.credential ? {
+        username: order.credential.accountInfo,
+        password: order.credential.password,
+        note: order.credential.notes,
+      } : null,
     }));
 
     return NextResponse.json({ orders: formattedOrders });

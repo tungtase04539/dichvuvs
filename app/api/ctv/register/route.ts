@@ -60,14 +60,38 @@ export async function POST(request: Request) {
 
       userId = existingUser.id;
     } else {
-      // Create new user with customer role
-      const newUserId = crypto.randomUUID();
+      // Create new user in Supabase Auth first
+      const { createClient } = await import("@supabase/supabase-js");
+      const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      );
+
+      const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password: phone, // Mật khẩu = số điện thoại
+        email_confirm: true,
+        user_metadata: {
+          name,
+          role: "customer",
+        },
+      });
+
+      if (authError) {
+        console.error("Error creating auth user:", authError);
+        return NextResponse.json(
+          { error: `Không thể tạo tài khoản: ${authError.message}` },
+          { status: 500 }
+        );
+      }
+
+      // Create user in database with same ID
       const { error: userError } = await supabase
         .from("User")
         .insert({
-          id: newUserId,
+          id: authUser.user.id,
           email,
-          password: phone, // Mật khẩu = số điện thoại
+          password: phone,
           name,
           phone,
           role: "customer",
@@ -77,14 +101,16 @@ export async function POST(request: Request) {
         });
 
       if (userError) {
-        console.error("Error creating user:", userError);
+        console.error("Error creating db user:", userError);
+        // Try to delete auth user if db insert fails
+        await supabaseAdmin.auth.admin.deleteUser(authUser.user.id);
         return NextResponse.json(
           { error: `Không thể tạo tài khoản: ${userError.message}` },
           { status: 500 }
         );
       }
 
-      userId = newUserId;
+      userId = authUser.user.id;
     }
 
     // Create CTV application

@@ -98,21 +98,43 @@ export async function PATCH(
       currentOrder.status !== "completed" &&
       currentOrder.customerEmail
     ) {
-      // Check if account already exists
+      // Check if account already exists in database
       const existingUser = await prisma.user.findUnique({
         where: { email: currentOrder.customerEmail },
       });
 
       if (!existingUser) {
-        await prisma.user.create({
-          data: {
-            email: currentOrder.customerEmail,
-            password: currentOrder.customerPhone, // Mật khẩu = số điện thoại
+        // Import supabase admin client
+        const { createClient } = await import("@supabase/supabase-js");
+        const supabaseAdmin = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+
+        // Create user in Supabase Auth
+        const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+          email: currentOrder.customerEmail,
+          password: currentOrder.customerPhone, // Mật khẩu = số điện thoại
+          email_confirm: true,
+          user_metadata: {
             name: currentOrder.customerName,
-            phone: currentOrder.customerPhone,
             role: "customer",
           },
         });
+
+        if (!authError && authUser.user) {
+          // Create user in database with same ID
+          await prisma.user.create({
+            data: {
+              id: authUser.user.id,
+              email: currentOrder.customerEmail,
+              password: currentOrder.customerPhone,
+              name: currentOrder.customerName,
+              phone: currentOrder.customerPhone,
+              role: "customer",
+            },
+          });
+        }
       }
     }
 

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSession } from "@/lib/auth";
 import { getCache, setCache } from "@/lib/cache";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 
@@ -53,23 +52,25 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Admin/CTV access
-    const user = await getSession();
-    console.log("Orders API - Session user:", user ? { email: user.email, role: user.role, id: user.id } : null);
+    // Admin/CTV access - Get user from Supabase auth directly
+    const { data: { user: authUser } } = await supabase.auth.getUser();
     
-    if (!user) {
+    if (!authUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Get user role from database
+    const { data: dbUser } = await supabase
+      .from("User")
+      .select("id, email, role")
+      .eq("email", authUser.email)
+      .single();
+
+    if (!dbUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 401 });
+    }
+
     const status = searchParams.get("status");
-    console.log("Orders API - Requested status filter:", status);
-    
-    // First, let's see ALL orders without filter to debug
-    const { data: allOrders, error: allError } = await supabase
-      .from("Order")
-      .select("id, status, customerName")
-      .limit(10);
-    console.log("Orders API - All orders sample:", allOrders, "Error:", allError);
     
     let query = supabase
       .from("Order")
@@ -87,17 +88,14 @@ export async function GET(request: NextRequest) {
     }
     
     // CTV chỉ xem đơn hàng của khách mình giới thiệu
-    if (user.role === "ctv" || user.role === "collaborator") {
-      query = query.eq("referrerId", user.id);
-    } else if (user.role === "staff") {
-      query = query.eq("assignedToId", user.id);
+    if (dbUser.role === "ctv" || dbUser.role === "collaborator") {
+      query = query.eq("referrerId", dbUser.id);
+    } else if (dbUser.role === "staff") {
+      query = query.eq("assignedToId", dbUser.id);
     }
     // Admin xem tất cả (không filter thêm)
-    
-    console.log("Orders filter - User:", user.email, "Role:", user.role, "Status filter:", status);
 
     const { data: orders, error } = await query;
-    console.log("Orders API - Query result count:", orders?.length, "Error:", error);
     
     if (error) {
       console.error("Get orders error:", error);

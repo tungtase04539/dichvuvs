@@ -57,8 +57,8 @@ export async function PATCH(
 
     // If approved, update user role to CTV and create referral link
     if (action === "approve") {
-      // Generate random 5-character referral code
-      const refCode = Math.random().toString(36).substring(2, 7).toUpperCase();
+      // Mã giới thiệu mặc định = số điện thoại của CTV
+      const refCode = application.phone.replace(/\D/g, ''); // Chỉ lấy số
       
       await supabase
         .from("User")

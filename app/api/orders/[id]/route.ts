@@ -96,52 +96,84 @@ export async function PATCH(
       (status === "confirmed" || status === "completed") &&
       currentOrder.status !== "confirmed" &&
       currentOrder.status !== "completed" &&
-      currentOrder.customerEmail
+      currentOrder.customerEmail &&
+      currentOrder.customerPhone
     ) {
-      // Check if account already exists in database
-      const existingUser = await prisma.user.findUnique({
-        where: { email: currentOrder.customerEmail },
-      });
-
-      if (!existingUser) {
-        try {
-          // Import supabase admin client
-          const { createClient } = await import("@supabase/supabase-js");
+      console.log("Creating customer account for:", currentOrder.customerEmail);
+      
+      try {
+        // Import supabase admin client
+        const { createClient } = await import("@supabase/supabase-js");
+        
+        if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+          console.error("SUPABASE_SERVICE_ROLE_KEY is not set!");
+        } else {
           const supabaseAdmin = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!
+            process.env.SUPABASE_SERVICE_ROLE_KEY
           );
 
-          // Create user in Supabase Auth
-          const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
-            email: currentOrder.customerEmail,
-            password: currentOrder.customerPhone, // Mật khẩu = số điện thoại
-            email_confirm: true,
-            user_metadata: {
-              name: currentOrder.customerName,
-              role: "customer",
-            },
-          });
+          // Check if user already exists in Supabase Auth
+          const { data: existingAuthUsers } = await supabaseAdmin.auth.admin.listUsers();
+          const authUserExists = existingAuthUsers?.users?.some(
+            (u) => u.email === currentOrder.customerEmail
+          );
 
-          if (authError) {
-            console.error("Error creating auth user:", authError);
-          } else if (authUser.user) {
-            // Create user in database with same ID
-            await prisma.user.create({
-              data: {
-                id: authUser.user.id,
-                email: currentOrder.customerEmail,
-                password: currentOrder.customerPhone,
+          let authUserId: string | null = null;
+
+          if (authUserExists) {
+            // Get existing auth user ID
+            const existingAuthUser = existingAuthUsers?.users?.find(
+              (u) => u.email === currentOrder.customerEmail
+            );
+            authUserId = existingAuthUser?.id || null;
+            console.log("Auth user already exists:", authUserId);
+          } else {
+            // Create user in Supabase Auth
+            const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+              email: currentOrder.customerEmail,
+              password: currentOrder.customerPhone, // Mật khẩu = số điện thoại
+              email_confirm: true,
+              user_metadata: {
                 name: currentOrder.customerName,
-                phone: currentOrder.customerPhone,
                 role: "customer",
               },
             });
-            console.log("Created customer account:", currentOrder.customerEmail);
+
+            if (authError) {
+              console.error("Error creating auth user:", authError.message);
+            } else if (authUser.user) {
+              authUserId = authUser.user.id;
+              console.log("Created auth user:", authUserId);
+            }
           }
-        } catch (createError) {
-          console.error("Error creating customer account:", createError);
+
+          // Check if user exists in database
+          if (authUserId) {
+            const existingDbUser = await prisma.user.findUnique({
+              where: { email: currentOrder.customerEmail },
+            });
+
+            if (!existingDbUser) {
+              // Create user in database
+              await prisma.user.create({
+                data: {
+                  id: authUserId,
+                  email: currentOrder.customerEmail,
+                  password: currentOrder.customerPhone,
+                  name: currentOrder.customerName,
+                  phone: currentOrder.customerPhone,
+                  role: "customer",
+                },
+              });
+              console.log("Created database user for:", currentOrder.customerEmail);
+            } else {
+              console.log("Database user already exists:", currentOrder.customerEmail);
+            }
+          }
         }
+      } catch (createError) {
+        console.error("Error creating customer account:", createError);
       }
     }
 

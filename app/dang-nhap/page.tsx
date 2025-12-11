@@ -29,7 +29,7 @@ export default function LoginPage() {
         return;
       }
 
-      const { error: authError } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -44,20 +44,29 @@ export default function LoginPage() {
         return;
       }
 
+      if (!authData.user) {
+        setError("Đăng nhập thất bại");
+        setIsLoading(false);
+        return;
+      }
+
+      // Get user role from database directly using email
+      const { data: dbUser } = await supabase
+        .from("User")
+        .select("role")
+        .eq("email", authData.user.email)
+        .single();
+
       // Refresh auth context
       await refetch();
 
-      // Get user role to redirect appropriately
-      const res = await fetch("/api/auth/me");
-      if (res.ok) {
-        const data = await res.json();
-        if (data.user?.role === "admin" || data.user?.role === "ctv" || data.user?.role === "collaborator") {
-          router.push("/admin");
-        } else {
-          router.push("/tai-khoan");
-        }
+      // Redirect based on role
+      if (dbUser?.role === "admin" || dbUser?.role === "ctv" || dbUser?.role === "collaborator") {
+        router.replace("/admin");
+      } else if (dbUser?.role === "customer") {
+        router.replace("/tai-khoan");
       } else {
-        router.push("/");
+        router.replace("/");
       }
     } catch {
       setError("Có lỗi xảy ra. Vui lòng thử lại.");

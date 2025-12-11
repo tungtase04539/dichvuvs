@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { getSupabase, generateOrderCode } from "@/lib/supabase";
+import { generateOrderCode } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
 import { getCurrentReferralCode } from "@/components/ReferralTracker";
 import { useAuth } from "@/contexts/AuthContext";
@@ -82,23 +82,17 @@ export default function OrderForm() {
 
   useEffect(() => {
     const loadProducts = async () => {
-      const supabase = getSupabase();
-      if (!supabase) {
+      try {
+        const res = await fetch("/api/products");
+        const data = await res.json();
+        if (data.products) {
+          setProducts(data.products);
+        }
+      } catch (error) {
+        console.error("Load products error:", error);
+      } finally {
         setIsLoading(false);
-        return;
       }
-      
-      const { data, error } = await supabase
-        .from("Service")
-        .select("id, name, slug, description, price, image, videoUrl, featured")
-        .eq("active", true)
-        .order("featured", { ascending: false })
-        .order("name");
-
-      if (!error && data) {
-        setProducts(data);
-      }
-      setIsLoading(false);
     };
 
     const savedCart = sessionStorage.getItem("cart");

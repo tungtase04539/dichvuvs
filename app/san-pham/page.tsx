@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getSupabase } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -34,24 +33,18 @@ export default function ProductsPage() {
 
   useEffect(() => {
     const loadProducts = async () => {
-      const supabase = getSupabase();
-      if (!supabase) {
+      try {
+        const res = await fetch("/api/products");
+        const data = await res.json();
+        if (data.products) {
+          setProducts(data.products);
+          setFilteredProducts(data.products);
+        }
+      } catch (error) {
+        console.error("Load products error:", error);
+      } finally {
         setIsLoading(false);
-        return;
       }
-      
-      const { data } = await supabase
-        .from("Service")
-        .select("id, name, slug, description, price, image, videoUrl, featured")
-        .eq("active", true)
-        .order("featured", { ascending: false })
-        .order("name");
-
-      if (data) {
-        setProducts(data);
-        setFilteredProducts(data);
-      }
-      setIsLoading(false);
     };
 
     loadProducts();

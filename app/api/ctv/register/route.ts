@@ -61,48 +61,54 @@ export async function POST(request: Request) {
       userId = existingUser.id;
     } else {
       // Create new user with customer role
-      const { data: newUser, error: userError } = await supabase
+      const newUserId = crypto.randomUUID();
+      const { error: userError } = await supabase
         .from("User")
         .insert({
+          id: newUserId,
           email,
           password: phone, // Mật khẩu = số điện thoại
           name,
           phone,
           role: "customer",
-        })
-        .select("id")
-        .single();
+          active: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
 
       if (userError) {
         console.error("Error creating user:", userError);
         return NextResponse.json(
-          { error: "Không thể tạo tài khoản" },
+          { error: `Không thể tạo tài khoản: ${userError.message}` },
           { status: 500 }
         );
       }
 
-      userId = newUser.id;
+      userId = newUserId;
     }
 
     // Create CTV application
     const { error: appError } = await supabase
       .from("CTVApplication")
       .insert({
+        id: crypto.randomUUID(),
         userId,
         fullName: name,
         phone,
         email,
-        facebook,
-        zalo,
-        experience,
-        reason,
+        facebook: facebook || null,
+        zalo: zalo || null,
+        experience: experience || null,
+        reason: reason || null,
         status: "pending",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       });
 
     if (appError) {
       console.error("Error creating application:", appError);
       return NextResponse.json(
-        { error: "Không thể gửi đơn đăng ký" },
+        { error: `Không thể gửi đơn đăng ký: ${appError.message}` },
         { status: 500 }
       );
     }

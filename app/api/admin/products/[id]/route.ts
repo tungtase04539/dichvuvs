@@ -1,23 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { createServerSupabaseClient, createAdminSupabaseClient } from "@/lib/supabase-server";
 
 export const dynamic = "force-dynamic";
 
 // Helper to check admin auth
-async function checkAdminAuth(supabase: ReturnType<typeof createServerSupabaseClient>) {
-  if (!supabase) return null;
+async function checkAdminAuth() {
+  const supabase = createServerSupabaseClient();
+  const adminSupabase = createAdminSupabaseClient();
+  
+  if (!supabase || !adminSupabase) return { user: null, adminSupabase: null };
   
   const { data: { user: authUser } } = await supabase.auth.getUser();
-  if (!authUser) return null;
+  if (!authUser) return { user: null, adminSupabase: null };
 
-  const { data: dbUser } = await supabase
+  const { data: dbUser } = await adminSupabase
     .from("User")
     .select("role")
     .eq("email", authUser.email)
     .single();
 
-  if (!dbUser || dbUser.role !== "admin") return null;
-  return dbUser;
+  if (!dbUser || dbUser.role !== "admin") return { user: null, adminSupabase: null };
+  return { user: dbUser, adminSupabase };
 }
 
 // Get single product
@@ -26,17 +29,12 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createServerSupabaseClient();
-    if (!supabase) {
-      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
-    }
-
-    const user = await checkAdminAuth(supabase);
-    if (!user) {
+    const { user, adminSupabase } = await checkAdminAuth();
+    if (!user || !adminSupabase) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { data: product, error } = await supabase
+    const { data: product, error } = await adminSupabase
       .from("Service")
       .select("*")
       .eq("id", params.id)
@@ -59,13 +57,8 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createServerSupabaseClient();
-    if (!supabase) {
-      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
-    }
-
-    const user = await checkAdminAuth(supabase);
-    if (!user) {
+    const { user, adminSupabase } = await checkAdminAuth();
+    if (!user || !adminSupabase) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -80,7 +73,7 @@ export async function PUT(
     }
 
     // Check if slug exists (excluding current product)
-    const { data: existing } = await supabase
+    const { data: existing } = await adminSupabase
       .from("Service")
       .select("id")
       .eq("slug", slug)
@@ -94,7 +87,7 @@ export async function PUT(
       );
     }
 
-    const { data: product, error } = await supabase
+    const { data: product, error } = await adminSupabase
       .from("Service")
       .update({
         name,
@@ -130,18 +123,13 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createServerSupabaseClient();
-    if (!supabase) {
-      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
-    }
-
-    const user = await checkAdminAuth(supabase);
-    if (!user) {
+    const { user, adminSupabase } = await checkAdminAuth();
+    if (!user || !adminSupabase) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if product has orders
-    const { count } = await supabase
+    const { count } = await adminSupabase
       .from("Order")
       .select("id", { count: "exact", head: true })
       .eq("serviceId", params.id);
@@ -153,7 +141,7 @@ export async function DELETE(
       );
     }
 
-    const { error } = await supabase
+    const { error } = await adminSupabase
       .from("Service")
       .delete()
       .eq("id", params.id);

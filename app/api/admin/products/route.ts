@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { createServerSupabaseClient, createAdminSupabaseClient } from "@/lib/supabase-server";
 
 export const dynamic = "force-dynamic";
 
@@ -7,7 +7,9 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const supabase = createServerSupabaseClient();
-    if (!supabase) {
+    const adminSupabase = createAdminSupabaseClient();
+    
+    if (!supabase || !adminSupabase) {
       return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
     }
 
@@ -17,8 +19,8 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check role
-    const { data: dbUser } = await supabase
+    // Check role using admin client
+    const { data: dbUser } = await adminSupabase
       .from("User")
       .select("role")
       .eq("email", authUser.email)
@@ -28,7 +30,8 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { data: products, error } = await supabase
+    // Use admin client to bypass RLS
+    const { data: products, error } = await adminSupabase
       .from("Service")
       .select("*")
       .order("createdAt", { ascending: false });
@@ -49,7 +52,9 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const supabase = createServerSupabaseClient();
-    if (!supabase) {
+    const adminSupabase = createAdminSupabaseClient();
+    
+    if (!supabase || !adminSupabase) {
       return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
     }
 
@@ -59,8 +64,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check role
-    const { data: dbUser } = await supabase
+    // Check role using admin client
+    const { data: dbUser } = await adminSupabase
       .from("User")
       .select("role")
       .eq("email", authUser.email)
@@ -80,8 +85,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if slug exists
-    const { data: existing } = await supabase
+    // Check if slug exists using admin client
+    const { data: existing } = await adminSupabase
       .from("Service")
       .select("id")
       .eq("slug", slug)
@@ -94,7 +99,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: product, error } = await supabase
+    // Use admin client to bypass RLS
+    const { data: product, error } = await adminSupabase
       .from("Service")
       .insert({
         id: crypto.randomUUID(),

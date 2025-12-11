@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { getSession } from "@/lib/auth";
+import { createServerSupabaseClient } from "@/lib/supabase-server";
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await getSession();
-    if (!user || user.role !== "admin") {
+    const supabase = createServerSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -21,12 +25,13 @@ export async function PATCH(
     }
 
     // Get the application
-    const application = await prisma.cTVApplication.findUnique({
-      where: { id },
-      include: { user: true },
-    });
+    const { data: application, error: fetchError } = await supabase
+      .from("CTVApplication")
+      .select("*")
+      .eq("id", id)
+      .single();
 
-    if (!application) {
+    if (fetchError || !application) {
       return NextResponse.json({ error: "Không tìm thấy đơn đăng ký" }, { status: 404 });
     }
 
@@ -35,21 +40,27 @@ export async function PATCH(
     }
 
     // Update application status
-    await prisma.cTVApplication.update({
-      where: { id },
-      data: {
+    const { error: updateError } = await supabase
+      .from("CTVApplication")
+      .update({
         status: action === "approve" ? "approved" : "rejected",
         reviewedBy: user.id,
-        reviewedAt: new Date(),
-      },
-    });
+        reviewedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+      .eq("id", id);
+
+    if (updateError) {
+      console.error("Update error:", updateError);
+      return NextResponse.json({ error: "Lỗi cập nhật" }, { status: 500 });
+    }
 
     // If approved, update user role to CTV
     if (action === "approve") {
-      await prisma.user.update({
-        where: { id: application.userId },
-        data: { role: "ctv" },
-      });
+      await supabase
+        .from("User")
+        .update({ role: "ctv", updatedAt: new Date().toISOString() })
+        .eq("id", application.userId);
     }
 
     return NextResponse.json({

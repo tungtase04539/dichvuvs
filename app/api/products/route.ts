@@ -7,6 +7,10 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const supabase = createServerSupabaseClient();
+    
+    if (!supabase) {
+      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+    }
 
     const { data: products, error } = await supabase
       .from("Service")

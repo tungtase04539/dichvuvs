@@ -57,6 +57,16 @@ export async function PATCH(
     const body = await request.json();
     const { status, assignedToId, notes } = body;
 
+    // Get current order to check status change
+    const currentOrder = await prisma.order.findUnique({
+      where: { id: params.id },
+      select: { status: true, customerEmail: true, customerName: true, customerPhone: true },
+    });
+
+    if (!currentOrder) {
+      return NextResponse.json({ error: "Không tìm thấy đơn hàng" }, { status: 404 });
+    }
+
     const updateData: Record<string, unknown> = {};
 
     if (status) {
@@ -79,6 +89,32 @@ export async function PATCH(
         },
       },
     });
+
+    // Tự động tạo tài khoản khách hàng khi thanh toán thành công
+    if (
+      status &&
+      (status === "confirmed" || status === "completed") &&
+      currentOrder.status !== "confirmed" &&
+      currentOrder.status !== "completed" &&
+      currentOrder.customerEmail
+    ) {
+      // Check if account already exists
+      const existingUser = await prisma.user.findUnique({
+        where: { email: currentOrder.customerEmail },
+      });
+
+      if (!existingUser) {
+        await prisma.user.create({
+          data: {
+            email: currentOrder.customerEmail,
+            password: currentOrder.customerPhone, // Mật khẩu = số điện thoại
+            name: currentOrder.customerName,
+            phone: currentOrder.customerPhone,
+            role: "customer",
+          },
+        });
+      }
+    }
 
     return NextResponse.json({ order });
   } catch (error) {

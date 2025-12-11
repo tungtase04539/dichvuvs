@@ -93,6 +93,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Vui lòng nhập họ tên và số điện thoại" }, { status: 400 });
     }
 
+    if (!email) {
+      return NextResponse.json({ error: "Vui lòng nhập email để nhận tài khoản quản lý ChatBot" }, { status: 400 });
+    }
+
     if (!items || items.length === 0) {
       return NextResponse.json({ error: "Vui lòng chọn ít nhất 1 sản phẩm" }, { status: 400 });
     }
@@ -129,7 +133,7 @@ export async function POST(request: NextRequest) {
     const mainProduct = productMap.get(items[0].serviceId);
     const orderCode = generateOrderCode();
 
-    // Single insert query
+    // Single insert query - Tài khoản sẽ được tạo sau khi thanh toán thành công
     const order = await prisma.order.create({
       data: {
         orderCode,
@@ -138,13 +142,13 @@ export async function POST(request: NextRequest) {
         unit: "bot",
         customerName,
         customerPhone: finalPhone,
-        customerEmail: email || null,
+        customerEmail: email,
         address: "Online",
         district: "Online",
         scheduledDate: new Date(),
         scheduledTime: "Giao ngay",
         notes: notes ? `${notes}\n---\n${details.join(", ")}` : details.join(", "),
-        basePrice: mainProduct?.price || 30000,
+        basePrice: mainProduct?.price || 29000,
         totalPrice,
         status: "pending",
       },
@@ -153,6 +157,7 @@ export async function POST(request: NextRequest) {
         orderCode: true,
         totalPrice: true,
         status: true,
+        customerEmail: true,
         service: { select: { name: true, icon: true } },
       },
     });

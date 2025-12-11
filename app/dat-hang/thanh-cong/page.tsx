@@ -119,6 +119,27 @@ function CredentialDisplay({ credential }: { credential: Credential }) {
   );
 }
 
+function AccountNotice() {
+  return (
+    <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/10 rounded-2xl p-6 border border-blue-400/30 mb-6">
+      <div className="flex items-center gap-2 text-blue-400 mb-3">
+        <Key className="w-5 h-5" />
+        <span className="font-bold">📧 Tài khoản sẽ được tạo tự động</span>
+      </div>
+      <p className="text-slate-300 text-sm">
+        Sau khi thanh toán thành công, hệ thống sẽ <strong>tự động tạo tài khoản</strong> cho bạn với:
+      </p>
+      <ul className="text-slate-400 text-sm mt-2 space-y-1 ml-4 list-disc">
+        <li><strong className="text-blue-400">Tên đăng nhập:</strong> Email bạn đã nhập</li>
+        <li><strong className="text-blue-400">Mật khẩu:</strong> Số điện thoại của bạn</li>
+      </ul>
+      <p className="text-xs text-slate-500 mt-3">
+        Bạn sẽ dùng tài khoản này để đăng nhập và quản lý ChatBot đã mua.
+      </p>
+    </div>
+  );
+}
+
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
   const orderCode = searchParams.get("code") || "";
@@ -142,7 +163,7 @@ function OrderSuccessContent() {
       if (!supabase) {
         setOrder({
           orderCode,
-          totalPrice: 30000,
+          totalPrice: 29000,
           status: "pending",
           customerName: "Khách hàng",
           customerPhone: "",
@@ -166,7 +187,7 @@ function OrderSuccessContent() {
         } else {
           setOrder({
             orderCode,
-            totalPrice: 30000,
+            totalPrice: 29000,
             status: "pending",
             customerName: "Khách hàng",
             customerPhone: "",
@@ -331,6 +352,9 @@ function OrderSuccessContent() {
           Vui lòng thanh toán để nhận tài khoản ChatBot
         </p>
       </div>
+
+      {/* Account Notice - Will be created after payment */}
+      <AccountNotice />
 
       {/* Order Info */}
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 mb-6">

@@ -8,22 +8,21 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// Roles: admin, master_agent (tổng đại lý), agent (đại lý), collaborator (cộng tác viên), staff
-// Phân cấp: Admin > Tổng đại lý > Đại lý > Cộng tác viên
+// Roles: admin, ctv (cộng tác viên), customer (khách hàng)
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String
   name      String
-  role      String   @default("staff") // admin, master_agent, agent, collaborator, staff
+  role      String   @default("customer") // admin, ctv, customer
   phone     String?
   avatar    String?
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Phân cấp: Tổng đại lý > Đại lý > Cộng tác viên
-  parentId  String?  // ID của cấp trên (tổng đại lý/đại lý)
+  // Phân cấp CTV
+  parentId  String?  // ID của cấp trên
   parent    User?    @relation("AgentHierarchy", fields: [parentId], references: [id])
   subAgents User[]   @relation("AgentHierarchy") // Danh sách cấp dưới
 
@@ -32,6 +31,30 @@ model User {
   messages       Message[]
   referralLinks  ReferralLink[]
   referredOrders Order[]       @relation("ReferrerOrders")
+  ctvApplication CTVApplication?
+}
+
+// Đơn đăng ký làm CTV
+model CTVApplication {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  fullName    String
+  phone       String
+  email       String
+  facebook    String?
+  zalo        String?
+  experience  String?  // Kinh nghiệm bán hàng
+  reason      String?  // Lý do muốn làm CTV
+  
+  status      String   @default("pending") // pending, approved, rejected
+  reviewedBy  String?  // Admin duyệt
+  reviewedAt  DateTime?
+  rejectReason String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Service {

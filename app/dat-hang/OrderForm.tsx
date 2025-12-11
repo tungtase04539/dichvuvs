@@ -175,54 +175,46 @@ export default function OrderForm() {
       return;
     }
 
-    setIsSubmitting(true);
-    const supabase = getSupabase();
-    if (!supabase) {
-      alert("Lỗi kết nối, vui lòng thử lại");
-      setIsSubmitting(false);
+    if (!email) {
+      alert("Vui lòng nhập email để nhận tài khoản quản lý ChatBot");
       return;
     }
+
+    setIsSubmitting(true);
     
-    const orderCode = generateOrderCode();
-    const mainProduct = cart[0].product;
-    const details = cart.map((item) => `${item.product.name} x${item.quantity}`).join(", ");
+    try {
+      const items = cart.map((item) => ({
+        serviceId: item.product.id,
+        quantity: item.quantity,
+      }));
 
-    const orderData: Record<string, unknown> = {
-      id: crypto.randomUUID(),
-      orderCode,
-      serviceId: mainProduct.id,
-      quantity: totalItems,
-      unit: "bot",
-      customerName,
-      customerPhone: phone,
-      customerEmail: email || null,
-      address: "Online",
-      district: "Online",
-      scheduledDate: new Date().toISOString(),
-      scheduledTime: "Giao ngay",
-      notes: notes ? `${notes}\n---\n${details}` : details,
-      basePrice: mainProduct.price,
-      totalPrice,
-      status: "pending",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerName,
+          customerPhone: phone,
+          email,
+          notes,
+          items,
+          referralCode,
+        }),
+      });
 
-    // Thêm mã giới thiệu nếu có
-    if (referralCode) {
-      orderData.referralCode = referralCode;
-    }
+      const data = await res.json();
 
-    const { error } = await supabase.from("Order").insert(orderData);
+      if (!res.ok) {
+        alert(data.error || "Có lỗi xảy ra, vui lòng thử lại");
+        setIsSubmitting(false);
+        return;
+      }
 
-    if (error) {
+      router.push(`/dat-hang/thanh-cong?code=${data.order.orderCode}`);
+    } catch (error) {
       console.error("Order error:", error);
       alert("Có lỗi xảy ra, vui lòng thử lại");
       setIsSubmitting(false);
-      return;
     }
-
-    router.push(`/dat-hang/thanh-cong?code=${orderCode}`);
   };
 
   if (isLoading) {
@@ -456,15 +448,20 @@ export default function OrderForm() {
               <div>
                 <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-700 mb-1.5 sm:mb-2">
                   <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400" />
-                  Email
+                  Email <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
                   className="input text-sm"
                   placeholder="email@example.com"
                 />
+                <p className="text-xs text-amber-600 mt-1 flex items-start gap-1">
+                  <span>⚠️</span>
+                  <span>Email dùng làm <strong>tên đăng nhập</strong>, mật khẩu là <strong>số điện thoại</strong> của bạn để quản lý ChatBot đã mua.</span>
+                </p>
               </div>
               <div>
                 <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-700 mb-1.5 sm:mb-2">

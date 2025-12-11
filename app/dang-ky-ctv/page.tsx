@@ -18,12 +18,33 @@ export default function DangKyCTVPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  const [error, setError] = useState("");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    setError("");
+
+    try {
+      const res = await fetch("/api/ctv/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Có lỗi xảy ra, vui lòng thử lại");
+        setIsSubmitting(false);
+        return;
+      }
+
+      setSubmitted(true);
+    } catch (err) {
+      setError("Có lỗi xảy ra, vui lòng thử lại");
+    }
     setIsSubmitting(false);
-    setSubmitted(true);
   };
 
   const benefits = [
@@ -245,6 +266,11 @@ export default function DangKyCTVPage() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
+                  {error && (
+                    <div className="p-3 bg-red-900/30 border border-red-500/30 rounded-xl text-red-400 text-sm">
+                      {error}
+                    </div>
+                  )}
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-slate-300 mb-2">

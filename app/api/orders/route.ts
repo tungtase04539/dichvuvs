@@ -54,12 +54,14 @@ export async function GET(request: NextRequest) {
     if (status && status !== "all") where.status = status;
     
     // CTV chỉ xem đơn hàng của khách mình giới thiệu
-    if (user.role === "ctv") {
+    if (user.role === "ctv" || user.role === "collaborator") {
       where.referrerId = user.id;
     } else if (user.role === "staff") {
       where.assignedToId = user.id;
     }
     // Admin xem tất cả (không filter)
+    
+    console.log("Orders filter - User:", user.email, "Role:", user.role, "Where:", where);
 
     const orders = await prisma.order.findMany({
       where,
@@ -184,16 +186,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Update referral stats if code was used
-    if (referralCode && referrerId) {
-      await prisma.referralLink.update({
-        where: { code: referralCode },
-        data: {
-          orderCount: { increment: 1 },
-          revenue: { increment: totalPrice },
-        },
-      });
-    }
+    // Note: Referral stats (orderCount, revenue) sẽ được cập nhật 
+    // khi đơn hàng được xác nhận thanh toán, không phải khi tạo đơn
 
     return NextResponse.json({ order });
   } catch (error) {

@@ -60,7 +60,15 @@ export async function PATCH(
     // Get current order to check status change
     const currentOrder = await prisma.order.findUnique({
       where: { id: params.id },
-      select: { status: true, customerEmail: true, customerName: true, customerPhone: true },
+      select: { 
+        status: true, 
+        customerEmail: true, 
+        customerName: true, 
+        customerPhone: true,
+        referralCode: true,
+        referrerId: true,
+        totalPrice: true,
+      },
     });
 
     if (!currentOrder) {
@@ -174,6 +182,22 @@ export async function PATCH(
         }
       } catch (createError) {
         console.error("Error creating customer account:", createError);
+      }
+
+      // Cập nhật stats cho CTV khi đơn hàng được xác nhận
+      if (currentOrder.referralCode && currentOrder.referrerId) {
+        try {
+          await prisma.referralLink.update({
+            where: { code: currentOrder.referralCode },
+            data: {
+              orderCount: { increment: 1 },
+              revenue: { increment: currentOrder.totalPrice },
+            },
+          });
+          console.log("Updated referral stats for code:", currentOrder.referralCode);
+        } catch (refError) {
+          console.error("Error updating referral stats:", refError);
+        }
       }
     }
 

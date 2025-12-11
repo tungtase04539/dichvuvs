@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { getSupabase } from "@/lib/supabase";
 
 interface User {
   id: string;
@@ -33,10 +33,16 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = createClientComponentClient();
 
   const fetchUser = async () => {
     try {
+      const supabase = getSupabase();
+      if (!supabase) {
+        setUser(null);
+        setIsLoading(false);
+        return;
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session?.user) {
@@ -65,6 +71,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     fetchUser();
 
     // Listen for auth changes
+    const supabase = getSupabase();
+    if (!supabase) return;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event) => {
         if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {

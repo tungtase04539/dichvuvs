@@ -121,20 +121,12 @@ function CredentialDisplay({ credential }: { credential: Credential }) {
 
 function AccountNotice() {
   return (
-    <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/10 rounded-2xl p-6 border border-blue-400/30 mb-6">
-      <div className="flex items-center gap-2 text-blue-400 mb-3">
-        <Key className="w-5 h-5" />
-        <span className="font-bold">📧 Tài khoản sẽ được tạo tự động</span>
-      </div>
-      <p className="text-slate-300 text-sm">
-        Sau khi thanh toán thành công, hệ thống sẽ <strong>tự động tạo tài khoản</strong> cho bạn với:
+    <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 mb-4">
+      <p className="text-blue-800 text-sm font-medium mb-2">
+        📧 Tài khoản sẽ tự động tạo sau khi thanh toán
       </p>
-      <ul className="text-slate-400 text-sm mt-2 space-y-1 ml-4 list-disc">
-        <li><strong className="text-blue-400">Tên đăng nhập:</strong> Email bạn đã nhập</li>
-        <li><strong className="text-blue-400">Mật khẩu:</strong> Số điện thoại của bạn</li>
-      </ul>
-      <p className="text-xs text-slate-500 mt-3">
-        Bạn sẽ dùng tài khoản này để đăng nhập và quản lý ChatBot đã mua.
+      <p className="text-blue-600 text-xs">
+        Đăng nhập: <strong>Email</strong> | Mật khẩu: <strong>SĐT của bạn</strong>
       </p>
     </div>
   );
@@ -341,104 +333,81 @@ function OrderSuccessContent() {
   // Waiting for payment
   return (
     <>
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-4">
-          <CheckCircle className="w-10 h-10 text-green-600" />
+      {/* Header */}
+      <div className="text-center mb-6">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-3">
+          <CheckCircle className="w-8 h-8 text-green-600" />
         </div>
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">
+        <h1 className="text-2xl font-bold text-slate-900 mb-1">
           Đặt hàng thành công!
         </h1>
-        <p className="text-slate-600">
-          Vui lòng thanh toán để nhận tài khoản ChatBot
+        <p className="text-slate-500 text-sm">
+          Thanh toán để nhận tài khoản ChatBot
         </p>
       </div>
 
-      {/* Account Notice - Will be created after payment */}
-      <AccountNotice />
-
-      {/* Order Info */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 mb-6">
-        <div className="flex items-center justify-between mb-4 pb-4 border-b border-slate-100">
+      {/* Order Summary - Compact */}
+      <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 mb-4">
+        <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-slate-500">Mã đơn hàng</p>
-            <div className="flex items-center gap-2">
-              <p className="text-xl font-bold font-mono text-primary-600">
-                {order.orderCode}
-              </p>
+            <p className="text-xs text-slate-400">Mã đơn</p>
+            <div className="flex items-center gap-1">
+              <p className="text-lg font-bold font-mono text-primary-600">{order.orderCode}</p>
               <CopyButton text={order.orderCode} />
             </div>
           </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-100 text-amber-700 rounded-full text-sm font-medium">
-            <Clock className="w-4 h-4" />
-            Chờ thanh toán
+          <div className="text-right">
+            <p className="text-xs text-slate-400">Tổng tiền</p>
+            <p className="text-lg font-bold text-primary-600">{formatCurrency(order.totalPrice)}</p>
           </div>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <span className="text-slate-600">Tổng thanh toán</span>
-          <span className="text-2xl font-bold text-primary-600">
-            {formatCurrency(order.totalPrice)}
-          </span>
         </div>
       </div>
 
-      {/* Payment Section */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 mb-6">
-        <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-          <CreditCard className="w-5 h-5 text-primary-600" />
-          Thông tin thanh toán
-        </h2>
+      {/* Account Notice */}
+      <AccountNotice />
 
+      {/* Payment QR */}
+      <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 mb-4">
         <QRPayment orderCode={order.orderCode} amount={order.totalPrice} />
-
-        <div className="mt-6 p-4 bg-primary-50 rounded-xl border border-primary-100">
-          <p className="text-sm text-primary-800">
-            <strong>Lưu ý:</strong> Vui lòng ghi đúng nội dung chuyển khoản là{" "}
-            <span className="font-mono font-bold">{order.orderCode}</span> để hệ thống
-            tự động xác nhận thanh toán.
-          </p>
-        </div>
       </div>
 
       {/* Check Payment Button */}
-      <div className="mb-6">
-        <button
-          onClick={checkPaymentStatus}
-          disabled={checkingPayment}
-          className="btn btn-secondary w-full"
-        >
-          {checkingPayment ? (
-            <>
-              <Loader2 className="w-5 h-5 animate-spin" />
-              Đang kiểm tra...
-            </>
-          ) : (
-            <>
-              <RefreshCw className="w-5 h-5" />
-              Tôi đã thanh toán - Kiểm tra ngay
-            </>
-          )}
-        </button>
-        <p className="text-xs text-slate-500 text-center mt-2">
-          Hệ thống tự động kiểm tra mỗi 10 giây
-        </p>
-      </div>
+      <button
+        onClick={checkPaymentStatus}
+        disabled={checkingPayment}
+        className="w-full py-3 px-4 bg-primary-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary-600 disabled:opacity-50 mb-2"
+      >
+        {checkingPayment ? (
+          <>
+            <Loader2 className="w-5 h-5 animate-spin" />
+            Đang kiểm tra...
+          </>
+        ) : (
+          <>
+            <RefreshCw className="w-5 h-5" />
+            Đã thanh toán? Kiểm tra ngay
+          </>
+        )}
+      </button>
+      <p className="text-xs text-slate-400 text-center mb-4">
+        Tự động kiểm tra mỗi 10 giây
+      </p>
 
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex gap-3">
         <Link
           href={`/tra-cuu?code=${order.orderCode}`}
-          className="btn btn-primary flex-1"
+          className="flex-1 py-2.5 px-4 bg-slate-100 text-slate-700 font-medium rounded-xl flex items-center justify-center gap-2 text-sm"
         >
-          <Search className="w-5 h-5" />
-          Tra cứu đơn hàng
+          <Search className="w-4 h-4" />
+          Tra cứu
         </Link>
         <Link
           href="/san-pham"
-          className="btn btn-secondary flex-1"
+          className="flex-1 py-2.5 px-4 bg-slate-100 text-slate-700 font-medium rounded-xl flex items-center justify-center gap-2 text-sm"
         >
-          Tiếp tục mua sắm
-          <ArrowRight className="w-5 h-5" />
+          Mua thêm
+          <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
     </>
@@ -450,13 +419,13 @@ export default function OrderSuccessPage() {
     <div className="min-h-screen bg-slate-50">
       <Header settings={{}} />
 
-      <main className="pt-32 pb-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-xl mx-auto">
+      <main className="pt-20 sm:pt-28 pb-10 sm:pb-20">
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="max-w-md mx-auto">
             <Suspense
               fallback={
                 <div className="flex items-center justify-center py-20">
-                  <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+                  <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
                 </div>
               }
             >

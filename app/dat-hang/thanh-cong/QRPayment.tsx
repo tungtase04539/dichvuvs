@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import CopyButton from "./CopyButton";
-import { Loader2, QrCode, Building2 } from "lucide-react";
+import { Loader2, QrCode } from "lucide-react";
 
 interface QRPaymentProps {
   orderCode: string;
@@ -47,77 +47,66 @@ export default function QRPayment({ orderCode, amount }: QRPaymentProps) {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
       </div>
     );
   }
 
   return (
-    <div className="grid md:grid-cols-2 gap-6">
-      {/* QR Code */}
+    <div className="space-y-4">
+      {/* QR Code - Centered */}
       <div className="flex flex-col items-center">
-        <div className="bg-white p-4 rounded-2xl border-2 border-primary-100 shadow-lg">
+        <div className="bg-white p-3 rounded-xl border-2 border-primary-200 shadow-md">
           {qrUrl ? (
             <Image
               src={qrUrl}
               alt="QR Payment"
-              width={200}
-              height={200}
-              className="rounded-xl"
+              width={180}
+              height={180}
+              className="rounded-lg"
             />
           ) : (
-            <div className="w-[200px] h-[200px] bg-slate-100 rounded-xl flex items-center justify-center">
-              <QrCode className="w-16 h-16 text-slate-300" />
+            <div className="w-[180px] h-[180px] bg-slate-100 rounded-lg flex items-center justify-center">
+              <QrCode className="w-12 h-12 text-slate-300" />
             </div>
           )}
         </div>
-        <p className="text-sm text-slate-500 mt-3 text-center">
-          Quét mã QR để thanh toán
+        <p className="text-sm text-slate-500 mt-2 text-center">
+          Quét mã QR bằng app ngân hàng
         </p>
       </div>
 
-      {/* Bank Info */}
-      <div className="space-y-4">
-        <h3 className="font-semibold text-slate-900 flex items-center gap-2">
-          <Building2 className="w-5 h-5 text-primary-600" />
-          Hoặc chuyển khoản thủ công
-        </h3>
+      {/* Bank Info - Compact */}
+      <div className="bg-slate-50 rounded-xl p-4 space-y-3">
+        <div className="flex items-center justify-between py-2 border-b border-slate-200">
+          <span className="text-sm text-slate-500">Ngân hàng</span>
+          <span className="font-semibold text-slate-900">{bankInfo?.bankName}</span>
+        </div>
 
-        <div className="space-y-3">
-          <div className="p-3 bg-slate-50 rounded-xl">
-            <p className="text-xs text-slate-500 mb-1">Ngân hàng</p>
-            <p className="font-semibold text-slate-900">{bankInfo?.bankName}</p>
+        <div className="flex items-center justify-between py-2 border-b border-slate-200">
+          <span className="text-sm text-slate-500">Số TK</span>
+          <div className="flex items-center gap-2">
+            <span className="font-mono font-semibold text-slate-900">{bankInfo?.accountNumber}</span>
+            <CopyButton text={bankInfo?.accountNumber || ""} />
           </div>
+        </div>
 
-          <div className="p-3 bg-slate-50 rounded-xl">
-            <p className="text-xs text-slate-500 mb-1">Số tài khoản</p>
-            <div className="flex items-center justify-between">
-              <p className="font-mono font-semibold text-slate-900">
-                {bankInfo?.accountNumber}
-              </p>
-              <CopyButton text={bankInfo?.accountNumber || ""} />
-            </div>
-          </div>
+        <div className="flex items-center justify-between py-2 border-b border-slate-200">
+          <span className="text-sm text-slate-500">Chủ TK</span>
+          <span className="font-semibold text-slate-900 text-right">{bankInfo?.accountName}</span>
+        </div>
 
-          <div className="p-3 bg-slate-50 rounded-xl">
-            <p className="text-xs text-slate-500 mb-1">Chủ tài khoản</p>
-            <p className="font-semibold text-slate-900">{bankInfo?.accountName}</p>
-          </div>
+        <div className="flex items-center justify-between py-2 border-b border-slate-200">
+          <span className="text-sm text-slate-500">Số tiền</span>
+          <span className="font-bold text-primary-600">{amount.toLocaleString("vi-VN")}đ</span>
+        </div>
 
-          <div className="p-3 bg-primary-50 rounded-xl border border-primary-100">
-            <p className="text-xs text-primary-600 mb-1">Nội dung chuyển khoản</p>
-            <div className="flex items-center justify-between">
-              <p className="font-mono font-bold text-primary-700">{orderCode}</p>
-              <CopyButton text={orderCode} />
-            </div>
-          </div>
-
-          <div className="p-3 bg-slate-50 rounded-xl">
-            <p className="text-xs text-slate-500 mb-1">Số tiền</p>
-            <p className="font-bold text-lg text-primary-600">
-              {amount.toLocaleString("vi-VN")}đ
-            </p>
+        <div className="flex items-center justify-between py-2 bg-primary-50 -mx-4 px-4 rounded-b-xl">
+          <span className="text-sm text-primary-700 font-medium">Nội dung CK</span>
+          <div className="flex items-center gap-2">
+            <span className="font-mono font-bold text-primary-700">{orderCode}</span>
+            <CopyButton text={orderCode} />
           </div>
         </div>
       </div>

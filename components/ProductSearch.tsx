@@ -12,7 +12,6 @@ interface Product {
   slug: string;
   description: string;
   price: number;
-  icon: string | null;
   image: string | null;
 }
 
@@ -119,7 +118,7 @@ export default function ProductSearch() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-3xl">{product.icon || "🤖"}</span>
+                      <span className="text-3xl">🤖</span>
                     )}
                   </div>
 

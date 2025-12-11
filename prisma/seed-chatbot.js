@@ -66,7 +66,6 @@ Chatbot thông minh giúp bạn tự động hóa quy trình bán hàng, từ t�
 • Kinh doanh dropshipping`,
       price: 29000,
       unit: "bot",
-      icon: "🛒",
       featured: true,
     },
     {
@@ -97,7 +96,6 @@ Giải pháp CSKH tự động, giúp khách hàng luôn được hỗ trợ m�
 • Startup cần tối ưu chi phí`,
       price: 29000,
       unit: "bot",
-      icon: "🎧",
       featured: true,
     },
     {
@@ -128,7 +126,6 @@ Tự động hóa quy trình đặt lịch, giúp khách hàng book lịch dễ 
 • Dịch vụ tư vấn, coaching`,
       price: 29000,
       unit: "bot",
-      icon: "📅",
       featured: true,
     },
     {
@@ -159,7 +156,6 @@ Chatbot chuyên biệt cho ngành BĐS, giúp lọc lead và tư vấn khách h�
 • Agency marketing BĐS`,
       price: 29000,
       unit: "bot",
-      icon: "🏠",
       featured: false,
     },
     {
@@ -190,7 +186,6 @@ Chatbot thông minh hỗ trợ trung tâm đào tạo và học viên trong su�
 • Trường đại học, cao đẳng`,
       price: 29000,
       unit: "bot",
-      icon: "📚",
       featured: true,
     },
     {
@@ -221,7 +216,6 @@ Chatbot chuyên biệt cho ngành F&B, từ đặt bàn đến order và chăm s
 • Dịch vụ catering`,
       price: 29000,
       unit: "bot",
-      icon: "🍽️",
       featured: false,
     },
     {
@@ -252,7 +246,6 @@ Chatbot chuyên biệt cho ngành du lịch, hỗ trợ khách hàng lên kế h
 • Dịch vụ thuê xe du lịch`,
       price: 29000,
       unit: "bot",
-      icon: "✈️",
       featured: false,
     },
     {
@@ -283,7 +276,6 @@ Chatbot hỗ trợ phòng khám và bệnh nhân trong việc chăm sóc sức k
 • Trung tâm dinh dưỡng`,
       price: 29000,
       unit: "bot",
-      icon: "🏥",
       featured: false,
     },
     {
@@ -314,7 +306,6 @@ Chatbot tự động hóa quy trình tuyển dụng, từ tiếp nhận CV đế
 • Agency tuyển dụng`,
       price: 29000,
       unit: "bot",
-      icon: "👔",
       featured: true,
     },
     {
@@ -345,7 +336,6 @@ Chatbot chuyên biệt cho ngành tài chính, hỗ trợ tư vấn và bán s�
 • Tư vấn tài chính cá nhân`,
       price: 29000,
       unit: "bot",
-      icon: "💰",
       featured: false,
     },
   ];
@@ -358,7 +348,6 @@ Chatbot chuyên biệt cho ngành tài chính, hỗ trợ tư vấn và bán s�
         description: chatbot.description,
         longDescription: chatbot.longDescription,
         price: chatbot.price,
-        icon: chatbot.icon,
         featured: chatbot.featured,
       },
       create: {
@@ -368,7 +357,6 @@ Chatbot chuyên biệt cho ngành tài chính, hỗ trợ tư vấn và bán s�
         longDescription: chatbot.longDescription,
         price: chatbot.price,
         unit: chatbot.unit,
-        icon: chatbot.icon,
         featured: chatbot.featured,
       },
     });

@@ -12,7 +12,6 @@ interface Product {
   id: string;
   name: string;
   price: number;
-  icon: string | null;
   image: string | null;
   videoUrl: string | null;
   slug: string;
@@ -297,7 +296,7 @@ export default function OrderForm() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <span className="text-3xl sm:text-4xl">{product.icon || "🤖"}</span>
+                          <span className="text-3xl sm:text-4xl">🤖</span>
                         </div>
                       )}
                       {inCart && (
@@ -385,7 +384,7 @@ export default function OrderForm() {
                       {item.product.image ? (
                         <img src={item.product.image} alt="" className="w-full h-full object-cover" />
                       ) : (
-                        <span className="text-lg sm:text-xl">{item.product.icon || "🤖"}</span>
+                        <span className="text-lg sm:text-xl">🤖</span>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">

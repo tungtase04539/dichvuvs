@@ -15,7 +15,6 @@ interface Product {
   slug: string;
   description: string;
   price: number;
-  icon: string | null;
   image: string | null;
 }
 
@@ -159,7 +158,7 @@ export default function FlashSalePage() {
                   {product.image ? (
                     <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-6xl">{product.icon || "🤖"}</span>
+                    <span className="text-6xl">🤖</span>
                   )}
                 </div>
 

@@ -40,7 +40,6 @@ interface Order {
   createdAt: string;
   service: {
     name: string;
-    icon: string;
   };
 }
 
@@ -350,7 +349,7 @@ function TrackOrderContent() {
           {/* Order details */}
           <div className="space-y-4">
             <div className="flex items-start gap-3 p-4 bg-slate-700/50 rounded-xl">
-              <span className="text-3xl">{order.service.icon}</span>
+              <span className="text-3xl">🤖</span>
               <div className="flex-1">
                 <p className="font-semibold text-white">{order.service.name}</p>
                 <p className="text-sm text-slate-400">Số lượng: {order.quantity} bot</p>

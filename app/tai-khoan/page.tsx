@@ -25,7 +25,6 @@ interface Order {
   createdAt: string;
   service: {
     name: string;
-    icon: string;
   };
   credential?: {
     username: string;
@@ -213,7 +212,7 @@ export default function CustomerDashboard() {
               <div key={order.id} className="p-6">
                 <div className="flex items-start justify-between flex-wrap gap-4">
                   <div className="flex items-start gap-4">
-                    <span className="text-4xl">{order.service.icon}</span>
+                    <span className="text-4xl">🤖</span>
                     <div>
                       <h3 className="font-bold text-white text-lg">{order.service.name}</h3>
                       <div className="flex items-center gap-3 mt-1 text-sm text-slate-400">

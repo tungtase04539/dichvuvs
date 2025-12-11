@@ -10,7 +10,7 @@ interface Product {
   slug: string;
   description: string;
   price: number;
-  icon: string | null;
+  image: string | null;
   featured: boolean;
 }
 
@@ -32,7 +32,7 @@ export async function GET() {
         slug: true,
         description: true,
         price: true,
-        icon: true,
+        image: true,
         featured: true,
       },
       orderBy: [{ featured: "desc" }, { name: "asc" }],

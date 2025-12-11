@@ -34,7 +34,6 @@ interface Order {
   createdAt: string;
   service: {
     name: string;
-    icon: string;
   };
   assignedTo?: {
     id: string;
@@ -201,7 +200,7 @@ export default function OrdersPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-xl">{order.service.icon}</span>
+                        <span className="text-xl">🤖</span>
                         <span className="text-slate-700">{order.service.name}</span>
                       </div>
                     </td>

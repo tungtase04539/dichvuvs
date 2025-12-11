@@ -57,7 +57,7 @@ export default async function AdminProductsPage() {
               <tr key={product.id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <span className="text-3xl">{product.icon}</span>
+                    <span className="text-3xl">🤖</span>
                     <div>
                       <p className="font-semibold text-slate-900">{product.name}</p>
                       <p className="text-sm text-slate-500 line-clamp-1 max-w-xs">

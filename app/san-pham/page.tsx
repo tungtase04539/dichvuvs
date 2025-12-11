@@ -16,7 +16,6 @@ interface Product {
   slug: string;
   description: string;
   price: number;
-  icon: string | null;
   image: string | null;
   videoUrl: string | null;
   featured: boolean;
@@ -177,7 +176,7 @@ export default function ProductsPage() {
                         </div>
                       ) : (
                         <div className="aspect-video bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center">
-                          <span className="text-6xl">{product.icon}</span>
+                          <span className="text-6xl">🤖</span>
                         </div>
                       )}
                     </Link>

@@ -20,7 +20,6 @@ interface Product {
   slug: string;
   description: string;
   price: number;
-  icon: string | null;
   featured: boolean;
 }
 
@@ -149,7 +148,7 @@ export default function CTVProductsPage() {
               {/* Product Header */}
               <div className="p-6 border-b border-slate-100">
                 <div className="flex items-start gap-4">
-                  <span className="text-4xl">{product.icon}</span>
+                  <span className="text-4xl">🤖</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-bold text-slate-900 truncate">

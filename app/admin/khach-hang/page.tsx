@@ -29,7 +29,6 @@ interface Customer {
   status: string;
   createdAt: string;
   serviceName: string;
-  serviceIcon: string;
 }
 
 export default function CustomersPage() {
@@ -63,7 +62,7 @@ export default function CustomersPage() {
         quantity: number;
         status: string;
         createdAt: string;
-        service: { name: string; icon: string };
+        service: { name: string };
       }) => ({
         id: order.id,
         orderCode: order.orderCode,
@@ -75,7 +74,6 @@ export default function CustomersPage() {
         status: order.status,
         createdAt: order.createdAt,
         serviceName: order.service?.name || "ChatBot",
-        serviceIcon: order.service?.icon || "🤖",
       }));
 
       // Sort by date (newest first)
@@ -282,7 +280,7 @@ export default function CustomersPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-xl">{customer.serviceIcon}</span>
+                        <span className="text-xl">🤖</span>
                         <div>
                           <p className="text-slate-700">{customer.serviceName}</p>
                           <p className="text-xs text-slate-400">x{customer.quantity}</p>

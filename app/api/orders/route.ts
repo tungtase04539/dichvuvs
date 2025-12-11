@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
           quantity: true,
           createdAt: true,
           notes: true,
-          service: { select: { id: true, name: true, icon: true } },
+          service: { select: { id: true, name: true } },
         },
       });
 
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
         scheduledDate: true,
         scheduledTime: true,
         createdAt: true,
-        service: { select: { name: true, icon: true } },
+        service: { select: { name: true } },
       },
       orderBy: { createdAt: "desc" },
       take: 200,
@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
         totalPrice: true,
         status: true,
         customerEmail: true,
-        service: { select: { name: true, icon: true } },
+        service: { select: { name: true } },
       },
     });
 

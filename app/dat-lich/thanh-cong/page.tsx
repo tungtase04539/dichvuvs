@@ -133,7 +133,7 @@ export default async function BookingSuccessPage({
           {order && (
             <div className="bg-slate-50 rounded-xl p-3 mb-4">
               <div className="flex items-center gap-3">
-                <span className="text-2xl">{order.service.icon}</span>
+                <span className="text-2xl">🤖</span>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-slate-900 text-sm">{order.service.name}</p>
                   <p className="text-xs text-slate-500">

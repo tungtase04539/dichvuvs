@@ -65,7 +65,6 @@ model Service {
   longDescription String?  // Chi tiết sản phẩm (HTML/Markdown)
   price           Float
   unit            String   @default("bot")
-  icon            String?
   image           String?  // URL ảnh đại diện sản phẩm (Supabase Storage)
   videoUrl        String?  // URL video demo (Supabase Storage)
   featured        Boolean  @default(false)

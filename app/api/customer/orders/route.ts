@@ -30,7 +30,6 @@ export async function GET() {
         service: {
           select: {
             name: true,
-            icon: true,
           },
         },
         credential: {

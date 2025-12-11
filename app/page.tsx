@@ -37,7 +37,6 @@ interface Product {
   slug: string;
   description: string;
   price: number;
-  icon: string | null;
   image: string | null;
   videoUrl: string | null;
   featured: boolean;
@@ -429,7 +428,7 @@ export default function HomePage() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-6xl">{product.icon || "🤖"}</span>
+                        <span className="text-6xl">🤖</span>
                       </div>
                     )}
                   </div>

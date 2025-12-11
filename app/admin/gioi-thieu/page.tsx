@@ -1,77 +1,125 @@
-import prisma from "@/lib/prisma";
+"use client";
+
+import { useState, useEffect } from "react";
+import { Link2, MousePointer, ShoppingCart, DollarSign, TrendingUp, Users, Copy, Check, Loader2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import { Link2, MousePointer, ShoppingCart, DollarSign, TrendingUp, Users } from "lucide-react";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
-async function getReferralStats() {
-  const [referralLinks, stats, topPerformers] = await Promise.all([
-    prisma.referralLink.findMany({
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            role: true,
-            parent: {
-              select: { name: true },
-            },
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.referralLink.aggregate({
-      _sum: {
-        clickCount: true,
-        orderCount: true,
-        revenue: true,
-      },
-    }),
-    prisma.referralLink.findMany({
-      include: {
-        user: {
-          select: { name: true, email: true, role: true },
-        },
-      },
-      orderBy: { revenue: "desc" },
-      take: 5,
-    }),
-  ]);
-
-  return { referralLinks, stats, topPerformers };
+interface ReferralLink {
+  id: string;
+  code: string;
+  clickCount: number;
+  orderCount: number;
+  revenue: number;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
 }
 
-const roleLabels: Record<string, string> = {
-  admin: "Admin",
-  master_agent: "Tổng đại lý",
-  agent: "Đại lý",
-  staff: "Nhân viên",
-};
+interface UserInfo {
+  id: string;
+  role: string;
+  referralCode: string | null;
+}
 
-const roleColors: Record<string, string> = {
-  admin: "bg-purple-100 text-purple-700",
-  master_agent: "bg-blue-100 text-blue-700",
-  agent: "bg-green-100 text-green-700",
-  staff: "bg-slate-100 text-slate-700",
-};
+export default function ReferralsPage() {
+  const [referralLinks, setReferralLinks] = useState<ReferralLink[]>([]);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
 
-export default async function AdminReferralsPage() {
-  const { referralLinks, stats, topPerformers } = await getReferralStats();
+  const isAdmin = userInfo?.role === "admin";
+  const isCTV = userInfo?.role === "ctv" || userInfo?.role === "collaborator";
 
-  const totalClicks = stats._sum.clickCount || 0;
-  const totalOrders = stats._sum.orderCount || 0;
-  const totalRevenue = stats._sum.revenue || 0;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Get user info
+        const userRes = await fetch("/api/auth/me");
+        if (userRes.ok) {
+          const userData = await userRes.json();
+          setUserInfo(userData.user);
+        }
+
+        // Get referral links
+        const refRes = await fetch("/api/admin/referrals");
+        if (refRes.ok) {
+          const refData = await refRes.json();
+          setReferralLinks(refData.referralLinks || []);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const copyLink = async (code: string) => {
+    const link = `${window.location.origin}?ref=${code}`;
+    await navigator.clipboard.writeText(link);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Calculate stats
+  const totalClicks = referralLinks.reduce((sum, l) => sum + l.clickCount, 0);
+  const totalOrders = referralLinks.reduce((sum, l) => sum + l.orderCount, 0);
+  const totalRevenue = referralLinks.reduce((sum, l) => sum + l.revenue, 0);
   const conversionRate = totalClicks > 0 ? ((totalOrders / totalClicks) * 100).toFixed(1) : 0;
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    );
+  }
 
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900">Quản lý Mã giới thiệu</h1>
-        <p className="text-slate-600">Theo dõi hiệu quả của các mã giới thiệu</p>
+        <h1 className="text-2xl font-bold text-slate-900">
+          {isAdmin ? "Quản lý Mã giới thiệu" : "Mã giới thiệu của bạn"}
+        </h1>
+        <p className="text-slate-600">
+          {isAdmin ? "Theo dõi hiệu quả của các mã giới thiệu" : "Copy link và chia sẻ để kiếm hoa hồng"}
+        </p>
       </div>
+
+      {/* CTV: Show their referral code prominently */}
+      {isCTV && userInfo?.referralCode && (
+        <div className="bg-gradient-to-r from-primary-500 to-yellow-500 rounded-2xl p-6 mb-8 text-white">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <p className="text-sm opacity-80 mb-1">Mã giới thiệu của bạn</p>
+              <p className="text-3xl font-bold font-mono">{userInfo.referralCode}</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => copyLink(userInfo.referralCode!)}
+                className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
+                  copied 
+                    ? "bg-green-500 text-white" 
+                    : "bg-white text-primary-600 hover:bg-white/90"
+                }`}
+              >
+                {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                {copied ? "Đã copy!" : "Copy link giới thiệu"}
+              </button>
+            </div>
+          </div>
+          <div className="mt-4 p-3 bg-white/10 rounded-lg">
+            <p className="text-sm font-mono truncate">
+              {typeof window !== "undefined" ? `${window.location.origin}?ref=${userInfo.referralCode}` : ""}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -124,9 +172,9 @@ export default async function AdminReferralsPage() {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Main Table */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      {/* Admin: Show all referral links */}
+      {isAdmin && (
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-200">
             <h2 className="text-lg font-semibold text-slate-900">Danh sách mã giới thiệu</h2>
           </div>
@@ -145,27 +193,13 @@ export default async function AdminReferralsPage() {
                 {referralLinks.map((link) => (
                   <tr key={link.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <Link2 className="w-4 h-4 text-slate-400" />
-                        <code className="px-2 py-1 bg-slate-100 rounded text-sm font-mono font-medium text-primary-600">
-                          {link.code}
-                        </code>
-                      </div>
+                      <code className="px-2 py-1 bg-slate-100 rounded text-sm font-mono font-medium text-primary-600">
+                        {link.code}
+                      </code>
                     </td>
                     <td className="px-6 py-4">
-                      <div>
-                        <p className="font-medium text-slate-900">{link.user.name}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className={`text-xs px-2 py-0.5 rounded-full ${roleColors[link.user.role]}`}>
-                            {roleLabels[link.user.role]}
-                          </span>
-                          {link.user.parent && (
-                            <span className="text-xs text-slate-500">
-                              thuộc {link.user.parent.name}
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                      <p className="font-medium text-slate-900">{link.user.name}</p>
+                      <p className="text-xs text-slate-500">{link.user.email}</p>
                     </td>
                     <td className="px-6 py-4 text-center">
                       <span className="font-semibold text-slate-900">{link.clickCount}</span>
@@ -189,47 +223,21 @@ export default async function AdminReferralsPage() {
             )}
           </div>
         </div>
+      )}
 
-        {/* Top Performers */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-200">
-            <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-              <Users className="w-5 h-5 text-primary-600" />
-              Top doanh thu
-            </h2>
-          </div>
-          <div className="p-4 space-y-3">
-            {topPerformers.map((link, index) => (
-              <div
-                key={link.id}
-                className="flex items-center gap-4 p-3 rounded-xl bg-slate-50"
-              >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white ${
-                  index === 0 ? "bg-amber-500" :
-                  index === 1 ? "bg-slate-400" :
-                  index === 2 ? "bg-amber-700" :
-                  "bg-slate-300"
-                }`}>
-                  {index + 1}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-slate-900 truncate">{link.user.name}</p>
-                  <p className="text-xs text-slate-500">{link.code}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-primary-600">{formatCurrency(link.revenue)}</p>
-                  <p className="text-xs text-slate-500">{link.orderCount} đơn</p>
-                </div>
-              </div>
-            ))}
-
-            {topPerformers.length === 0 && (
-              <p className="text-center text-slate-500 py-8">Chưa có dữ liệu</p>
-            )}
-          </div>
+      {/* CTV: Tips section */}
+      {isCTV && (
+        <div className="bg-gradient-to-r from-primary-50 to-yellow-50 rounded-2xl p-6 border border-primary-100">
+          <h3 className="font-bold text-primary-700 mb-3">💡 Cách kiếm tiền với mã giới thiệu</h3>
+          <ul className="space-y-2 text-sm text-slate-600">
+            <li>• Chia sẻ link giới thiệu lên Facebook, Zalo, TikTok...</li>
+            <li>• Gửi cho bạn bè, người thân có nhu cầu sử dụng ChatBot</li>
+            <li>• Viết bài review sản phẩm kèm link giới thiệu</li>
+            <li>• Tham gia các group kinh doanh online để chia sẻ</li>
+            <li>• Khách mua hàng trong 7 ngày sau khi click link sẽ được tính cho bạn</li>
+          </ul>
         </div>
-      </div>
+      )}
     </div>
   );
 }
-

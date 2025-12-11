@@ -60,7 +60,7 @@ async function getDashboardStats(userId: string, role: string) {
         totalPrice: true,
         status: true,
         createdAt: true,
-        service: { select: { name: true, icon: true } },
+        service: { select: { name: true } },
       },
       orderBy: { createdAt: "desc" },
       take: 5,
@@ -230,7 +230,7 @@ export default async function AdminDashboard() {
                   href={`/admin/don-hang/${order.id}`}
                   className="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors"
                 >
-                  <span className="text-2xl">{order.service.icon}</span>
+                  <span className="text-2xl">🤖</span>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-slate-900">{order.customerName}</p>
                     <p className="text-sm text-slate-500">{order.service.name}</p>

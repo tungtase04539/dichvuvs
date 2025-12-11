@@ -56,7 +56,6 @@ export async function GET(request: NextRequest) {
           orderCode: order.orderCode,
           status: order.status,
           service: order.service.name,
-          icon: order.service.icon,
         },
         credential: {
           accountInfo: order.credential.accountInfo,

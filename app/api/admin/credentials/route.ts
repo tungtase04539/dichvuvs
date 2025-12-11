@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const credentials = await prisma.productCredential.findMany({
       where,
       include: {
-        service: { select: { id: true, name: true, icon: true } },
+        service: { select: { id: true, name: true } },
         order: { select: { id: true, orderCode: true, customerName: true } },
       },
       orderBy: { createdAt: "desc" },
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
         notes: notes || null,
       },
       include: {
-        service: { select: { id: true, name: true, icon: true } },
+        service: { select: { id: true, name: true } },
       },
     });
 

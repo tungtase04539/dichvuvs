@@ -23,7 +23,6 @@ export default function EditProductPage() {
     description: "",
     longDescription: "",
     price: "30000",
-    icon: "🤖",
     image: "",
     videoUrl: "", // YouTube URL
     featured: false,
@@ -44,7 +43,6 @@ export default function EditProductPage() {
             description: data.product.description || "",
             longDescription: data.product.longDescription || "",
             price: String(data.product.price || 30000),
-            icon: data.product.icon || "🤖",
             image: data.product.image || "",
             videoUrl: data.product.videoUrl || "",
             featured: data.product.featured || false,
@@ -219,29 +217,6 @@ export default function EditProductPage() {
               step="1000"
               className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
-          </div>
-
-          {/* Icon */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Icon (hiển thị khi không có ảnh)
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {EMOJI_OPTIONS.map((emoji) => (
-                <button
-                  key={emoji}
-                  type="button"
-                  onClick={() => setFormData({ ...formData, icon: emoji })}
-                  className={`w-12 h-12 rounded-lg text-2xl flex items-center justify-center border-2 transition-all ${
-                    formData.icon === emoji
-                      ? "border-primary-500 bg-primary-50"
-                      : "border-slate-200 hover:border-primary-300"
-                  }`}
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
           </div>
 
           {/* Checkboxes */}

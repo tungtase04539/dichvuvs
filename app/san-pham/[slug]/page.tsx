@@ -31,7 +31,6 @@ interface Product {
   description: string;
   longDescription: string | null;
   price: number;
-  icon: string | null;
   featured: boolean;
 }
 
@@ -114,7 +113,7 @@ export default function ProductDetailPage({
             QUAY LẠI DANH SÁCH
           </Link>
           <div className="flex items-center gap-4">
-            <span className="text-6xl">{product.icon}</span>
+            <span className="text-6xl">🤖</span>
             <div>
               {product.featured && (
                 <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary-400 text-slate-900 text-xs font-bold rounded-full mb-2">

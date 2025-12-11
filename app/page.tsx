@@ -26,6 +26,9 @@ import {
   Sparkles,
   Award,
   HeadphonesIcon,
+  Gift,
+  Flame,
+  Timer,
 } from "lucide-react";
 
 interface Product {
@@ -267,6 +270,39 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Flash Sale Banner */}
+      <section className="py-16 bg-gradient-to-r from-red-900 via-slate-900 to-orange-900 relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-1/4 w-64 h-64 bg-red-500/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-orange-500/20 rounded-full blur-3xl animate-pulse" />
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="text-center md:text-left">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 text-red-400 rounded-full text-sm font-bold uppercase tracking-wide mb-4 border border-red-500/30 animate-pulse">
+                <Flame className="w-4 h-4" />
+                FLASH SALE - GIẢM SỐC
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+                GIẢM ĐẾN <span className="text-red-500">50%</span> TẤT CẢ CHATBOT
+              </h2>
+              <p className="text-slate-300 text-lg">
+                Mua ngay kẻo lỡ! Ưu đãi có hạn + Quà tặng hấp dẫn
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/flash-sale"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold rounded-xl hover:from-red-600 hover:to-orange-600 shadow-lg shadow-red-500/30 text-lg uppercase transition-all hover:scale-105"
+              >
+                <Flame className="w-5 h-5" />
+                XEM FLASH SALE
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="tinh-nang" className="section bg-slate-900">
         <div className="container mx-auto px-4">
@@ -296,6 +332,57 @@ export default function HomePage() {
                 <p className="text-slate-400 leading-relaxed">{feature.description}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Gift & Free Trial Section */}
+      <section className="py-16 bg-slate-800">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Quà tặng */}
+            <div className="bg-gradient-to-br from-primary-400/20 to-primary-600/10 rounded-3xl p-8 border border-primary-400/30 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary-400/10 rounded-full blur-2xl" />
+              <div className="relative z-10">
+                <div className="w-16 h-16 rounded-2xl bg-primary-400/20 flex items-center justify-center mb-6">
+                  <Gift className="w-8 h-8 text-primary-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-3 uppercase">NHẬN QUÀ MIỄN PHÍ</h3>
+                <p className="text-slate-300 mb-6">
+                  Tham gia nhóm Zalo ngay để nhận ChatBot AI miễn phí và nhiều quà tặng hấp dẫn!
+                </p>
+                <Link
+                  href="/qua-tang"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-primary-400 text-slate-900 font-bold rounded-xl hover:bg-primary-300 transition-all uppercase"
+                >
+                  <Gift className="w-5 h-5" />
+                  NHẬN QUÀ NGAY
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Dùng thử */}
+            <div className="bg-gradient-to-br from-green-900/30 to-emerald-900/20 rounded-3xl p-8 border border-green-500/30 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-2xl" />
+              <div className="relative z-10">
+                <div className="w-16 h-16 rounded-2xl bg-green-500/20 flex items-center justify-center mb-6">
+                  <Timer className="w-8 h-8 text-green-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-3 uppercase">DÙNG THỬ 3 NGÀY</h3>
+                <p className="text-slate-300 mb-6">
+                  Trải nghiệm ChatBot AI hoàn toàn miễn phí trong 3 ngày. Không cần thẻ tín dụng!
+                </p>
+                <Link
+                  href="/dung-thu"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 text-white font-bold rounded-xl hover:bg-green-400 transition-all uppercase"
+                >
+                  <Zap className="w-5 h-5" />
+                  ĐĂNG KÝ DÙNG THỬ
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -431,6 +518,13 @@ export default function HomePage() {
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link href="/danh-gia" className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 font-bold uppercase transition-colors">
+              XEM TẤT CẢ ĐÁNH GIÁ
+              <ArrowRight className="w-5 h-5" />
+            </Link>
           </div>
         </div>
       </section>

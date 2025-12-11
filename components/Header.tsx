@@ -24,12 +24,9 @@ export default function Header({ settings }: HeaderProps) {
   const navLinks = [
     { href: "/", label: "TRANG CHỦ" },
     { href: "/san-pham", label: "SẢN PHẨM" },
-    { href: "/qua-tang", label: "QUÀ TẶNG" },
-    { href: "/dung-thu", label: "DÙNG THỬ 3 NGÀY" },
-    { href: "/flash-sale", label: "FLASH SALE" },
     { href: "/tin-tuc", label: "TIN TỨC" },
-    { href: "/danh-gia", label: "ĐÁNH GIÁ" },
     { href: "/dang-ky-ctv", label: "ĐĂNG KÝ CTV" },
+    { href: "/tra-cuu", label: "TRA CỨU ĐƠN" },
   ];
 
   return (

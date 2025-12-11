@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ order });
     }
 
-    // Admin access
+    // Admin/CTV access
     const user = await getSession();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -52,7 +52,14 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status");
     const where: Record<string, unknown> = {};
     if (status && status !== "all") where.status = status;
-    if (user.role === "staff") where.assignedToId = user.id;
+    
+    // CTV chỉ xem đơn hàng của khách mình giới thiệu
+    if (user.role === "ctv") {
+      where.referrerId = user.id;
+    } else if (user.role === "staff") {
+      where.assignedToId = user.id;
+    }
+    // Admin xem tất cả (không filter)
 
     const orders = await prisma.order.findMany({
       where,
@@ -66,6 +73,7 @@ export async function GET(request: NextRequest) {
         totalPrice: true,
         quantity: true,
         notes: true,
+        referralCode: true,
         scheduledDate: true,
         scheduledTime: true,
         createdAt: true,

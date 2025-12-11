@@ -20,12 +20,19 @@ export default async function AdminLayout({
     redirect("/quan-tri-vien-dang-nhap");
   }
 
+  // Get user data from database (for correct role)
+  const { data: dbUser } = await supabase
+    .from("User")
+    .select("id, name, role")
+    .eq("email", user.email)
+    .single();
+
   // Get user metadata
   const session = {
     id: user.id,
     email: user.email || "",
-    name: user.user_metadata?.name || user.email?.split("@")[0] || "Admin",
-    role: user.user_metadata?.role || "admin",
+    name: dbUser?.name || user.user_metadata?.name || user.email?.split("@")[0] || "Admin",
+    role: dbUser?.role || user.user_metadata?.role || "admin",
   };
 
   return (

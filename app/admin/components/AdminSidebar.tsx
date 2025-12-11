@@ -37,6 +37,8 @@ interface NavItem {
 
 const roleLabels: Record<string, string> = {
   admin: "Quản trị viên",
+  ctv: "Cộng tác viên",
+  customer: "Khách hàng",
   master_agent: "Tổng đại lý",
   agent: "Đại lý",
   collaborator: "Cộng tác viên",
@@ -107,11 +109,13 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       ];
     }
 
-    if (user.role === "collaborator") {
+    if (user.role === "ctv" || user.role === "collaborator") {
       return [
         ...baseItems,
         { href: "/admin/don-hang", icon: Package, label: "Đơn hàng của tôi" },
+        { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng của tôi" },
         { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
+        { href: "/admin/ho-so", icon: Key, label: "Hồ sơ cá nhân" },
       ];
     }
 

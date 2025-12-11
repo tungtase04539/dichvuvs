@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { getCache, setCache } from "@/lib/cache";
+import { createServerSupabaseClient } from "@/lib/supabase-server";
 
 export const dynamic = "force-dynamic";
 
@@ -18,29 +19,38 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const orderCode = searchParams.get("orderCode");
     const phone = searchParams.get("phone");
+    
+    const supabase = createServerSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+    }
 
     // Guest lookup
     if (orderCode && phone) {
-      const order = await prisma.order.findFirst({
-        where: { orderCode, customerPhone: phone },
-        select: {
-          id: true,
-          orderCode: true,
-          customerName: true,
-          customerPhone: true,
-          status: true,
-          totalPrice: true,
-          quantity: true,
-          createdAt: true,
-          notes: true,
-          service: { select: { id: true, name: true } },
-        },
-      });
+      const { data: order, error } = await supabase
+        .from("Order")
+        .select(`
+          id, orderCode, customerName, customerPhone, status, 
+          totalPrice, quantity, createdAt, notes, serviceId
+        `)
+        .eq("orderCode", orderCode)
+        .eq("customerPhone", phone)
+        .single();
 
-      if (!order) {
+      if (error || !order) {
         return NextResponse.json({ error: "Không tìm thấy đơn hàng" }, { status: 404 });
       }
-      return NextResponse.json({ order });
+      
+      // Get service name
+      const { data: service } = await supabase
+        .from("Service")
+        .select("id, name")
+        .eq("id", order.serviceId)
+        .single();
+        
+      return NextResponse.json({ 
+        order: { ...order, service: service || { name: "ChatBot" } } 
+      });
     }
 
     // Admin/CTV access
@@ -50,42 +60,54 @@ export async function GET(request: NextRequest) {
     }
 
     const status = searchParams.get("status");
-    const where: Record<string, unknown> = {};
-    if (status && status !== "all") where.status = status;
+    
+    let query = supabase
+      .from("Order")
+      .select(`
+        id, orderCode, customerName, customerPhone, customerEmail,
+        status, totalPrice, quantity, notes, referralCode,
+        scheduledDate, scheduledTime, createdAt, serviceId, referrerId
+      `)
+      .order("createdAt", { ascending: false })
+      .limit(200);
+
+    // Filter by status
+    if (status && status !== "all") {
+      query = query.eq("status", status);
+    }
     
     // CTV chỉ xem đơn hàng của khách mình giới thiệu
     if (user.role === "ctv" || user.role === "collaborator") {
-      where.referrerId = user.id;
+      query = query.eq("referrerId", user.id);
     } else if (user.role === "staff") {
-      where.assignedToId = user.id;
+      query = query.eq("assignedToId", user.id);
     }
-    // Admin xem tất cả (không filter)
+    // Admin xem tất cả (không filter thêm)
     
-    console.log("Orders filter - User:", user.email, "Role:", user.role, "Where:", where);
+    console.log("Orders filter - User:", user.email, "Role:", user.role);
 
-    const orders = await prisma.order.findMany({
-      where,
-      select: {
-        id: true,
-        orderCode: true,
-        customerName: true,
-        customerPhone: true,
-        customerEmail: true,
-        status: true,
-        totalPrice: true,
-        quantity: true,
-        notes: true,
-        referralCode: true,
-        scheduledDate: true,
-        scheduledTime: true,
-        createdAt: true,
-        service: { select: { name: true } },
-      },
-      orderBy: { createdAt: "desc" },
-      take: 200,
-    });
+    const { data: orders, error } = await query;
+    
+    if (error) {
+      console.error("Get orders error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
-    return NextResponse.json({ orders, total: orders.length });
+    // Get service names for all orders
+    const serviceIds = [...new Set((orders || []).map(o => o.serviceId))];
+    const { data: services } = await supabase
+      .from("Service")
+      .select("id, name")
+      .in("id", serviceIds);
+    
+    const serviceMap = new Map((services || []).map(s => [s.id, s]));
+    
+    const ordersWithService = (orders || []).map(order => ({
+      ...order,
+      service: serviceMap.get(order.serviceId) || { name: "ChatBot" }
+    }));
+
+    return NextResponse.json({ orders: ordersWithService, total: ordersWithService.length });
   } catch (error) {
     console.error("Get orders error:", error);
     return NextResponse.json({ error: "Error" }, { status: 500 });

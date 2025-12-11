@@ -14,7 +14,7 @@ export async function GET() {
 
     const { data: products, error } = await supabase
       .from("Service")
-      .select("id, name, slug, description, price, image, featured")
+      .select("id, name, slug, description, price, image, videoUrl, featured")
       .eq("active", true)
       .order("featured", { ascending: false })
       .order("name", { ascending: true });

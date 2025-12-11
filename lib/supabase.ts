@@ -3,20 +3,21 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
-// Create client only if env vars exist (avoid build error)
+// Singleton pattern - create client only once
 let _supabase: SupabaseClient | null = null;
 
-export const getSupabase = () => {
+export const getSupabase = (): SupabaseClient | null => {
   if (!_supabase && supabaseUrl && supabaseAnonKey) {
     _supabase = createClient(supabaseUrl, supabaseAnonKey);
   }
   return _supabase;
 };
 
-// For backward compatibility
-export const supabase = supabaseUrl && supabaseAnonKey 
-  ? createClient(supabaseUrl, supabaseAnonKey) 
-  : null as unknown as SupabaseClient;
+// Initialize singleton on first import (for backward compatibility)
+const _initSupabase = getSupabase();
+
+// For backward compatibility - export the singleton
+export const supabase = _initSupabase as SupabaseClient;
 
 // Generate order code
 export function generateOrderCode(): string {

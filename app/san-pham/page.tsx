@@ -8,7 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
 import VideoModal from "@/components/VideoModal";
-import { ArrowRight, Star, Bot, ShoppingCart, Loader2, Play } from "lucide-react";
+import { ArrowRight, Star, Bot, ShoppingCart, Loader2, Play, Search, X } from "lucide-react";
 
 interface Product {
   id: string;
@@ -24,6 +24,8 @@ interface Product {
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [videoModal, setVideoModal] = useState<{ isOpen: boolean; url: string; title: string }>({
     isOpen: false,
@@ -46,12 +48,28 @@ export default function ProductsPage() {
         .order("featured", { ascending: false })
         .order("name");
 
-      if (data) setProducts(data);
+      if (data) {
+        setProducts(data);
+        setFilteredProducts(data);
+      }
       setIsLoading(false);
     };
 
     loadProducts();
   }, []);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredProducts(products);
+    } else {
+      const filtered = products.filter(
+        (p) =>
+          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          p.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredProducts(filtered);
+    }
+  }, [searchQuery, products]);
 
   const openVideoModal = (e: React.MouseEvent, product: Product) => {
     e.preventDefault();
@@ -79,10 +97,30 @@ export default function ProductsPage() {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 uppercase">
             TẤT CẢ <span className="text-primary-400">CHATBOT</span>
           </h1>
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+          <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-8">
             Chọn ChatBot AI phù hợp với nhu cầu kinh doanh của bạn. 
             Mỗi bot chỉ <span className="text-primary-400 font-bold">29K/tháng</span>!
           </p>
+
+          {/* Search Box */}
+          <div className="max-w-xl mx-auto relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Tìm kiếm ChatBot AI..."
+              className="w-full pl-12 pr-12 py-4 bg-slate-800/80 backdrop-blur-sm border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 outline-none transition-all text-lg"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
         </div>
       </section>
 
@@ -95,9 +133,24 @@ export default function ProductsPage() {
             </div>
           ) : (
             <>
+              {/* Search Results Info */}
+              {searchQuery && (
+                <div className="mb-6 flex items-center justify-between">
+                  <p className="text-slate-400">
+                    Tìm thấy <span className="text-primary-400 font-bold">{filteredProducts.length}</span> kết quả cho "{searchQuery}"
+                  </p>
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="text-primary-400 hover:text-primary-300 font-medium"
+                  >
+                    Xóa bộ lọc
+                  </button>
+                </div>
+              )}
+
               {/* Products Grid */}
               <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-                {products.map((product) => (
+                {filteredProducts.map((product) => (
                   <div
                     key={product.id}
                     className="group relative bg-slate-800 rounded-2xl border border-slate-700 shadow-sm hover:shadow-xl hover:border-primary-400/50 transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col h-full"
@@ -175,6 +228,21 @@ export default function ProductsPage() {
                   </div>
                 ))}
               </div>
+
+              {/* Empty State */}
+              {filteredProducts.length === 0 && searchQuery && (
+                <div className="text-center py-16">
+                  <Bot className="w-20 h-20 text-slate-600 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-white mb-2">Không tìm thấy ChatBot</h3>
+                  <p className="text-slate-400 mb-6">Không có ChatBot nào phù hợp với "{searchQuery}"</p>
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="btn btn-primary"
+                  >
+                    XEM TẤT CẢ SẢN PHẨM
+                  </button>
+                </div>
+              )}
 
               {/* CTA */}
               <div className="text-center bg-gradient-cta rounded-3xl p-12 relative overflow-hidden">

@@ -22,10 +22,14 @@ export default function Header({ settings }: HeaderProps) {
   }, []);
 
   const navLinks = [
+    { href: "/", label: "TRANG CHỦ" },
     { href: "/san-pham", label: "SẢN PHẨM" },
-    { href: "/tra-cuu", label: "TRA CỨU ĐƠN" },
-    { href: "/#tinh-nang", label: "TÍNH NĂNG" },
-    { href: "/#lien-he", label: "LIÊN HỆ" },
+    { href: "/qua-tang", label: "QUÀ TẶNG" },
+    { href: "/dung-thu", label: "DÙNG THỬ 3 NGÀY" },
+    { href: "/flash-sale", label: "FLASH SALE" },
+    { href: "/tin-tuc", label: "TIN TỨC" },
+    { href: "/danh-gia", label: "ĐÁNH GIÁ" },
+    { href: "/dang-ky-ctv", label: "ĐĂNG KÝ CTV" },
   ];
 
   return (

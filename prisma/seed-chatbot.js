@@ -64,7 +64,7 @@ Chatbot thông minh giúp bạn tự động hóa quy trình bán hàng, từ t�
 • Website bán hàng
 • Cửa hàng thời trang, mỹ phẩm
 • Kinh doanh dropshipping`,
-      price: 30000,
+      price: 29000,
       unit: "bot",
       icon: "🛒",
       featured: true,
@@ -95,7 +95,7 @@ Giải pháp CSKH tự động, giúp khách hàng luôn được hỗ trợ m�
 • Công ty cung cấp dịch vụ
 • Sàn thương mại điện tử
 • Startup cần tối ưu chi phí`,
-      price: 30000,
+      price: 29000,
       unit: "bot",
       icon: "🎧",
       featured: true,
@@ -126,7 +126,7 @@ Tự động hóa quy trình đặt lịch, giúp khách hàng book lịch dễ 
 • Phòng khám, nha khoa
 • Gym, yoga studio
 • Dịch vụ tư vấn, coaching`,
-      price: 30000,
+      price: 29000,
       unit: "bot",
       icon: "📅",
       featured: true,
@@ -157,7 +157,7 @@ Chatbot chuyên biệt cho ngành BĐS, giúp lọc lead và tư vấn khách h�
 • Chủ đầu tư dự án
 • Môi giới BĐS cá nhân
 • Agency marketing BĐS`,
-      price: 30000,
+      price: 29000,
       unit: "bot",
       icon: "🏠",
       featured: false,
@@ -188,7 +188,7 @@ Chatbot thông minh hỗ trợ trung tâm đào tạo và học viên trong su�
 • Trung tâm đào tạo kỹ năng
 • Khóa học online
 • Trường đại học, cao đẳng`,
-      price: 30000,
+      price: 29000,
       unit: "bot",
       icon: "📚",
       featured: true,
@@ -219,7 +219,7 @@ Chatbot chuyên biệt cho ngành F&B, từ đặt bàn đến order và chăm s
 • Quán cà phê, trà sữa
 • Chuỗi F&B
 • Dịch vụ catering`,
-      price: 30000,
+      price: 29000,
       unit: "bot",
       icon: "🍽️",
       featured: false,
@@ -250,7 +250,7 @@ Chatbot chuyên biệt cho ngành du lịch, hỗ trợ khách hàng lên kế h
 • Đại lý vé máy bay
 • Khách sạn, resort
 • Dịch vụ thuê xe du lịch`,
-      price: 30000,
+      price: 29000,
       unit: "bot",
       icon: "✈️",
       featured: false,
@@ -281,7 +281,7 @@ Chatbot hỗ trợ phòng khám và bệnh nhân trong việc chăm sóc sức k
 • Bệnh viện
 • Nha khoa, mắt
 • Trung tâm dinh dưỡng`,
-      price: 30000,
+      price: 29000,
       unit: "bot",
       icon: "🏥",
       featured: false,
@@ -312,7 +312,7 @@ Chatbot tự động hóa quy trình tuyển dụng, từ tiếp nhận CV đế
 • Công ty headhunter
 • Startup đang scale team
 • Agency tuyển dụng`,
-      price: 30000,
+      price: 29000,
       unit: "bot",
       icon: "👔",
       featured: true,
@@ -343,7 +343,7 @@ Chatbot chuyên biệt cho ngành tài chính, hỗ trợ tư vấn và bán s�
 • Công ty bảo hiểm
 • Công ty chứng khoán
 • Tư vấn tài chính cá nhân`,
-      price: 30000,
+      price: 29000,
       unit: "bot",
       icon: "💰",
       featured: false,

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getSupabase } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -47,34 +46,29 @@ export default function ProductDetailPage({
 
   useEffect(() => {
     const loadData = async () => {
-      const supabase = getSupabase();
-      if (!supabase) {
-        setIsLoading(false);
-        return;
-      }
-      
-      const { data: productData } = await supabase
-        .from("Service")
-        .select("*")
-        .eq("slug", params.slug)
-        .single();
+      try {
+        const res = await fetch(`/api/products/${params.slug}`);
+        
+        if (!res.ok) {
+          router.push("/san-pham");
+          return;
+        }
+        
+        const data = await res.json();
+        
+        if (!data.product) {
+          router.push("/san-pham");
+          return;
+        }
 
-      if (!productData) {
+        setProduct(data.product);
+        setRelatedProducts(data.relatedProducts || []);
+      } catch (error) {
+        console.error("Load product error:", error);
         router.push("/san-pham");
-        return;
+      } finally {
+        setIsLoading(false);
       }
-
-      setProduct(productData);
-
-      const { data: relatedData } = await supabase
-        .from("Service")
-        .select("id, name, slug, price, image")
-        .eq("active", true)
-        .neq("slug", params.slug)
-        .limit(4);
-
-      if (relatedData) setRelatedProducts(relatedData as Product[]);
-      setIsLoading(false);
     };
 
     loadData();

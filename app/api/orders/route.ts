@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get service names for all orders
-    const serviceIds = [...new Set((orders || []).map(o => o.serviceId))];
+    const serviceIds = Array.from(new Set((orders || []).map(o => o.serviceId)));
     const { data: services } = await supabase
       .from("Service")
       .select("id, name")

@@ -99,12 +99,12 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
                     <p className="text-sm text-slate-500">{user.email}</p>
                   </div>
                   <Link
-                    href="/admin/tai-khoan"
+                    href="/admin/ho-so"
                     className="flex items-center gap-3 px-4 py-2 text-slate-600 hover:bg-slate-50"
                     onClick={() => setShowUserMenu(false)}
                   >
                     <User className="w-4 h-4" />
-                    <span>Tài khoản</span>
+                    <span>Hồ sơ cá nhân</span>
                   </Link>
                   {user.role === "admin" && (
                     <Link

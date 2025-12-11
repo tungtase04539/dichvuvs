@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 
 const REF_STORAGE_KEY = "chatbotvn_ref";
-const REF_EXPIRY_DAYS = 30;
+const REF_EXPIRY_DAYS = 7; // 7 ngày để track referral
 
 export default function ReferralTracker() {
   const searchParams = useSearchParams();
@@ -12,16 +12,18 @@ export default function ReferralTracker() {
   useEffect(() => {
     const refCode = searchParams.get("ref");
     
-    if (refCode) {
-      // Lưu mã ref vào localStorage với thời hạn 30 ngày
+    if (refCode && refCode.trim()) {
+      // Lưu mã ref vào localStorage với thời hạn 7 ngày
+      // Dù khách mua sản phẩm nào cũng sẽ được track về CTV này
       const refData = {
-        code: refCode,
+        code: refCode.trim(),
         expiry: Date.now() + REF_EXPIRY_DAYS * 24 * 60 * 60 * 1000,
+        savedAt: Date.now(),
       };
       localStorage.setItem(REF_STORAGE_KEY, JSON.stringify(refData));
 
-      // Track click
-      trackReferralClick(refCode);
+      // Track click để CTV thấy số click
+      trackReferralClick(refCode.trim());
     }
   }, [searchParams]);
 

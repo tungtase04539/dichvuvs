@@ -40,6 +40,7 @@ interface CurrentUser {
   email: string;
   name: string;
   role: string;
+  [key: string]: unknown;
 }
 
 export default function CTVApprovalPage() {

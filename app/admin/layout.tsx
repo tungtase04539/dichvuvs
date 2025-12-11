@@ -30,10 +30,10 @@ export default async function AdminLayout({
   const userRole = dbUser?.role || "customer";
 
   // Chỉ cho phép admin, ctv (đã duyệt), staff vào admin panel
-  // customer hoặc không có role = không được vào
+  // customer chuyển tới trang tài khoản riêng
   const allowedRoles = ["admin", "ctv", "staff", "master_agent", "agent", "collaborator"];
   if (!allowedRoles.includes(userRole)) {
-    redirect("/");
+    redirect("/tai-khoan");
   }
 
   // Get user metadata

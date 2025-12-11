@@ -104,36 +104,43 @@ export async function PATCH(
       });
 
       if (!existingUser) {
-        // Import supabase admin client
-        const { createClient } = await import("@supabase/supabase-js");
-        const supabaseAdmin = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.SUPABASE_SERVICE_ROLE_KEY!
-        );
+        try {
+          // Import supabase admin client
+          const { createClient } = await import("@supabase/supabase-js");
+          const supabaseAdmin = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!
+          );
 
-        // Create user in Supabase Auth
-        const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
-          email: currentOrder.customerEmail,
-          password: currentOrder.customerPhone, // Mật khẩu = số điện thoại
-          email_confirm: true,
-          user_metadata: {
-            name: currentOrder.customerName,
-            role: "customer",
-          },
-        });
-
-        if (!authError && authUser.user) {
-          // Create user in database with same ID
-          await prisma.user.create({
-            data: {
-              id: authUser.user.id,
-              email: currentOrder.customerEmail,
-              password: currentOrder.customerPhone,
+          // Create user in Supabase Auth
+          const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+            email: currentOrder.customerEmail,
+            password: currentOrder.customerPhone, // Mật khẩu = số điện thoại
+            email_confirm: true,
+            user_metadata: {
               name: currentOrder.customerName,
-              phone: currentOrder.customerPhone,
               role: "customer",
             },
           });
+
+          if (authError) {
+            console.error("Error creating auth user:", authError);
+          } else if (authUser.user) {
+            // Create user in database with same ID
+            await prisma.user.create({
+              data: {
+                id: authUser.user.id,
+                email: currentOrder.customerEmail,
+                password: currentOrder.customerPhone,
+                name: currentOrder.customerName,
+                phone: currentOrder.customerPhone,
+                role: "customer",
+              },
+            });
+            console.log("Created customer account:", currentOrder.customerEmail);
+          }
+        } catch (createError) {
+          console.error("Error creating customer account:", createError);
         }
       }
     }

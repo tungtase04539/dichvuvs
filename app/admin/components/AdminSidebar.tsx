@@ -113,6 +113,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
     if (user.role === "ctv" || user.role === "collaborator") {
       return [
         ...baseItems,
+        { href: "/admin/san-pham-ctv", icon: ShoppingBag, label: "Sản phẩm" },
         { href: "/admin/don-hang", icon: Package, label: "Đơn hàng của tôi" },
         { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng của tôi" },
         { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },

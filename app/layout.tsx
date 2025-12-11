@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import "./globals.css";
 import ReferralTracker from "@/components/ReferralTracker";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 export const metadata: Metadata = {
   title: "ChatBotVN - Mua ChatBot AI chỉ 29K/tháng",
@@ -17,10 +18,12 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body className="font-sans">
-        <Suspense fallback={null}>
-          <ReferralTracker />
-        </Suspense>
-        {children}
+        <AuthProvider>
+          <Suspense fallback={null}>
+            <ReferralTracker />
+          </Suspense>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

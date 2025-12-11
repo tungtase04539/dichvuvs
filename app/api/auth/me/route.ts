@@ -26,7 +26,7 @@ export async function GET() {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Get referral code if user is CTV
+    // Get referral code if user is CTV or Admin
     let referralCode = null;
     if (dbUser.role === "ctv" || dbUser.role === "collaborator" || dbUser.role === "admin") {
       const { data: refLink } = await supabase
@@ -36,7 +36,30 @@ export async function GET() {
         .eq("isActive", true)
         .single();
       
-      referralCode = refLink?.code || null;
+      if (refLink?.code) {
+        referralCode = refLink.code;
+      } else {
+        // Auto-create referral code if not exists (using phone number or random)
+        const newCode = dbUser.phone?.replace(/\D/g, '') || Math.random().toString(36).substring(2, 8).toUpperCase();
+        
+        const { error: insertError } = await supabase
+          .from("ReferralLink")
+          .insert({
+            id: crypto.randomUUID(),
+            code: newCode,
+            userId: dbUser.id,
+            clickCount: 0,
+            orderCount: 0,
+            revenue: 0,
+            isActive: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          });
+        
+        if (!insertError) {
+          referralCode = newCode;
+        }
+      }
     }
 
     return NextResponse.json({

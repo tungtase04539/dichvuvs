@@ -235,7 +235,7 @@ function TrackOrderContent() {
 
     setOrder({
       ...data,
-      service: serviceData || { name: "ChatBot", icon: "🤖" },
+      service: serviceData || { name: "ChatBot" },
     });
     setIsLoading(false);
   };

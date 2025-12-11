@@ -4,16 +4,18 @@ import { getSession } from "@/lib/auth";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    
     const user = await getSession();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const order = await prisma.order.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         service: true,
         assignedTo: {
@@ -46,9 +48,11 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    
     const user = await getSession();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -57,9 +61,13 @@ export async function PATCH(
     const body = await request.json();
     const { status, assignedToId, notes } = body;
 
+    console.log("=== ORDER UPDATE ===");
+    console.log("Order ID:", id);
+    console.log("New status:", status);
+
     // Get current order to check status change
     const currentOrder = await prisma.order.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: { 
         status: true, 
         customerEmail: true, 
@@ -88,7 +96,7 @@ export async function PATCH(
     }
 
     const order = await prisma.order.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
       include: {
         service: true,
@@ -99,15 +107,24 @@ export async function PATCH(
     });
 
     // Tự động tạo tài khoản khách hàng khi thanh toán thành công
-    if (
+    console.log("=== ACCOUNT CREATION CHECK ===");
+    console.log("New status:", status);
+    console.log("Current status:", currentOrder.status);
+    console.log("Customer email:", currentOrder.customerEmail);
+    console.log("Customer phone:", currentOrder.customerPhone);
+    
+    const shouldCreateAccount = 
       status &&
       (status === "confirmed" || status === "completed") &&
       currentOrder.status !== "confirmed" &&
       currentOrder.status !== "completed" &&
       currentOrder.customerEmail &&
-      currentOrder.customerPhone
-    ) {
-      console.log("Creating customer account for:", currentOrder.customerEmail);
+      currentOrder.customerPhone;
+    
+    console.log("Should create account:", shouldCreateAccount);
+    
+    if (shouldCreateAccount) {
+      console.log(">>> Creating customer account for:", currentOrder.customerEmail);
       
       try {
         // Import supabase admin client
@@ -213,16 +230,18 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    
     const user = await getSession();
     if (!user || user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await prisma.order.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });

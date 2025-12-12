@@ -63,7 +63,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { name, slug, description, longDescription, price, image, videoUrl, featured, active } = body;
+    const { name, slug, description, longDescription, price, image, videoUrl, categoryId, featured, active } = body;
 
     if (!name || !slug || !price) {
       return NextResponse.json(
@@ -97,6 +97,7 @@ export async function PUT(
         price: parseFloat(price),
         image: image || null,
         videoUrl: videoUrl || null,
+        categoryId: categoryId || null,
         featured: featured || false,
         active: active !== false,
         updatedAt: new Date().toISOString(),

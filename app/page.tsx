@@ -28,7 +28,17 @@ import {
   Gift,
   Flame,
   Timer,
+  Grid3X3,
 } from "lucide-react";
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  icon: string | null;
+  color: string | null;
+}
 
 interface Product {
   id: string;
@@ -39,22 +49,48 @@ interface Product {
   image: string | null;
   videoUrl: string | null;
   featured: boolean;
+  categoryId: string | null;
+  category: Category | null;
 }
 
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [videoModal, setVideoModal] = useState({
     isOpen: false,
     url: "",
     title: "",
   });
 
+  // Load categories
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const res = await fetch("/api/categories");
+        const data = await res.json();
+        if (data.categories) {
+          setCategories(data.categories);
+        }
+      } catch (error) {
+        console.error("Load categories error:", error);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  // Load products
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const res = await fetch("/api/products");
+        const url = selectedCategory === "all" 
+          ? "/api/products" 
+          : `/api/products?category=${selectedCategory}`;
+        const res = await fetch(url);
         const data = await res.json();
         if (data.products) {
+          setAllProducts(data.products);
           setProducts(data.products.slice(0, 6));
         }
       } catch (error) {
@@ -62,7 +98,7 @@ export default function HomePage() {
       }
     };
     loadProducts();
-  }, []);
+  }, [selectedCategory]);
 
   const openVideoModal = (e: React.MouseEvent, product: Product) => {
     e.preventDefault();
@@ -263,6 +299,101 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Category Filter Section */}
+      <section className="py-16 bg-gradient-to-b from-slate-800 to-slate-900">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-10">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-400/20 text-primary-400 rounded-full text-sm font-semibold mb-4 uppercase tracking-wide">
+              <Grid3X3 className="w-4 h-4" />
+              CHỌN LĨNH VỰC
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              CHATBOT THEO <span className="text-primary-400">LĨNH VỰC</span>
+            </h2>
+            <p className="text-slate-400 max-w-2xl mx-auto">
+              Chọn lĩnh vực phù hợp để tìm ChatBot AI tối ưu cho ngành nghề của bạn
+            </p>
+          </div>
+
+          {/* Category Buttons */}
+          <div className="flex flex-wrap justify-center gap-3 mb-8">
+            <button
+              onClick={() => setSelectedCategory("all")}
+              className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all ${
+                selectedCategory === "all"
+                  ? "bg-primary-400 text-slate-900 shadow-lg shadow-primary-400/30"
+                  : "bg-slate-700/50 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-600"
+              }`}
+            >
+              <span className="text-xl">🌟</span>
+              Tất cả
+            </button>
+            {categories.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => setSelectedCategory(category.slug)}
+                className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all ${
+                  selectedCategory === category.slug
+                    ? "bg-primary-400 text-slate-900 shadow-lg shadow-primary-400/30"
+                    : "bg-slate-700/50 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-600"
+                }`}
+              >
+                <span className="text-xl">{category.icon || "📦"}</span>
+                {category.name}
+              </button>
+            ))}
+          </div>
+
+          {/* Filtered Products Preview */}
+          {selectedCategory !== "all" && allProducts.length > 0 && (
+            <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-white">
+                  Kết quả: <span className="text-primary-400">{allProducts.length}</span> ChatBot
+                </h3>
+                <Link
+                  href={`/san-pham?category=${selectedCategory}`}
+                  className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 font-semibold transition-colors"
+                >
+                  Xem tất cả
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+              <div className="grid md:grid-cols-3 gap-4">
+                {allProducts.slice(0, 3).map((product) => (
+                  <Link
+                    key={product.id}
+                    href={`/san-pham/${product.slug}`}
+                    className="flex items-center gap-4 p-4 bg-slate-700/50 rounded-xl hover:bg-slate-700 transition-colors group"
+                  >
+                    <div className="w-16 h-16 rounded-xl bg-slate-600 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      {product.image ? (
+                        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-2xl">🤖</span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-white group-hover:text-primary-400 transition-colors truncate">
+                        {product.name}
+                      </h4>
+                      <p className="text-primary-400 font-bold">{formatCurrency(product.price)}</p>
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-primary-400 transition-colors flex-shrink-0" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {selectedCategory !== "all" && allProducts.length === 0 && (
+            <div className="text-center py-12 bg-slate-800/50 rounded-2xl border border-slate-700">
+              <p className="text-slate-400">Chưa có ChatBot nào trong lĩnh vực này</p>
+            </div>
+          )}
         </div>
       </section>
 

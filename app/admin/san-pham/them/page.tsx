@@ -1,29 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Save, Loader2, Youtube } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
 
-const EMOJI_OPTIONS = ["🤖", "🛒", "🎧", "📅", "🏠", "📚", "🍽️", "✈️", "🏥", "👔", "💰", "💬", "🎯", "⚡", "🔒"];
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  icon: string | null;
+}
 
 export default function AddProductPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
   
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
     description: "",
     longDescription: "",
-    price: "30000",
+    price: "29000",
     image: "",
-    videoUrl: "", // YouTube URL
+    videoUrl: "",
+    categoryId: "",
     featured: false,
     active: true,
   });
+
+  // Load categories
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const res = await fetch("/api/categories");
+        const data = await res.json();
+        if (data.categories) {
+          setCategories(data.categories);
+        }
+      } catch (error) {
+        console.error("Load categories error:", error);
+      }
+    };
+    loadCategories();
+  }, []);
 
   const generateSlug = (name: string) => {
     return name
@@ -112,6 +135,26 @@ export default function AddProductPage() {
               className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm"
               placeholder="chatbot-ban-hang-pro"
             />
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Lĩnh vực <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={formData.categoryId}
+              onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+              required
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            >
+              <option value="">-- Chọn lĩnh vực --</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.icon} {cat.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Product Image */}

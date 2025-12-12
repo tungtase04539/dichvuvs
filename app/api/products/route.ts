@@ -1,21 +1,45 @@
-import { NextResponse } from "next/server";
-import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { NextRequest, NextResponse } from "next/server";
+import { createAdminSupabaseClient } from "@/lib/supabase-server";
 
 export const dynamic = "force-dynamic";
 
 // Fast products API using Supabase directly
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = createServerSupabaseClient();
+    const supabase = createAdminSupabaseClient();
     
     if (!supabase) {
       return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
     }
 
-    const { data: products, error } = await supabase
+    // Get query params
+    const { searchParams } = new URL(request.url);
+    const categorySlug = searchParams.get("category");
+
+    // Build query
+    let query = supabase
       .from("Service")
-      .select("id, name, slug, description, price, image, videoUrl, featured")
-      .eq("active", true)
+      .select(`
+        id, name, slug, description, price, image, videoUrl, featured, categoryId,
+        category:Category(id, name, slug, icon, color)
+      `)
+      .eq("active", true);
+
+    // Filter by category if provided
+    if (categorySlug && categorySlug !== "all") {
+      // First get category ID by slug
+      const { data: category } = await supabase
+        .from("Category")
+        .select("id")
+        .eq("slug", categorySlug)
+        .single();
+      
+      if (category) {
+        query = query.eq("categoryId", category.id);
+      }
+    }
+
+    const { data: products, error } = await query
       .order("featured", { ascending: false })
       .order("name", { ascending: true });
 

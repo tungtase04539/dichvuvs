@@ -57,6 +57,24 @@ model CTVApplication {
   updatedAt   DateTime @updatedAt
 }
 
+// Danh mục/Lĩnh vực chatbot
+model Category {
+  id          String   @id @default(uuid())
+  name        String   // Tên lĩnh vực: Giáo dục, Kinh doanh, Tôn giáo...
+  slug        String   @unique
+  description String?
+  icon        String?  // Emoji hoặc icon class
+  image       String?  // Ảnh đại diện
+  color       String?  // Màu chủ đạo (hex)
+  order       Int      @default(0) // Thứ tự hiển thị
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  services    Service[]
+}
+
 model Service {
   id              String   @id @default(uuid())
   name            String
@@ -71,6 +89,10 @@ model Service {
   active          Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  
+  // Category
+  categoryId      String?
+  category        Category? @relation(fields: [categoryId], references: [id])
 
   // Relations
   orders      Order[]

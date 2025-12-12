@@ -8,13 +8,11 @@ import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
 import VideoModal from "@/components/VideoModal";
 import {
-  Bot,
   Zap,
   Shield,
   Clock,
   Users,
   TrendingUp,
-  CheckCircle,
   ArrowRight,
   Star,
   MessageSquare,
@@ -23,12 +21,11 @@ import {
   MapPin,
   Play,
   Sparkles,
-  Award,
   HeadphonesIcon,
   Gift,
   Flame,
   Timer,
-  Grid3X3,
+  Bot,
 } from "lucide-react";
 
 interface Category {
@@ -177,197 +174,83 @@ export default function HomePage() {
     <div className="min-h-screen bg-slate-900">
       <Header settings={{ site_phone: "0363 189 699" }} />
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center bg-gradient-hero overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-white rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent-400 rounded-full blur-3xl" />
+      {/* Category Filter Section - Main Hero */}
+      <section className="pt-28 pb-16 bg-gradient-to-b from-slate-800 via-slate-900 to-slate-900 relative overflow-hidden">
+        {/* Background decorations */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-primary-400 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary-600 rounded-full blur-3xl" />
         </div>
-        <div className="absolute inset-0 pattern-dots opacity-5" />
-
-        <div className="container mx-auto px-4 pt-32 pb-20 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-white mb-6 border border-white/20">
-                <Sparkles className="w-4 h-4 text-yellow-400" />
-                #1 ChatBot AI tại Việt Nam
-              </div>
-
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
-                Tự động hóa
-                <span className="block text-accent-300">Chăm sóc khách hàng</span>
-                với AI ChatBot
-              </h1>
-
-              <p className="text-lg md:text-xl text-slate-300 mb-8 max-w-xl mx-auto lg:mx-0">
-                Tăng doanh số, tiết kiệm thời gian với ChatBot AI thông minh. 
-                Chỉ từ <span className="text-primary-400 font-bold">29K/chatbot AI/tháng</span> - Cài đặt trong 5 phút!
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Link
-                  href="/dat-hang"
-                  className="btn bg-primary-400 text-slate-900 hover:bg-primary-300 text-lg font-bold uppercase shadow-lg shadow-primary-400/30"
-                >
-                  MUA NGAY
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-                <Link
-                  href="/san-pham"
-                  className="btn bg-transparent text-primary-400 border-2 border-primary-400/50 hover:bg-primary-400/10 text-lg font-bold uppercase"
-                >
-                  XEM SẢN PHẨM
-                </Link>
-              </div>
-
-              {/* Trust indicators */}
-              <div className="mt-10 flex items-center gap-6 justify-center lg:justify-start">
-                <div className="flex -space-x-3">
-                  {["A", "B", "C", "D", "E"].map((letter, i) => (
-                    <div
-                      key={i}
-                      className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-slate-900 font-semibold text-sm border-2 border-slate-800"
-                    >
-                      {letter}
-                    </div>
-                  ))}
-                </div>
-                <div className="text-left">
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 text-primary-400 fill-primary-400" />
-                    ))}
-                  </div>
-                  <p className="text-sm text-slate-400">10,000+ khách hàng tin dùng</p>
-                </div>
-              </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-400/20 text-primary-400 rounded-full text-sm font-semibold mb-6 uppercase tracking-wide border border-primary-400/30">
+              <Sparkles className="w-4 h-4" />
+              #1 CHATBOT AI TẠI VIỆT NAM
             </div>
-
-            {/* Hero Image/Illustration */}
-            <div className="relative hidden lg:block">
-              <div className="relative z-10">
-                <div className="w-full max-w-md mx-auto bg-slate-800 rounded-3xl shadow-2xl p-6 animate-float border border-slate-700">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-2xl bg-primary-400/20 flex items-center justify-center">
-                      <Bot className="w-7 h-7 text-primary-400" />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-white">ChatBot AI</p>
-                      <p className="text-sm text-green-400 flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-green-400"></span>
-                        Đang hoạt động
-                      </p>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="bg-slate-700 rounded-2xl rounded-tl-sm p-3 max-w-[80%]">
-                      <p className="text-sm text-slate-200">Xin chào! Tôi có thể giúp gì cho bạn?</p>
-                    </div>
-                    <div className="bg-primary-400 rounded-2xl rounded-tr-sm p-3 max-w-[80%] ml-auto">
-                      <p className="text-sm text-slate-900 font-medium">Tôi muốn mua ChatBot cho shop online</p>
-                    </div>
-                    <div className="bg-slate-700 rounded-2xl rounded-tl-sm p-3 max-w-[80%]">
-                      <p className="text-sm text-slate-200">Tuyệt vời! Chúng tôi có nhiều gói ChatBot phù hợp với shop online. Bạn muốn tư vấn gói nào?</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* Decorative elements */}
-              <div className="absolute top-10 -right-10 w-20 h-20 bg-primary-400 rounded-2xl rotate-12 opacity-80" />
-              <div className="absolute -bottom-5 -left-5 w-16 h-16 bg-primary-500 rounded-xl -rotate-12" />
-            </div>
-          </div>
-        </div>
-
-        {/* Wave divider */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="#1e293b"/>
-          </svg>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-12 bg-slate-800 relative -mt-1">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center p-6">
-                <p className="text-3xl md:text-4xl font-bold text-primary-400 mb-1">{stat.value}</p>
-                <p className="text-slate-300">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Category Filter Section */}
-      <section className="py-16 bg-gradient-to-b from-slate-800 to-slate-900">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-400/20 text-primary-400 rounded-full text-sm font-semibold mb-4 uppercase tracking-wide">
-              <Grid3X3 className="w-4 h-4" />
-              CHỌN LĨNH VỰC
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              CHATBOT THEO <span className="text-primary-400">LĨNH VỰC</span>
-            </h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">
-              Chọn lĩnh vực phù hợp để tìm ChatBot AI tối ưu cho ngành nghề của bạn
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+              CHỌN <span className="text-primary-400">LĨNH VỰC</span> CỦA BẠN
+            </h1>
+            <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto">
+              Chọn lĩnh vực phù hợp để tìm ChatBot AI tối ưu cho ngành nghề của bạn. 
+              Chỉ từ <span className="text-primary-400 font-bold">29K/tháng</span>!
             </p>
           </div>
 
-          {/* Category Buttons */}
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
+          {/* Category Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 max-w-4xl mx-auto">
             <button
               onClick={() => setSelectedCategory("all")}
-              className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all ${
+              className={`flex flex-col items-center gap-3 p-6 rounded-2xl font-semibold transition-all ${
                 selectedCategory === "all"
-                  ? "bg-primary-400 text-slate-900 shadow-lg shadow-primary-400/30"
-                  : "bg-slate-700/50 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-600"
+                  ? "bg-primary-400 text-slate-900 shadow-xl shadow-primary-400/40 scale-105"
+                  : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700 hover:border-primary-400/50"
               }`}
             >
-              <span className="text-xl">🌟</span>
-              Tất cả
+              <span className="text-4xl">🌟</span>
+              <span className="text-sm md:text-base">Tất cả</span>
             </button>
             {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.slug)}
-                className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all ${
+                className={`flex flex-col items-center gap-3 p-6 rounded-2xl font-semibold transition-all ${
                   selectedCategory === category.slug
-                    ? "bg-primary-400 text-slate-900 shadow-lg shadow-primary-400/30"
-                    : "bg-slate-700/50 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-600"
+                    ? "bg-primary-400 text-slate-900 shadow-xl shadow-primary-400/40 scale-105"
+                    : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700 hover:border-primary-400/50"
                 }`}
               >
-                <span className="text-xl">{category.icon || "📦"}</span>
-                {category.name}
+                <span className="text-4xl">{category.icon || "📦"}</span>
+                <span className="text-sm md:text-base text-center">{category.name}</span>
               </button>
             ))}
           </div>
 
-          {/* Filtered Products Preview */}
-          {selectedCategory !== "all" && allProducts.length > 0 && (
-            <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-white">
-                  Kết quả: <span className="text-primary-400">{allProducts.length}</span> ChatBot
-                </h3>
-                <Link
-                  href={`/san-pham?category=${selectedCategory}`}
-                  className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 font-semibold transition-colors"
-                >
-                  Xem tất cả
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-              <div className="grid md:grid-cols-3 gap-4">
-                {allProducts.slice(0, 3).map((product) => (
+          {/* Products Grid */}
+          <div className="bg-slate-800/50 rounded-3xl p-6 md:p-8 border border-slate-700/50 backdrop-blur-sm">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl md:text-2xl font-bold text-white">
+                {selectedCategory === "all" ? "Tất cả ChatBot" : (
+                  <>Kết quả: <span className="text-primary-400">{allProducts.length}</span> ChatBot</>
+                )}
+              </h3>
+              <Link
+                href={selectedCategory === "all" ? "/san-pham" : `/san-pham?category=${selectedCategory}`}
+                className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 font-semibold transition-colors"
+              >
+                Xem tất cả
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            
+            {allProducts.length > 0 ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {allProducts.slice(0, 6).map((product) => (
                   <Link
                     key={product.id}
                     href={`/san-pham/${product.slug}`}
-                    className="flex items-center gap-4 p-4 bg-slate-700/50 rounded-xl hover:bg-slate-700 transition-colors group"
+                    className="flex items-center gap-4 p-4 bg-slate-700/50 rounded-xl hover:bg-slate-700 transition-all group hover:scale-[1.02]"
                   >
                     <div className="w-16 h-16 rounded-xl bg-slate-600 flex items-center justify-center flex-shrink-0 overflow-hidden">
                       {product.image ? (
@@ -380,20 +263,29 @@ export default function HomePage() {
                       <h4 className="font-semibold text-white group-hover:text-primary-400 transition-colors truncate">
                         {product.name}
                       </h4>
-                      <p className="text-primary-400 font-bold">{formatCurrency(product.price)}</p>
+                      <p className="text-sm text-slate-400 truncate">{product.description}</p>
+                      <p className="text-primary-400 font-bold mt-1">{formatCurrency(product.price)}</p>
                     </div>
                     <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-primary-400 transition-colors flex-shrink-0" />
                   </Link>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-slate-400">Chưa có ChatBot nào trong lĩnh vực này</p>
+              </div>
+            )}
+          </div>
 
-          {selectedCategory !== "all" && allProducts.length === 0 && (
-            <div className="text-center py-12 bg-slate-800/50 rounded-2xl border border-slate-700">
-              <p className="text-slate-400">Chưa có ChatBot nào trong lĩnh vực này</p>
-            </div>
-          )}
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center p-4 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                <p className="text-2xl md:text-3xl font-bold text-primary-400 mb-1">{stat.value}</p>
+                <p className="text-sm text-slate-400">{stat.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

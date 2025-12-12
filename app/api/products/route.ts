@@ -36,6 +36,9 @@ export async function GET(request: NextRequest) {
       
       if (category) {
         query = query.eq("categoryId", category.id);
+      } else {
+        // Category not found, return empty
+        return NextResponse.json({ products: [] });
       }
     }
 

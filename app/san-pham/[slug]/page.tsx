@@ -8,7 +8,6 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
 import AddToCartButton from "./AddToCartButton";
-import CopyRefButton from "@/components/CopyRefButton";
 import {
   ArrowLeft,
   Star,
@@ -232,13 +231,6 @@ export default function ProductDetailPage({
                 </div>
 
                 <AddToCartButton product={product} />
-
-                {/* CTV Referral Button */}
-                <CopyRefButton 
-                  productSlug={product.slug} 
-                  variant="full" 
-                  className="mt-4"
-                />
 
                 {/* Guarantees */}
                 <div className="mt-6 space-y-3">

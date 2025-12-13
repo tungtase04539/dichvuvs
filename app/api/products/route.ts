@@ -27,20 +27,8 @@ export async function GET(request: NextRequest) {
 
     // Filter by category if provided
     if (categorySlug && categorySlug !== "all") {
-      // First get category ID by slug
-      const { data: category, error: categoryError } = await supabase
-        .from("Category")
-        .select("id")
-        .eq("slug", categorySlug)
-        .single();
-      
-      if (categoryError || !category) {
-        console.error("Category not found:", categorySlug, categoryError);
-        // Category not found, return empty
-        return NextResponse.json({ products: [] });
-      }
-      
-      query = query.eq("categoryId", category.id);
+      // Use join to filter by category slug directly
+      query = query.eq("category.slug", categorySlug);
     }
 
     const { data: products, error } = await query

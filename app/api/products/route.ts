@@ -40,6 +40,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ products: [] });
       }
       
+      console.log("Filtering by category:", categorySlug, "Category ID:", category.id);
       // Filter by categoryId
       query = query.eq("categoryId", category.id);
     }
@@ -53,6 +54,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    console.log("Products found:", products?.length || 0, "for category:", categorySlug || "all");
     return NextResponse.json({ products: products || [] });
   } catch (error) {
     console.error("Get products error:", error);

@@ -4,18 +4,16 @@ import { getSession } from "@/lib/auth";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
-    
     const user = await getSession();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const order = await prisma.order.findUnique({
-      where: { id },
+      where: { id: params.id },
       include: {
         service: true,
         assignedTo: {
@@ -48,11 +46,9 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
-    
     const user = await getSession();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -60,28 +56,6 @@ export async function PATCH(
 
     const body = await request.json();
     const { status, assignedToId, notes } = body;
-
-    console.log("=== ORDER UPDATE ===");
-    console.log("Order ID:", id);
-    console.log("New status:", status);
-
-    // Get current order to check status change
-    const currentOrder = await prisma.order.findUnique({
-      where: { id },
-      select: { 
-        status: true, 
-        customerEmail: true, 
-        customerName: true, 
-        customerPhone: true,
-        referralCode: true,
-        referrerId: true,
-        totalPrice: true,
-      },
-    });
-
-    if (!currentOrder) {
-      return NextResponse.json({ error: "Không tìm thấy đơn hàng" }, { status: 404 });
-    }
 
     const updateData: Record<string, unknown> = {};
 
@@ -96,7 +70,7 @@ export async function PATCH(
     }
 
     const order = await prisma.order.update({
-      where: { id },
+      where: { id: params.id },
       data: updateData,
       include: {
         service: true,
@@ -105,121 +79,6 @@ export async function PATCH(
         },
       },
     });
-
-    // Tự động tạo tài khoản khách hàng khi thanh toán thành công
-    console.log("=== ACCOUNT CREATION CHECK ===");
-    console.log("New status:", status);
-    console.log("Current status:", currentOrder.status);
-    console.log("Customer email:", currentOrder.customerEmail);
-    console.log("Customer phone:", currentOrder.customerPhone);
-    
-    const shouldCreateAccount = 
-      status &&
-      (status === "confirmed" || status === "completed") &&
-      currentOrder.status !== "confirmed" &&
-      currentOrder.status !== "completed" &&
-      currentOrder.customerEmail &&
-      currentOrder.customerPhone;
-    
-    console.log("Should create account:", shouldCreateAccount);
-    
-    if (shouldCreateAccount) {
-      console.log(">>> Creating customer account for:", currentOrder.customerEmail);
-      
-      try {
-        // Import supabase admin client
-        const { createClient } = await import("@supabase/supabase-js");
-        
-        if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-          console.error("SUPABASE_SERVICE_ROLE_KEY is not set!");
-        } else {
-          const supabaseAdmin = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY
-          );
-
-          // Check if user already exists in Supabase Auth
-          const customerEmail = currentOrder.customerEmail!;
-          const customerPhone = currentOrder.customerPhone!;
-          
-          const { data: existingAuthUsers } = await supabaseAdmin.auth.admin.listUsers();
-          const authUserExists = existingAuthUsers?.users?.some(
-            (u) => u.email === customerEmail
-          );
-
-          let authUserId: string | null = null;
-
-          if (authUserExists) {
-            // Get existing auth user ID
-            const existingAuthUser = existingAuthUsers?.users?.find(
-              (u) => u.email === customerEmail
-            );
-            authUserId = existingAuthUser?.id || null;
-            console.log("Auth user already exists:", authUserId);
-          } else {
-            // Create user in Supabase Auth
-            const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
-              email: customerEmail,
-              password: customerPhone, // Mật khẩu = số điện thoại
-              email_confirm: true,
-              user_metadata: {
-                name: currentOrder.customerName,
-                role: "customer",
-              },
-            });
-
-            if (authError) {
-              console.error("Error creating auth user:", authError.message);
-            } else if (authUser.user) {
-              authUserId = authUser.user.id;
-              console.log("Created auth user:", authUserId);
-            }
-          }
-
-          // Check if user exists in database
-          if (authUserId) {
-            const existingDbUser = await prisma.user.findUnique({
-              where: { email: customerEmail },
-            });
-
-            if (!existingDbUser) {
-              // Create user in database
-              await prisma.user.create({
-                data: {
-                  id: authUserId,
-                  email: customerEmail,
-                  password: customerPhone,
-                  name: currentOrder.customerName,
-                  phone: customerPhone,
-                  role: "customer",
-                },
-              });
-              console.log("Created database user for:", customerEmail);
-            } else {
-              console.log("Database user already exists:", customerEmail);
-            }
-          }
-        }
-      } catch (createError) {
-        console.error("Error creating customer account:", createError);
-      }
-
-      // Cập nhật stats cho CTV khi đơn hàng được xác nhận
-      if (currentOrder.referralCode && currentOrder.referrerId) {
-        try {
-          await prisma.referralLink.update({
-            where: { code: currentOrder.referralCode },
-            data: {
-              orderCount: { increment: 1 },
-              revenue: { increment: currentOrder.totalPrice },
-            },
-          });
-          console.log("Updated referral stats for code:", currentOrder.referralCode);
-        } catch (refError) {
-          console.error("Error updating referral stats:", refError);
-        }
-      }
-    }
 
     return NextResponse.json({ order });
   } catch (error) {
@@ -233,18 +92,16 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
-    
     const user = await getSession();
     if (!user || user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await prisma.order.delete({
-      where: { id },
+      where: { id: params.id },
     });
 
     return NextResponse.json({ success: true });

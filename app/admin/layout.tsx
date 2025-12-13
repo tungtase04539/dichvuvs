@@ -20,28 +20,12 @@ export default async function AdminLayout({
     redirect("/quan-tri-vien-dang-nhap");
   }
 
-  // Get user data from database (for correct role)
-  const { data: dbUser } = await supabase
-    .from("User")
-    .select("id, name, role")
-    .eq("email", user.email)
-    .single();
-
-  const userRole = dbUser?.role || "customer";
-
-  // Chỉ cho phép admin, ctv (đã duyệt), staff vào admin panel
-  // customer chuyển tới trang tài khoản riêng
-  const allowedRoles = ["admin", "ctv", "staff", "master_agent", "agent", "collaborator"];
-  if (!allowedRoles.includes(userRole)) {
-    redirect("/tai-khoan");
-  }
-
   // Get user metadata
   const session = {
     id: user.id,
     email: user.email || "",
-    name: dbUser?.name || user.user_metadata?.name || user.email?.split("@")[0] || "Admin",
-    role: userRole,
+    name: user.user_metadata?.name || user.email?.split("@")[0] || "Admin",
+    role: user.user_metadata?.role || "admin",
   };
 
   return (

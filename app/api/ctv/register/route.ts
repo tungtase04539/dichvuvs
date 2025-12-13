@@ -1,130 +1,126 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+export const dynamic = "force-dynamic";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, phone, email, facebook, zalo, experience, reason } = body;
+    const { name, phone, email, facebook, experience, reason } = body;
 
     // Validate required fields
     if (!name || !phone || !email) {
       return NextResponse.json(
-        { error: "Vui lòng nhập đầy đủ họ tên, số điện thoại và email" },
+        { error: "Vui lòng điền đầy đủ thông tin bắt buộc (Họ tên, SĐT, Email)" },
         { status: 400 }
       );
     }
 
-    // Check if email already exists
-    const { data: existingUser } = await supabase
-      .from("User")
-      .select("id, role")
-      .eq("email", email)
-      .single();
-
-    let userId: string;
-
-    if (existingUser) {
-      // Check if already applied
-      const { data: existingApp } = await supabase
-        .from("CTVApplication")
-        .select("id, status")
-        .eq("userId", existingUser.id)
-        .single();
-
-      if (existingApp) {
-        if (existingApp.status === "pending") {
-          return NextResponse.json(
-            { error: "Bạn đã gửi đơn đăng ký CTV, vui lòng chờ duyệt" },
-            { status: 400 }
-          );
-        }
-        if (existingApp.status === "approved") {
-          return NextResponse.json(
-            { error: "Bạn đã là CTV" },
-            { status: 400 }
-          );
-        }
-      }
-
-      if (existingUser.role === "ctv") {
-        return NextResponse.json(
-          { error: "Bạn đã là CTV" },
-          { status: 400 }
-        );
-      }
-
-      userId = existingUser.id;
-    } else {
-      // CHỈ tạo record trong bảng User, KHÔNG tạo Auth user
-      // Auth user sẽ được tạo khi admin DUYỆT đơn đăng ký CTV
-      const newUserId = crypto.randomUUID();
-      
-      const { error: userError } = await supabase
-        .from("User")
-        .insert({
-          id: newUserId,
-          email,
-          password: phone, // Lưu tạm, sẽ dùng khi tạo Auth user
-          name,
-          phone,
-          role: "customer", // Vẫn là customer cho đến khi được duyệt
-          active: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
-
-      if (userError) {
-        console.error("Error creating db user:", userError);
-        return NextResponse.json(
-          { error: `Không thể tạo tài khoản: ${userError.message}` },
-          { status: 500 }
-        );
-      }
-
-      userId = newUserId;
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: "Email không hợp lệ" },
+        { status: 400 }
+      );
     }
 
-    // Create CTV application
-    const { error: appError } = await supabase
-      .from("CTVApplication")
-      .insert({
-        id: crypto.randomUUID(),
-        userId,
+    // Validate phone format (Vietnamese phone)
+    const phoneRegex = /^(0|\+84)[0-9]{9,10}$/;
+    const cleanPhone = phone.replace(/\s/g, "");
+    if (!phoneRegex.test(cleanPhone)) {
+      return NextResponse.json(
+        { error: "Số điện thoại không hợp lệ" },
+        { status: 400 }
+      );
+    }
+
+    // Check if user already exists
+    let user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (user) {
+      // Check if user already has a CTV application
+      const existingApplication = await prisma.cTVApplication.findUnique({
+        where: { userId: user.id },
+      });
+
+      if (existingApplication) {
+        if (existingApplication.status === "pending") {
+          return NextResponse.json(
+            { error: "Bạn đã có đơn đăng ký đang chờ duyệt" },
+            { status: 400 }
+          );
+        } else if (existingApplication.status === "approved") {
+          return NextResponse.json(
+            { error: "Bạn đã được duyệt làm CTV rồi" },
+            { status: 400 }
+          );
+        }
+      }
+    } else {
+      // Create new user with default password (user will reset later)
+      const defaultPassword = await bcrypt.hash("temp123456", 10);
+      user = await prisma.user.create({
+        data: {
+          email,
+          password: defaultPassword,
+          name,
+          phone: cleanPhone,
+          role: "customer", // Default role, will be changed to "collaborator" when approved
+        },
+      });
+    }
+
+    // Create or update CTV application
+    const application = await prisma.cTVApplication.upsert({
+      where: { userId: user.id },
+      create: {
+        userId: user.id,
         fullName: name,
-        phone,
+        phone: cleanPhone,
         email,
         facebook: facebook || null,
-        zalo: zalo || null,
+        zalo: null, // Can be extracted from facebook field if needed
         experience: experience || null,
         reason: reason || null,
         status: "pending",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-
-    if (appError) {
-      console.error("Error creating application:", appError);
-      return NextResponse.json(
-        { error: `Không thể gửi đơn đăng ký: ${appError.message}` },
-        { status: 500 }
-      );
-    }
+      },
+      update: {
+        fullName: name,
+        phone: cleanPhone,
+        email,
+        facebook: facebook || null,
+        zalo: null,
+        experience: experience || null,
+        reason: reason || null,
+        status: "pending", // Reset to pending if updating
+      },
+    });
 
     return NextResponse.json({
       success: true,
       message: "Đăng ký thành công! Chúng tôi sẽ liên hệ với bạn trong vòng 24h.",
+      applicationId: application.id,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("CTV registration error:", error);
+    
+    // Handle unique constraint errors
+    if (error.code === "P2002") {
+      return NextResponse.json(
+        { error: "Email hoặc số điện thoại đã được sử dụng" },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
-      { error: "Đã xảy ra lỗi, vui lòng thử lại" },
+      { error: "Có lỗi xảy ra khi đăng ký. Vui lòng thử lại sau." },
       { status: 500 }
     );
   }
 }
+
 

@@ -17,7 +17,6 @@ export default function DangKyCTVPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,16 +34,18 @@ export default function DangKyCTVPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Có lỗi xảy ra, vui lòng thử lại");
+        setError(data.error || "Có lỗi xảy ra khi đăng ký");
         setIsSubmitting(false);
         return;
       }
 
       setSubmitted(true);
-    } catch (err) {
-      setError("Có lỗi xảy ra, vui lòng thử lại");
+    } catch (error) {
+      console.error("Registration error:", error);
+      setError("Có lỗi xảy ra. Vui lòng thử lại sau.");
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   const benefits = [
@@ -266,11 +267,6 @@ export default function DangKyCTVPage() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  {error && (
-                    <div className="p-3 bg-red-900/30 border border-red-500/30 rounded-xl text-red-400 text-sm">
-                      {error}
-                    </div>
-                  )}
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-slate-300 mb-2">
@@ -351,6 +347,11 @@ export default function DangKyCTVPage() {
                       placeholder="Chia sẻ lý do bạn muốn tham gia..."
                     />
                   </div>
+                  {error && (
+                    <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-lg text-red-400 text-sm">
+                      {error}
+                    </div>
+                  )}
                   <button
                     type="submit"
                     disabled={isSubmitting}

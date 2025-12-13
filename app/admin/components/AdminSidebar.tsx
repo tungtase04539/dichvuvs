@@ -14,7 +14,6 @@ import {
   UserCheck,
   Link2,
   Building2,
-  RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -38,8 +37,6 @@ interface NavItem {
 
 const roleLabels: Record<string, string> = {
   admin: "Quản trị viên",
-  ctv: "Cộng tác viên",
-  customer: "Khách hàng",
   master_agent: "Tổng đại lý",
   agent: "Đại lý",
   collaborator: "Cộng tác viên",
@@ -86,7 +83,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" },
         { href: "/admin/chat", icon: MessageCircle, label: "Chat", badge: unreadCount },
         { href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" },
-        { href: "/admin/ctv", icon: Users, label: "Quản lý CTV" },
+        { href: "/admin/dai-ly", icon: Building2, label: "Đại lý" },
         { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
         { href: "/admin/tai-khoan", icon: Key, label: "Tài khoản" },
       ];
@@ -110,14 +107,11 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       ];
     }
 
-    if (user.role === "ctv" || user.role === "collaborator") {
+    if (user.role === "collaborator") {
       return [
         ...baseItems,
-        { href: "/admin/san-pham-ctv", icon: ShoppingBag, label: "Sản phẩm" },
         { href: "/admin/don-hang", icon: Package, label: "Đơn hàng của tôi" },
-        { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng của tôi" },
         { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
-        { href: "/admin/ho-so", icon: Key, label: "Hồ sơ cá nhân" },
       ];
     }
 
@@ -177,35 +171,6 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         })}
       </nav>
 
-      {/* Reset Button - Admin only */}
-      {user.role === "admin" && (
-        <div className="absolute bottom-4 left-4 right-4">
-          <button
-            onClick={async () => {
-              if (confirm("⚠️ CẢNH BÁO: Bạn có chắc muốn RESET tất cả dữ liệu?\n\nSẽ xóa:\n- Tất cả đơn hàng\n- Tất cả khách hàng\n- Tất cả CTV\n- Tất cả đăng ký CTV\n\nGiữ lại:\n- Tài khoản Admin\n- Dữ liệu ChatBot/Service")) {
-                if (confirm("🔴 XÁC NHẬN LẦN CUỐI: Hành động này KHÔNG THỂ hoàn tác!")) {
-                  try {
-                    const res = await fetch("/api/admin/reset", { method: "POST" });
-                    const data = await res.json();
-                    if (res.ok) {
-                      alert("✅ " + data.message);
-                      window.location.reload();
-                    } else {
-                      alert("❌ Lỗi: " + data.error);
-                    }
-                  } catch {
-                    alert("❌ Lỗi kết nối");
-                  }
-                }
-              }
-            }}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 border border-red-600/30 transition-colors text-sm"
-          >
-            <RotateCcw className="w-4 h-4" />
-            Reset Data
-          </button>
-        </div>
-      )}
     </aside>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/Header";
@@ -21,6 +22,9 @@ interface Product {
 }
 
 export default function ProductsPage() {
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams.get("category");
+  
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,7 +38,10 @@ export default function ProductsPage() {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const res = await fetch("/api/products");
+        const url = categoryParam 
+          ? `/api/products?category=${categoryParam}`
+          : "/api/products";
+        const res = await fetch(url);
         const data = await res.json();
         if (data.products) {
           setProducts(data.products);
@@ -48,7 +55,7 @@ export default function ProductsPage() {
     };
 
     loadProducts();
-  }, []);
+  }, [categoryParam]);
 
   useEffect(() => {
     if (!searchQuery.trim()) {

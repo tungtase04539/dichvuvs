@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
         id, name, slug, description, price, image, videoUrl, featured, categoryId,
         category:Category(id, name, slug, icon, color)
       `)
-      .eq("active", true);
+      .or("active.eq.true,active.is.null"); // Include both active=true and active=null
 
     // Filter by category if provided
     if (categorySlug && categorySlug !== "all") {

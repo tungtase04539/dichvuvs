@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
@@ -21,7 +21,7 @@ interface Product {
   featured: boolean;
 }
 
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category");
   
@@ -286,5 +286,22 @@ export default function ProductsPage() {
         title={videoModal.title}
       />
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-900">
+        <Header settings={{}} />
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        </div>
+        <Footer settings={{}} />
+        <ChatWidget />
+      </div>
+    }>
+      <ProductsContent />
+    </Suspense>
   );
 }

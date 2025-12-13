@@ -86,12 +86,18 @@ export default function HomePage() {
           : `/api/products?category=${selectedCategory}`;
         const res = await fetch(url);
         const data = await res.json();
+        console.log("Loaded products for category:", selectedCategory, data.products?.length || 0);
         if (data.products) {
           setAllProducts(data.products);
           setProducts(data.products.slice(0, 6));
+        } else {
+          setAllProducts([]);
+          setProducts([]);
         }
       } catch (error) {
         console.error("Load products error:", error);
+        setAllProducts([]);
+        setProducts([]);
       }
     };
     loadProducts();

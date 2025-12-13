@@ -35,11 +35,11 @@ export default function DangKyCTVPage() {
 
       if (!res.ok) {
         setError(data.error || "Có lỗi xảy ra khi đăng ký");
-        setIsSubmitting(false);
+    setIsSubmitting(false);
         return;
       }
 
-      setSubmitted(true);
+    setSubmitted(true);
     } catch (error) {
       console.error("Registration error:", error);
       setError("Có lỗi xảy ra. Vui lòng thử lại sau.");

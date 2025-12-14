@@ -8,9 +8,9 @@ SELECT
     slug,
     active,
     "categoryId",
-    created_at
+    "createdAt"
 FROM "Service"
-ORDER BY created_at DESC;
+ORDER BY "createdAt" DESC;
 
 -- 2. Kiểm tra chatbot có active = false hoặc null
 SELECT 

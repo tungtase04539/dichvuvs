@@ -20,8 +20,8 @@ SELECT
     slug,
     active,
     "categoryId",
-    created_at
+    "createdAt"
 FROM "Service"
-ORDER BY updated_at DESC
+ORDER BY "updatedAt" DESC
 LIMIT 20;
 

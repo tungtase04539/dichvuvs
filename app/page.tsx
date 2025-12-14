@@ -80,12 +80,15 @@ export default function HomePage() {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const baseUrl = selectedCategory === "all" 
-          ? "/api/products" 
-          : `/api/products?category=${selectedCategory}`;
-        // Thêm timestamp để tránh cache, sử dụng & nếu đã có query params
-        const separator = selectedCategory === "all" ? "?" : "&";
-        const url = `${baseUrl}${separator}_=${Date.now()}`;
+        // Build URL đúng cách
+        let url = "/api/products";
+        if (selectedCategory && selectedCategory !== "all") {
+          url = `/api/products?category=${encodeURIComponent(selectedCategory)}`;
+        }
+        // Thêm timestamp để tránh cache
+        url += url.includes("?") ? `&_=${Date.now()}` : `?_=${Date.now()}`;
+        
+        console.log("Loading products from:", url);
         
         const res = await fetch(url, {
           cache: 'no-store',
@@ -95,11 +98,20 @@ export default function HomePage() {
             'Expires': '0'
           }
         });
+        
+        if (!res.ok) {
+          console.error("Fetch failed:", res.status, res.statusText);
+          setAllProducts([]);
+          return;
+        }
+        
         const data = await res.json();
-        console.log("Loaded products for category:", selectedCategory, data.products?.length || 0);
-        if (data.products) {
+        console.log("Loaded products for category:", selectedCategory, "count:", data.products?.length || 0);
+        
+        if (data.products && Array.isArray(data.products)) {
           setAllProducts(data.products);
         } else {
+          console.warn("Invalid products data:", data);
           setAllProducts([]);
         }
       } catch (error) {

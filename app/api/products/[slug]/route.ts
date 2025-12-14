@@ -18,6 +18,7 @@ export async function GET(
       .from("Service")
       .select("*")
       .eq("slug", params.slug)
+      .eq("active", true)
       .single();
 
     if (error || !product) {

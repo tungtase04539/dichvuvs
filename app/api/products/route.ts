@@ -16,14 +16,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const categorySlug = searchParams.get("category");
 
-    // Build query - Test without active filter
+    // Build query - Only show active products
     let query = supabase
       .from("Service")
       .select(`
         id, name, slug, description, price, image, videoUrl, featured, categoryId, active,
         category:Category(id, name, slug, icon, color)
-      `);
-    // Temporarily removed active filter to test
+      `)
+      .eq("active", true);
 
     // Filter by category if provided
     if (categorySlug && categorySlug !== "all") {

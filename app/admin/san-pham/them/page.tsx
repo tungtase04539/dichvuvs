@@ -90,6 +90,11 @@ export default function AddProductPage() {
 
       if (res.ok) {
         console.log("Product created successfully:", data.product?.id, "active:", data.product?.active);
+        // Trigger storage event để các tab khác biết có update
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('products-updated', Date.now().toString());
+          localStorage.removeItem('products-updated');
+        }
         router.push("/admin/san-pham");
         // Force refresh để cập nhật danh sách
         router.refresh();

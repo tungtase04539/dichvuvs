@@ -27,6 +27,11 @@ export default function DeleteProductButton({ productId, productName }: DeletePr
       if (res.ok) {
         const data = await res.json();
         console.log("Product deleted/deactivated:", productId, data);
+        // Trigger storage event để các tab khác biết có update
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('products-updated', Date.now().toString());
+          localStorage.removeItem('products-updated');
+        }
         // Force refresh để cập nhật danh sách
         router.refresh();
         // Thông báo nếu chỉ ẩn thay vì xóa

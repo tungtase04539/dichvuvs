@@ -65,7 +65,43 @@ function ProductsContent() {
       }
     };
 
+    // Load immediately
     loadProducts();
+
+    // Auto-refresh every 3 seconds (nhanh hơn)
+    const interval = setInterval(() => {
+      loadProducts();
+    }, 3000);
+
+    // Refresh when page becomes visible
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        loadProducts();
+      }
+    };
+
+    // Refresh when window gets focus
+    const handleFocus = () => {
+      loadProducts();
+    };
+
+    // Listen to storage events (khi có thay đổi từ tab khác)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'products-updated') {
+        loadProducts();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, [categoryParam]);
 
   useEffect(() => {

@@ -100,7 +100,13 @@ export default function EditProductPage() {
       const data = await res.json();
 
       if (res.ok) {
+        // Trigger storage event để các tab khác biết có update
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('products-updated', Date.now().toString());
+          localStorage.removeItem('products-updated');
+        }
         router.push("/admin/san-pham");
+        router.refresh();
       } else {
         setError(data.error || "Có lỗi xảy ra");
       }

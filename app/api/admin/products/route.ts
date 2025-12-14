@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
         videoUrl: videoUrl || null,
         categoryId: categoryId || null,
         featured: featured || false,
-        active: active !== false,
+        active: active !== false, // Đảm bảo active = true mặc định
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       })
@@ -124,6 +124,20 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error("Create product error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Đảm bảo sản phẩm mới luôn có active = true
+    if (product && !product.active) {
+      const { data: updatedProduct } = await adminSupabase
+        .from("Service")
+        .update({ active: true })
+        .eq("id", product.id)
+        .select()
+        .single();
+      
+      if (updatedProduct) {
+        return NextResponse.json({ product: updatedProduct });
+      }
     }
 
     return NextResponse.json({ product });

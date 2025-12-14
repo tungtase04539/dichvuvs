@@ -25,7 +25,14 @@ export default function DeleteProductButton({ productId, productName }: DeletePr
       });
 
       if (res.ok) {
+        const data = await res.json();
+        console.log("Product deleted/deactivated:", productId, data);
+        // Force refresh để cập nhật danh sách
         router.refresh();
+        // Thông báo nếu chỉ ẩn thay vì xóa
+        if (data.message) {
+          alert(data.message);
+        }
       } else {
         const data = await res.json();
         alert(data.error || "Không thể xóa sản phẩm");

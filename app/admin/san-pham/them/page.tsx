@@ -72,20 +72,32 @@ export default function AddProductPage() {
     setIsSubmitting(true);
 
     try {
+      // Đảm bảo active luôn = true khi thêm sản phẩm mới
+      const submitData = {
+        ...formData,
+        active: true, // Force active = true
+      };
+
+      console.log("Submitting product with active:", submitData.active);
+
       const res = await fetch("/api/admin/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData),
       });
 
       const data = await res.json();
 
       if (res.ok) {
+        console.log("Product created successfully:", data.product?.id, "active:", data.product?.active);
         router.push("/admin/san-pham");
+        // Force refresh để cập nhật danh sách
+        router.refresh();
       } else {
         setError(data.error || "Có lỗi xảy ra");
       }
-    } catch {
+    } catch (error) {
+      console.error("Submit error:", error);
       setError("Có lỗi xảy ra");
     } finally {
       setIsSubmitting(false);

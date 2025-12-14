@@ -99,7 +99,7 @@ export async function PUT(
         videoUrl: videoUrl || null,
         categoryId: categoryId || null,
         featured: featured || false,
-        active: active !== false,
+        active: active !== false, // Đảm bảo active được cập nhật đúng
         updatedAt: new Date().toISOString(),
       })
       .eq("id", params.id)
@@ -110,6 +110,9 @@ export async function PUT(
       console.error("Update product error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    // Log để debug
+    console.log("Updated product:", product?.id, "active:", product?.active);
 
     return NextResponse.json({ product });
   } catch (error) {
@@ -136,12 +139,27 @@ export async function DELETE(
       .eq("serviceId", params.id);
 
     if (count && count > 0) {
-      return NextResponse.json(
-        { error: `Không thể xóa sản phẩm đã có ${count} đơn hàng` },
-        { status: 400 }
-      );
+      // Nếu có đơn hàng, chỉ set active = false thay vì xóa
+      const { error: updateError } = await adminSupabase
+        .from("Service")
+        .update({
+          active: false,
+          updatedAt: new Date().toISOString(),
+        })
+        .eq("id", params.id);
+
+      if (updateError) {
+        console.error("Deactivate product error:", updateError);
+        return NextResponse.json({ error: updateError.message }, { status: 500 });
+      }
+
+      return NextResponse.json({ 
+        success: true, 
+        message: `Sản phẩm đã được ẩn (có ${count} đơn hàng)` 
+      });
     }
 
+    // Nếu không có đơn hàng, xóa thật
     const { error } = await adminSupabase
       .from("Service")
       .delete()

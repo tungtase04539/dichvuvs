@@ -38,11 +38,14 @@ function ProductsContent() {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const url = categoryParam 
+        const baseUrl = categoryParam 
           ? `/api/products?category=${categoryParam}`
           : "/api/products";
-        // Thêm timestamp để tránh cache và cache: 'no-store'
-        const res = await fetch(`${url}?_=${Date.now()}`, {
+        // Thêm timestamp để tránh cache, sử dụng & nếu đã có query params
+        const separator = categoryParam ? "&" : "?";
+        const url = `${baseUrl}${separator}_=${Date.now()}`;
+        
+        const res = await fetch(url, {
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',

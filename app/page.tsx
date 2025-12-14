@@ -80,11 +80,14 @@ export default function HomePage() {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const url = selectedCategory === "all" 
+        const baseUrl = selectedCategory === "all" 
           ? "/api/products" 
           : `/api/products?category=${selectedCategory}`;
-        // Thêm timestamp để tránh cache và cache: 'no-store'
-        const res = await fetch(`${url}?_=${Date.now()}`, {
+        // Thêm timestamp để tránh cache, sử dụng & nếu đã có query params
+        const separator = selectedCategory === "all" ? "?" : "&";
+        const url = `${baseUrl}${separator}_=${Date.now()}`;
+        
+        const res = await fetch(url, {
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',

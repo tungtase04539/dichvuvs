@@ -66,12 +66,17 @@ export async function GET(request: NextRequest) {
 
     console.log("Products found:", products?.length || 0, "for category:", categorySlug || "all");
     if (products && products.length > 0) {
+      const firstProduct = products[0] as any;
+      const category = Array.isArray(firstProduct.category) 
+        ? firstProduct.category[0] 
+        : firstProduct.category;
+      
       console.log("Sample product:", {
-        id: products[0].id,
-        name: products[0].name,
-        active: products[0].active,
-        categoryId: products[0].categoryId,
-        categoryName: products[0].category?.name
+        id: firstProduct.id,
+        name: firstProduct.name,
+        active: firstProduct.active,
+        categoryId: firstProduct.categoryId,
+        categoryName: category?.name || null
       });
     }
     

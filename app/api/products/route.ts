@@ -55,7 +55,19 @@ export async function GET(request: NextRequest) {
     }
 
     console.log("Products found:", products?.length || 0, "for category:", categorySlug || "all");
-    return NextResponse.json({ products: products || [] });
+    
+    // Thêm headers để không cache response
+    return NextResponse.json(
+      { products: products || [] },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+          'Surrogate-Control': 'no-store'
+        }
+      }
+    );
   } catch (error) {
     console.error("Get products error:", error);
     return NextResponse.json({ error: "Error" }, { status: 500 });

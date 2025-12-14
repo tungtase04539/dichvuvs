@@ -83,7 +83,15 @@ export default function HomePage() {
         const url = selectedCategory === "all" 
           ? "/api/products" 
           : `/api/products?category=${selectedCategory}`;
-        const res = await fetch(url);
+        // Thêm timestamp để tránh cache và cache: 'no-store'
+        const res = await fetch(`${url}?_=${Date.now()}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        });
         const data = await res.json();
         console.log("Loaded products for category:", selectedCategory, data.products?.length || 0);
         if (data.products) {

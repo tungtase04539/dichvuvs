@@ -7,6 +7,7 @@ import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
+import VideoModal from "@/components/VideoModal";
 import AddToCartButton from "./AddToCartButton";
 import {
   ArrowLeft,
@@ -20,6 +21,7 @@ import {
   TrendingUp,
   Loader2,
   CheckCircle,
+  Play,
 } from "lucide-react";
 
 interface Product {
@@ -30,6 +32,7 @@ interface Product {
   longDescription: string | null;
   price: number;
   image: string | null;
+  videoUrl: string | null;
   featured: boolean;
 }
 
@@ -41,6 +44,11 @@ export default function ProductDetailPage({
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [videoModal, setVideoModal] = useState({
+    isOpen: false,
+    url: "",
+    title: "",
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -232,6 +240,21 @@ export default function ProductDetailPage({
 
                 <AddToCartButton product={product} />
 
+                {/* Video Demo Button */}
+                {product.videoUrl && (
+                  <button
+                    onClick={() => setVideoModal({
+                      isOpen: true,
+                      url: product.videoUrl!,
+                      title: `${product.name} - Video Demo`,
+                    })}
+                    className="w-full mt-4 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-primary-400 to-primary-500 text-slate-900 font-bold rounded-xl hover:from-primary-300 hover:to-primary-400 transition-all shadow-md hover:shadow-lg"
+                  >
+                    <Play className="w-5 h-5" />
+                    XEM VIDEO DEMO
+                  </button>
+                )}
+
                 {/* Guarantees */}
                 <div className="mt-6 space-y-3">
                   {[
@@ -310,6 +333,14 @@ export default function ProductDetailPage({
 
       <Footer settings={{}} />
       <ChatWidget />
+
+      {/* Video Modal */}
+      <VideoModal
+        isOpen={videoModal.isOpen}
+        onClose={() => setVideoModal({ ...videoModal, isOpen: false })}
+        youtubeUrl={videoModal.url}
+        title={videoModal.title}
+      />
     </div>
   );
 }

@@ -51,7 +51,6 @@ interface Product {
 }
 
 export default function HomePage() {
-  const [products, setProducts] = useState<Product[]>([]);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -89,15 +88,12 @@ export default function HomePage() {
         console.log("Loaded products for category:", selectedCategory, data.products?.length || 0);
         if (data.products) {
           setAllProducts(data.products);
-          setProducts(data.products.slice(0, 6));
         } else {
           setAllProducts([]);
-          setProducts([]);
         }
       } catch (error) {
         console.error("Load products error:", error);
         setAllProducts([]);
-        setProducts([]);
       }
     };
     loadProducts();
@@ -255,31 +251,42 @@ export default function HomePage() {
             {allProducts.length > 0 ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {allProducts.map((product) => (
-                  <Link
+                  <div
                     key={product.id}
-                    href={`/san-pham/${product.slug}`}
                     className="flex flex-col p-4 bg-slate-700/50 rounded-xl hover:bg-slate-700 transition-all group hover:scale-[1.02] border border-slate-600/50 hover:border-primary-400/50"
                   >
-                    <div className="w-full aspect-video rounded-lg bg-slate-600 flex items-center justify-center mb-3 overflow-hidden">
-                      {product.image ? (
-                        <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                      ) : (
-                        <span className="text-4xl">🤖</span>
-                      )}
-                    </div>
-                    <div className="flex-1 flex flex-col">
-                      <h4 className="font-semibold text-white group-hover:text-primary-400 transition-colors mb-1 line-clamp-2">
-                        {product.name}
-                      </h4>
-                      <p className="text-xs text-slate-400 mb-2 line-clamp-2 flex-grow">{product.description}</p>
-                      {product.category && (
-                        <span className="inline-block text-xs px-2 py-1 bg-primary-400/20 text-primary-400 rounded mb-2 w-fit">
-                          {product.category.name}
-                        </span>
-                      )}
-                      <p className="text-primary-400 font-bold text-lg mt-auto">{formatCurrency(product.price)}</p>
-                    </div>
-                  </Link>
+                    <Link href={`/san-pham/${product.slug}`} className="flex flex-col flex-1">
+                      <div className="w-full aspect-video rounded-lg bg-slate-600 flex items-center justify-center mb-3 overflow-hidden relative">
+                        {product.image ? (
+                          <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                        ) : (
+                          <span className="text-4xl">🤖</span>
+                        )}
+                      </div>
+                      <div className="flex-1 flex flex-col">
+                        <h4 className="font-semibold text-white group-hover:text-primary-400 transition-colors mb-1 line-clamp-2">
+                          {product.name}
+                        </h4>
+                        <p className="text-xs text-slate-400 mb-2 line-clamp-2 flex-grow">{product.description}</p>
+                        {product.category && (
+                          <span className="inline-block text-xs px-2 py-1 bg-primary-400/20 text-primary-400 rounded mb-2 w-fit">
+                            {product.category.name}
+                          </span>
+                        )}
+                        <p className="text-primary-400 font-bold text-lg mt-auto">{formatCurrency(product.price)}</p>
+                      </div>
+                    </Link>
+                    {/* Video Demo Button */}
+                    {product.videoUrl && (
+                      <button
+                        onClick={(e) => openVideoModal(e, product)}
+                        className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-primary-400 to-primary-500 text-slate-900 font-bold rounded-lg hover:from-primary-300 hover:to-primary-400 transition-all shadow-md hover:shadow-lg text-sm"
+                      >
+                        <Play className="w-4 h-4" />
+                        XEM VIDEO DEMO
+                      </button>
+                    )}
+                  </div>
                 ))}
               </div>
             ) : (
@@ -414,104 +421,6 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Products Section */}
-      <section id="san-pham" className="section bg-slate-800">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-400/20 text-primary-400 rounded-full text-sm font-semibold mb-4 uppercase tracking-wide">
-              <Bot className="w-4 h-4" />
-              SẢN PHẨM
-            </span>
-            <h2 className="section-title">
-              CHATBOT <span className="text-primary-400">PHÙ HỢP</span> VỚI BẠN
-            </h2>
-            <p className="section-subtitle">
-              Đa dạng loại ChatBot cho mọi ngành nghề, mọi quy mô kinh doanh
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((product) => (
-              <div
-                key={product.id}
-                className="card-hover p-0 overflow-hidden flex flex-col h-full relative"
-              >
-                {product.featured && (
-                  <div className="absolute top-3 right-3 z-10">
-                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-primary-400 to-primary-500 text-slate-900 text-xs font-bold rounded-full shadow-lg">
-                      <Star className="w-3 h-3 fill-current" />
-                      HOT
-                    </span>
-                  </div>
-                )}
-
-                {/* Product Image - Clickable */}
-                <Link href={`/san-pham/${product.slug}`} className="group">
-                  <div className="relative aspect-video bg-gradient-to-br from-slate-700 to-slate-800 overflow-hidden">
-                    {product.image ? (
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-6xl">🤖</span>
-                      </div>
-                    )}
-                  </div>
-                </Link>
-
-                {/* Product Info */}
-                <div className="p-6 flex flex-col flex-grow">
-                  <Link href={`/san-pham/${product.slug}`} className="group">
-                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary-400 transition-colors">
-                      {product.name}
-                    </h3>
-                  </Link>
-                  <p className="text-slate-400 text-sm mb-4 line-clamp-2 flex-grow">{product.description}</p>
-
-                  {/* Bottom Section - Always at bottom */}
-                  <div className="mt-auto">
-                    <div className="flex items-center justify-between pt-4 border-t border-slate-700">
-                      <div>
-                        <span className="text-2xl font-bold text-primary-400">
-                          {formatCurrency(product.price)}
-                        </span>
-                      </div>
-                      <Link 
-                        href={`/san-pham/${product.slug}`}
-                        className="w-10 h-10 rounded-full bg-primary-400/20 flex items-center justify-center hover:bg-primary-400 transition-colors group"
-                      >
-                        <ArrowRight className="w-5 h-5 text-primary-400 group-hover:text-slate-900 transition-colors" />
-                      </Link>
-                    </div>
-
-                    {/* Video Demo Button */}
-                    {product.videoUrl && (
-                      <button
-                        onClick={(e) => openVideoModal(e, product)}
-                        className="w-full mt-4 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-primary-400 to-primary-500 text-slate-900 font-bold rounded-xl hover:from-primary-300 hover:to-primary-400 transition-all shadow-md hover:shadow-lg"
-                      >
-                        <Play className="w-4 h-4" />
-                        XEM VIDEO DEMO
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <Link href="/san-pham" className="btn btn-primary uppercase">
-              XEM TẤT CẢ SẢN PHẨM
-              <ArrowRight className="w-5 h-5" />
-            </Link>
           </div>
         </div>
       </section>

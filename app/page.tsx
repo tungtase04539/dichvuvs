@@ -204,36 +204,36 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Category Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 max-w-4xl mx-auto">
+          {/* Category Grid - Compact */}
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-8 max-w-5xl mx-auto">
             <button
               onClick={() => setSelectedCategory("all")}
-              className={`flex flex-col items-center gap-3 p-6 rounded-2xl font-semibold transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 selectedCategory === "all"
-                  ? "bg-primary-400 text-slate-900 shadow-xl shadow-primary-400/40 scale-105"
+                  ? "bg-primary-400 text-slate-900 shadow-lg shadow-primary-400/40"
                   : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700 hover:border-primary-400/50"
               }`}
             >
-              <span className="text-4xl">🌟</span>
-              <span className="text-sm md:text-base">Tất cả</span>
+              <span className="text-lg">🌟</span>
+              <span>Tất cả</span>
             </button>
             {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.slug)}
-                className={`flex flex-col items-center gap-3 p-6 rounded-2xl font-semibold transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   selectedCategory === category.slug
-                    ? "bg-primary-400 text-slate-900 shadow-xl shadow-primary-400/40 scale-105"
+                    ? "bg-primary-400 text-slate-900 shadow-lg shadow-primary-400/40"
                     : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700 hover:border-primary-400/50"
                 }`}
               >
-                <span className="text-4xl">{category.icon || "📦"}</span>
-                <span className="text-sm md:text-base text-center">{category.name}</span>
+                <span className="text-lg">{category.icon || "📦"}</span>
+                <span>{category.name}</span>
               </button>
             ))}
           </div>
 
-          {/* Products Grid */}
+          {/* Products Grid - Full Display */}
           <div className="bg-slate-800/50 rounded-3xl p-6 md:p-8 border border-slate-700/50 backdrop-blur-sm">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl md:text-2xl font-bold text-white">
@@ -241,38 +241,44 @@ export default function HomePage() {
                   <>Kết quả: <span className="text-primary-400">{allProducts.length}</span> ChatBot</>
                 )}
               </h3>
-              <Link
-                href={selectedCategory === "all" ? "/san-pham" : `/san-pham?category=${selectedCategory}`}
-                className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 font-semibold transition-colors"
-              >
-                Xem tất cả
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+              {allProducts.length > 6 && (
+                <Link
+                  href={selectedCategory === "all" ? "/san-pham" : `/san-pham?category=${selectedCategory}`}
+                  className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 font-semibold transition-colors"
+                >
+                  Xem tất cả
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              )}
             </div>
             
             {allProducts.length > 0 ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {allProducts.slice(0, 6).map((product) => (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {allProducts.map((product) => (
                   <Link
                     key={product.id}
                     href={`/san-pham/${product.slug}`}
-                    className="flex items-center gap-4 p-4 bg-slate-700/50 rounded-xl hover:bg-slate-700 transition-all group hover:scale-[1.02]"
+                    className="flex flex-col p-4 bg-slate-700/50 rounded-xl hover:bg-slate-700 transition-all group hover:scale-[1.02] border border-slate-600/50 hover:border-primary-400/50"
                   >
-                    <div className="w-16 h-16 rounded-xl bg-slate-600 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    <div className="w-full aspect-video rounded-lg bg-slate-600 flex items-center justify-center mb-3 overflow-hidden">
                       {product.image ? (
-                        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                        <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                       ) : (
-                        <span className="text-2xl">🤖</span>
+                        <span className="text-4xl">🤖</span>
                       )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-white group-hover:text-primary-400 transition-colors truncate">
+                    <div className="flex-1 flex flex-col">
+                      <h4 className="font-semibold text-white group-hover:text-primary-400 transition-colors mb-1 line-clamp-2">
                         {product.name}
                       </h4>
-                      <p className="text-sm text-slate-400 truncate">{product.description}</p>
-                      <p className="text-primary-400 font-bold mt-1">{formatCurrency(product.price)}</p>
+                      <p className="text-xs text-slate-400 mb-2 line-clamp-2 flex-grow">{product.description}</p>
+                      {product.category && (
+                        <span className="inline-block text-xs px-2 py-1 bg-primary-400/20 text-primary-400 rounded mb-2 w-fit">
+                          {product.category.name}
+                        </span>
+                      )}
+                      <p className="text-primary-400 font-bold text-lg mt-auto">{formatCurrency(product.price)}</p>
                     </div>
-                    <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-primary-400 transition-colors flex-shrink-0" />
                   </Link>
                 ))}
               </div>

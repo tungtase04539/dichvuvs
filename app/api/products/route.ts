@@ -19,6 +19,15 @@ export async function GET(request: NextRequest) {
     console.log("API /products called with category:", categorySlug || "all");
 
     // Build query - Only show active products
+    console.log("Building query for active products...");
+    
+    // Debug: Kiểm tra số lượng sản phẩm active trước khi filter category
+    const { count: totalActiveCount } = await supabase
+      .from("Service")
+      .select("*", { count: "exact", head: true })
+      .eq("active", true);
+    console.log("Total active products in database:", totalActiveCount);
+    
     let query = supabase
       .from("Service")
       .select(`
@@ -61,10 +70,18 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error("Get products error:", error);
+      console.error("Error details:", JSON.stringify(error, null, 2));
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     console.log("Products found:", products?.length || 0, "for category:", categorySlug || "all");
+    
+    // Debug: Log tất cả products để kiểm tra
+    if (products && products.length > 0) {
+      console.log("All products IDs:", products.map((p: any) => ({ id: p.id, name: p.name, active: p.active, categoryId: p.categoryId })));
+    } else {
+      console.warn("No products returned! Check if products exist with active=true");
+    }
     if (products && products.length > 0) {
       const firstProduct = products[0] as any;
       const category = Array.isArray(firstProduct.category) 

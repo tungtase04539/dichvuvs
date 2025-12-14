@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
     
     // Join với Category sau khi đã có products
     if (products && products.length > 0) {
-      const categoryIds = [...new Set(products.map((p: any) => p.categoryId).filter(Boolean))];
+      const categoryIds = Array.from(new Set(products.map((p: any) => p.categoryId).filter(Boolean)));
       if (categoryIds.length > 0) {
         const { data: categories } = await supabase
           .from("Category")

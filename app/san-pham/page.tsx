@@ -322,7 +322,6 @@ function ProductsContent() {
       </main>
 
       <Footer settings={{}} />
-      <ChatWidget />
 
       {/* Video Modal */}
       <VideoModal

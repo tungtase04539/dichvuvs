@@ -143,7 +143,7 @@ export default function HomePage() {
     // Listen to storage events (khi có thay đổi từ tab khác)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'products-updated') {
-        loadProducts();
+    loadProducts();
       }
     };
 
@@ -298,13 +298,13 @@ export default function HomePage() {
                 )}
               </h3>
               {allProducts.length > 6 && (
-                <Link
-                  href={selectedCategory === "all" ? "/san-pham" : `/san-pham?category=${selectedCategory}`}
-                  className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 font-semibold transition-colors"
-                >
-                  Xem tất cả
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
+              <Link
+                href={selectedCategory === "all" ? "/san-pham" : `/san-pham?category=${selectedCategory}`}
+                className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 font-semibold transition-colors"
+              >
+                Xem tất cả
+                <ArrowRight className="w-4 h-4" />
+              </Link>
               )}
             </div>
             
@@ -317,16 +317,16 @@ export default function HomePage() {
                   >
                     <Link href={`/san-pham/${product.slug}`} className="flex flex-col flex-1">
                       <div className="w-full aspect-video rounded-lg bg-slate-600 flex items-center justify-center mb-3 overflow-hidden relative">
-                        {product.image ? (
+                      {product.image ? (
                           <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                        ) : (
+                      ) : (
                           <span className="text-4xl">🤖</span>
-                        )}
-                      </div>
+                      )}
+                    </div>
                       <div className="flex-1 flex flex-col">
                         <h4 className="font-semibold text-white group-hover:text-primary-400 transition-colors mb-1 line-clamp-2">
-                          {product.name}
-                        </h4>
+                        {product.name}
+                      </h4>
                         <p className="text-xs text-slate-400 mb-2 line-clamp-2 flex-grow">{product.description}</p>
                         {product.category && (
                           <span className="inline-block text-xs px-2 py-1 bg-primary-400/20 text-primary-400 rounded mb-2 w-fit">
@@ -334,8 +334,8 @@ export default function HomePage() {
                           </span>
                         )}
                         <p className="text-primary-400 font-bold text-lg mt-auto">{formatCurrency(product.price)}</p>
-                      </div>
-                    </Link>
+                    </div>
+                  </Link>
                     {/* Video Demo Button */}
                     {product.videoUrl && (
                       <button

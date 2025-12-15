@@ -7,22 +7,8 @@ import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
-import VideoModal from "@/components/VideoModal";
 import AddToCartButton from "./AddToCartButton";
-import {
-  ArrowLeft,
-  Star,
-  Zap,
-  Shield,
-  Clock,
-  MessageSquare,
-  Bot,
-  Users,
-  TrendingUp,
-  Loader2,
-  CheckCircle,
-  Play,
-} from "lucide-react";
+import { ArrowLeft, Star, Bot, Loader2, CheckCircle } from "lucide-react";
 
 interface Product {
   id: string;
@@ -44,12 +30,30 @@ export default function ProductDetailPage({
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [videoModal, setVideoModal] = useState({
-    isOpen: false,
-    url: "",
-    title: "",
-  });
   const router = useRouter();
+
+  const getYoutubeEmbedUrl = (url: string | null) => {
+    if (!url) return null;
+    try {
+      const u = new URL(url);
+      if (u.hostname.includes("youtu.be")) {
+        const id = u.pathname.slice(1);
+        return id ? `https://www.youtube.com/embed/${id}` : null;
+      }
+      if (u.hostname.includes("youtube.com")) {
+        if (u.searchParams.get("v")) {
+          return `https://www.youtube.com/embed/${u.searchParams.get("v")}`;
+        }
+        if (u.pathname.startsWith("/shorts/")) {
+          const id = u.pathname.split("/shorts/")[1];
+          return id ? `https://www.youtube.com/embed/${id}` : null;
+        }
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -80,15 +84,6 @@ export default function ProductDetailPage({
 
     loadData();
   }, [params.slug, router]);
-
-  const features = [
-    { icon: Zap, text: "Cài đặt trong 5 phút" },
-    { icon: MessageSquare, text: "AI hiểu ngữ cảnh thông minh" },
-    { icon: Clock, text: "Hoạt động 24/7 không nghỉ" },
-    { icon: Shield, text: "Bảo mật dữ liệu cao" },
-    { icon: Users, text: "Hỗ trợ đa kênh" },
-    { icon: TrendingUp, text: "Báo cáo chi tiết" },
-  ];
 
   if (isLoading) {
     return (
@@ -142,21 +137,6 @@ export default function ProductDetailPage({
                 <p className="text-slate-300 leading-relaxed text-lg">
                   {product.description}
                 </p>
-              </div>
-
-              {/* Features */}
-              <div className="bg-slate-800 rounded-2xl p-8 shadow-sm border border-slate-700">
-                <h2 className="text-xl font-bold text-white mb-6 uppercase">Tính năng nổi bật</h2>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {features.map((feature, i) => (
-                    <div key={i} className="flex items-center gap-3 p-4 bg-slate-700/50 rounded-xl">
-                      <div className="w-10 h-10 rounded-xl bg-primary-400/20 flex items-center justify-center">
-                        <feature.icon className="w-5 h-5 text-primary-400" />
-                      </div>
-                      <span className="font-medium text-slate-200">{feature.text}</span>
-                    </div>
-                  ))}
-                </div>
               </div>
 
               {/* Long Description */}
@@ -217,6 +197,18 @@ export default function ProductDetailPage({
             <div className="space-y-6">
               {/* Price Card */}
               <div className="bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-700">
+                {product.videoUrl && getYoutubeEmbedUrl(product.videoUrl) && (
+                  <div className="mb-4 rounded-xl overflow-hidden border border-slate-700 aspect-video bg-black">
+                    <iframe
+                      src={`${getYoutubeEmbedUrl(product.videoUrl)}?rel=0`}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title="Video demo"
+                    />
+                  </div>
+                )}
+
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 text-primary-400 fill-primary-400" />
@@ -239,21 +231,6 @@ export default function ProductDetailPage({
                 </div>
 
                 <AddToCartButton product={product} />
-
-                {/* Video Demo Button */}
-                {product.videoUrl && (
-                  <button
-                    onClick={() => setVideoModal({
-                      isOpen: true,
-                      url: product.videoUrl!,
-                      title: `${product.name} - Video Demo`,
-                    })}
-                    className="w-full mt-4 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-primary-400 to-primary-500 text-slate-900 font-bold rounded-xl hover:from-primary-300 hover:to-primary-400 transition-all shadow-md hover:shadow-lg"
-                  >
-                    <Play className="w-5 h-5" />
-                    XEM VIDEO DEMO
-                  </button>
-                )}
 
                 {/* Guarantees */}
                 <div className="mt-6 space-y-3">
@@ -333,14 +310,6 @@ export default function ProductDetailPage({
 
       <Footer settings={{}} />
       <ChatWidget />
-
-      {/* Video Modal */}
-      <VideoModal
-        isOpen={videoModal.isOpen}
-        onClose={() => setVideoModal({ ...videoModal, isOpen: false })}
-        youtubeUrl={videoModal.url}
-        title={videoModal.title}
-      />
     </div>
   );
 }

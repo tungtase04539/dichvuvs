@@ -1,12 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Package,
-  MessageCircle,
   Users,
   Bot,
   ShoppingBag,
@@ -45,30 +43,6 @@ const roleLabels: Record<string, string> = {
 
 export default function AdminSidebar({ user }: AdminSidebarProps) {
   const pathname = usePathname();
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  // Fetch unread message count
-  useEffect(() => {
-    const fetchUnreadCount = async () => {
-      try {
-        const res = await fetch("/api/admin/chat/unread");
-        if (res.ok) {
-          const data = await res.json();
-          setUnreadCount(data.count || 0);
-        }
-      } catch (error) {
-        console.error("Failed to fetch unread count:", error);
-      }
-    };
-
-    // Only fetch for admin and staff
-    if (user.role === "admin" || user.role === "staff") {
-      fetchUnreadCount();
-      // Refresh every 30 seconds
-      const interval = setInterval(fetchUnreadCount, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [user.role]);
 
   // Navigation items based on role
   const getNavItems = (): NavItem[] => {
@@ -81,8 +55,8 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         ...baseItems,
         { href: "/admin/don-hang", icon: Package, label: "Đơn hàng" },
         { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" },
-        { href: "/admin/chat", icon: MessageCircle, label: "Chat", badge: unreadCount },
         { href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" },
+        { href: "/admin/ctv", icon: Users, label: "CTV" },
         { href: "/admin/dai-ly", icon: Building2, label: "Đại lý" },
         { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
         { href: "/admin/tai-khoan", icon: Key, label: "Tài khoản" },
@@ -120,7 +94,6 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       ...baseItems,
       { href: "/admin/don-hang", icon: Package, label: "Đơn hàng" },
       { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" },
-      { href: "/admin/chat", icon: MessageCircle, label: "Chat", badge: unreadCount },
     ];
   };
 

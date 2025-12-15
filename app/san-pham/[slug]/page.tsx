@@ -130,7 +130,7 @@ export default function ProductDetailPage({
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Main Content */}
-            <div className="lg:col-span-2 space-y-8">
+            <div className="lg:col-span-2 space-y-8 order-2 lg:order-1">
               {/* Description */}
               <div className="bg-slate-800 rounded-2xl p-8 shadow-sm border border-slate-700">
                 <h2 className="text-xl font-bold text-white mb-4 uppercase">Mô tả sản phẩm</h2>
@@ -194,7 +194,7 @@ export default function ProductDetailPage({
             </div>
 
             {/* Sidebar */}
-            <div className="space-y-6">
+            <div className="space-y-6 order-1 lg:order-2">
               {/* Price Card */}
               <div className="bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-700">
                 {product.videoUrl && getYoutubeEmbedUrl(product.videoUrl) && (

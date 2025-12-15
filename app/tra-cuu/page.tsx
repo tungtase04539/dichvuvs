@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ChatWidget from "@/components/ChatWidget";
 import { getSupabase } from "@/lib/supabase";
 import { formatCurrency, formatDateTime, getStatusLabel, getStatusColor } from "@/lib/utils";
 import {
@@ -449,7 +448,6 @@ export default function TrackOrderPage() {
       </main>
 
       <Footer settings={{}} />
-      <ChatWidget />
     </div>
   );
 }

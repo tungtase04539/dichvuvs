@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ChatWidget from "@/components/ChatWidget";
 import { getSupabase } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
 import { Zap, Clock, Gift, Star, ArrowRight, ShoppingCart, Flame } from "lucide-react";
@@ -211,7 +210,6 @@ export default function FlashSalePage() {
       </section>
 
       <Footer settings={{}} />
-      <ChatWidget />
     </div>
   );
 }

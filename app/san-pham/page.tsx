@@ -6,7 +6,6 @@ import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ChatWidget from "@/components/ChatWidget";
 import VideoModal from "@/components/VideoModal";
 import { ArrowRight, Star, Bot, ShoppingCart, Loader2, Play, Search, X } from "lucide-react";
 
@@ -345,7 +344,6 @@ export default function ProductsPage() {
           <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
         </div>
         <Footer settings={{}} />
-        <ChatWidget />
       </div>
     }>
       <ProductsContent />

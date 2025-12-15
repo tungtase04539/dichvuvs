@@ -1,6 +1,5 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ChatWidget from "@/components/ChatWidget";
 import OrderForm from "./OrderForm";
 import { ShoppingCart } from "lucide-react";
 
@@ -36,7 +35,6 @@ export default function OrderPage() {
       </main>
 
       <Footer settings={{}} />
-      <ChatWidget />
     </div>
   );
 }

@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ChatWidget from "@/components/ChatWidget";
 import AddToCartButton from "./AddToCartButton";
 import { ArrowLeft, Star, Bot, Loader2, CheckCircle } from "lucide-react";
 
@@ -280,7 +279,6 @@ export default function ProductDetailPage({
       </main>
 
       <Footer settings={{}} />
-      <ChatWidget />
     </div>
   );
 }

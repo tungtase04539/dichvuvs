@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ChatWidget from "@/components/ChatWidget";
 import { Gift, Users, MessageCircle, Star, ArrowRight, CheckCircle, Sparkles } from "lucide-react";
 
 export default function QuaTangPage() {
@@ -148,7 +147,6 @@ export default function QuaTangPage() {
       </section>
 
       <Footer settings={{}} />
-      <ChatWidget />
     </div>
   );
 }

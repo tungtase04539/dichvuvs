@@ -2,7 +2,6 @@
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ChatWidget from "@/components/ChatWidget";
 import { Star, Quote, Play, Image, MessageSquare, ThumbsUp, CheckCircle } from "lucide-react";
 
 export default function DanhGiaPage() {
@@ -218,7 +217,6 @@ export default function DanhGiaPage() {
       </section>
 
       <Footer settings={{}} />
-      <ChatWidget />
     </div>
   );
 }

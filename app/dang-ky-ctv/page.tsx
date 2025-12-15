@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ChatWidget from "@/components/ChatWidget";
 import { Users, DollarSign, TrendingUp, Gift, CheckCircle, ArrowRight, Loader2, Star, Zap } from "lucide-react";
 
 export default function DangKyCTVPage() {
@@ -377,7 +376,6 @@ export default function DangKyCTVPage() {
       </section>
 
       <Footer settings={{}} />
-      <ChatWidget />
     </div>
   );
 }

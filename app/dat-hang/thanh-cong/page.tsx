@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ChatWidget from "@/components/ChatWidget";
 import QRPayment from "./QRPayment";
 import CopyButton from "./CopyButton";
 import { formatCurrency } from "@/lib/utils";
@@ -426,7 +425,6 @@ export default function OrderSuccessPage() {
       </main>
 
       <Footer settings={{}} />
-      <ChatWidget />
     </div>
   );
 }

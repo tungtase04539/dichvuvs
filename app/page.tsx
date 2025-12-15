@@ -5,7 +5,6 @@ import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ChatWidget from "@/components/ChatWidget";
 import VideoModal from "@/components/VideoModal";
 import {
   Zap,
@@ -650,7 +649,6 @@ export default function HomePage() {
       </section>
 
       <Footer settings={{ site_phone: "0363 189 699 – 0345 501 969" }} />
-      <ChatWidget />
 
       {/* Video Modal */}
       <VideoModal

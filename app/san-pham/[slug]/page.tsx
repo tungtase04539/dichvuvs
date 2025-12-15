@@ -232,18 +232,6 @@ export default function ProductDetailPage({
 
                 <AddToCartButton product={product} />
 
-                {/* Guarantees */}
-                <div className="mt-6 space-y-3">
-                  {[
-                    "✓ Cài đặt miễn phí",
-                    "✓ Hỗ trợ 24/7",
-                    "✓ Hoàn tiền 7 ngày",
-                  ].map((item, i) => (
-                    <p key={i} className="text-sm text-green-400 font-medium">
-                      {item}
-                    </p>
-                  ))}
-                </div>
               </div>
 
               {/* Contact Card */}
@@ -261,24 +249,7 @@ export default function ProductDetailPage({
                 </a>
               </div>
 
-              {/* Specs */}
-              <div className="bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-700">
-                <h3 className="font-bold text-white mb-4 uppercase">Thông số sản phẩm</h3>
-                <div className="space-y-3">
-                  {[
-                    { label: "Loại sản phẩm", value: "ChatBot AI" },
-                    { label: "Nền tảng", value: "Facebook, Zalo, Web" },
-                    { label: "Ngôn ngữ", value: "Tiếng Việt" },
-                    { label: "Hỗ trợ", value: "24/7" },
-                    { label: "Bảo hành", value: "Trọn đời" },
-                  ].map((item, i) => (
-                    <div key={i} className="flex justify-between py-2 border-b border-slate-700 last:border-0">
-                      <span className="text-slate-400">{item.label}</span>
-                      <span className="font-medium text-white">{item.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            
             </div>
           </div>
 

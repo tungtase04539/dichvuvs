@@ -55,8 +55,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         ...baseItems,
         { href: "/admin/don-hang", icon: Package, label: "Đơn hàng" },
         { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" },
-        { href: "/admin/ctv/duyet", icon: UserCheck, label: "Duyệt CTV" },
-        { href: "/admin/ctv", icon: Users, label: "CTV" },
+        { href: "/admin/ctv/duyet", icon: Users, label: "CTV" }, // Duyệt CTV nằm trong mục CTV
         { href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" },
         { href: "/admin/dai-ly", icon: Building2, label: "Đại lý" },
         { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },

@@ -95,21 +95,25 @@ export async function POST(request: NextRequest) {
           let agentIdToCredit = null;
 
           // Xác định % dựa trên role (Phương án A)
-          if (referrer.role === "ctv" || referrer.role === "collaborator") {
-            directCommissionPercent = 15; // CTV hưởng 15%
+          const isDirectLowTier = ["ctv", "collaborator"].includes(referrer.role);
+          const isDirectHighTier = ["agent", "master_agent"].includes(referrer.role);
 
-            // Tìm cấp trên của CTV (nếu có) để hưởng hoa hồng chênh lệch
+          if (isDirectLowTier) {
+            directCommissionPercent = 15; // CTV/Collaborator hưởng 15%
+
+            // Tìm cấp trên để hưởng hoa hồng chênh lệch
             if (referrer.parentId) {
               const parent = await prisma.user.findUnique({
                 where: { id: referrer.parentId }
               });
-              if (parent && parent.role === "agent") {
+              // Nếu cấp trên là Agent hoặc Master Agent thì hưởng 5%
+              if (parent && ["agent", "master_agent"].includes(parent.role)) {
                 agentIdToCredit = parent.id;
-                indirectCommissionPercent = 5; // Đại lý hưởng 5% từ CTV
+                indirectCommissionPercent = 5;
               }
             }
-          } else if (referrer.role === "agent") {
-            directCommissionPercent = 20; // Đại lý tự bán hưởng 20%
+          } else if (isDirectHighTier) {
+            directCommissionPercent = 20; // Đại lý/Tổng đại lý tự bán hưởng 20%
           }
 
           // 1. Cộng tiền cho người giới thiệu trực tiếp

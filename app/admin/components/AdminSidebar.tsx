@@ -12,6 +12,7 @@ import {
   UserCheck,
   Link2,
   Building2,
+  Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -60,6 +61,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         { href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" },
         { href: "/admin/dai-ly", icon: Building2, label: "Đại lý" },
         { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
+        { href: "/admin/vi-tien", icon: Wallet, label: "Ví tiền" },
         { href: "/admin/tai-khoan", icon: Key, label: "Tài khoản" },
       ];
     }
@@ -70,6 +72,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         { href: "/admin/don-hang", icon: Package, label: "Đơn hàng của tôi" },
         { href: "/admin/dai-ly", icon: Users, label: "Đại lý của tôi" },
         { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
+        { href: "/admin/vi-tien", icon: Wallet, label: "Ví tiền" },
       ];
     }
 
@@ -80,6 +83,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         { href: "/admin/ctv", icon: Users, label: "CTV của tôi" },
         { href: "/admin/ctv/duyet", icon: UserCheck, label: "Duyệt CTV" },
         { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
+        { href: "/admin/vi-tien", icon: Wallet, label: "Ví tiền" },
       ];
     }
 
@@ -88,6 +92,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         ...baseItems,
         { href: "/admin/don-hang", icon: Package, label: "Đơn hàng của tôi" },
         { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
+        { href: "/admin/vi-tien", icon: Wallet, label: "Ví tiền" },
       ];
     }
 
@@ -119,9 +124,9 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
 
       <nav className="px-4 py-2">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || 
+          const isActive = pathname === item.href ||
             (item.href !== "/admin" && pathname.startsWith(item.href));
-          
+
           return (
             <Link
               key={item.href}

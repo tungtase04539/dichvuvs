@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
+import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -31,46 +32,67 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
-    const userRole = user?.user_metadata?.role || "admin";
-    if (!user || userRole !== "admin") {
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    const currentRole = authUser?.user_metadata?.role || "admin";
+    if (!authUser || currentRole !== "admin") {
       return NextResponse.json({ error: "Chỉ Admin mới có quyền" }, { status: 403 });
     }
 
     const body = await request.json();
-    const { name, role, phone, password } = body;
+    const { name, role, phone, password, parentId } = body;
 
     const supabaseAdmin = getSupabaseAdmin();
 
-    // Update user metadata
-    const updateData: Record<string, unknown> = {
+    // 1. Update Supabase Auth user
+    const updatePayload: Record<string, any> = {
       user_metadata: {
         name,
         role,
         phone: phone || "",
+        parentId: parentId || null
       },
     };
 
-    // Update password if provided
     if (password) {
-      updateData.password = password;
+      updatePayload.password = password;
     }
 
-    const { data, error } = await supabaseAdmin.auth.admin.updateUserById(
+    const { data: updatedAuth, error: authError } = await supabaseAdmin.auth.admin.updateUserById(
       params.id,
-      updateData
+      updatePayload
     );
 
-    if (error) {
-      console.error("Update user error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (authError) {
+      console.error("Update auth error:", authError);
+      return NextResponse.json({ error: authError.message }, { status: 500 });
     }
+
+    // 2. Sync with Prisma User table
+    // Important: We use upsert because the user might not exist in Prisma table yet
+    await prisma.user.upsert({
+      where: { id: params.id },
+      update: {
+        name,
+        role,
+        phone,
+        parentId: parentId || null
+      },
+      create: {
+        id: params.id,
+        email: updatedAuth.user.email!,
+        password: "SUPABASE_AUTH_USER", // Password is managed by Supabase
+        name,
+        role,
+        phone,
+        parentId: parentId || null
+      }
+    });
 
     return NextResponse.json({
       success: true,
       user: {
-        id: data.user.id,
-        email: data.user.email,
+        id: updatedAuth.user.id,
+        email: updatedAuth.user.email,
         name,
         role,
       },

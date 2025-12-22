@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   keywords: ["chatbot", "AI", "tự động", "bán hàng", "chăm sóc khách hàng"],
 };
 
+import FloatingButtons from "@/components/FloatingButtons";
+
 export default function RootLayout({
   children,
 }: {
@@ -21,6 +23,7 @@ export default function RootLayout({
           <ReferralTracker />
         </Suspense>
         {children}
+        <FloatingButtons />
       </body>
     </html>
   );

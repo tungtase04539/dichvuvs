@@ -1,10 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Gift, Zap, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function FloatingButtons() {
+  const pathname = usePathname();
+
+  // Không hiện ở Dashboard admin hoặc Dashboard người dùng
+  const hidePaths = ["/admin", "/tai-khoan"];
+  const shouldHide = hidePaths.some(path => pathname?.startsWith(path));
+
+  if (shouldHide) return null;
+
   return (
     <div className="fixed bottom-24 right-4 sm:right-6 z-40 flex flex-col gap-3 items-end pointer-events-none">
       {/* Khuyến mại Tết */}

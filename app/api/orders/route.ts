@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const orderCode = searchParams.get("orderCode");
     const phone = searchParams.get("phone");
-    
+
     const supabase = createServerSupabaseClient();
     if (!supabase) {
       return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
@@ -39,22 +39,22 @@ export async function GET(request: NextRequest) {
       if (error || !order) {
         return NextResponse.json({ error: "Không tìm thấy đơn hàng" }, { status: 404 });
       }
-      
+
       // Get service name
       const { data: service } = await supabase
         .from("Service")
         .select("id, name")
         .eq("id", order.serviceId)
         .single();
-        
-      return NextResponse.json({ 
-        order: { ...order, service: service || { name: "ChatBot" } } 
+
+      return NextResponse.json({
+        order: { ...order, service: service || { name: "ChatBot" } }
       });
     }
 
     // Admin/CTV access - Get user from Supabase auth directly
     const { data: { user: authUser } } = await supabase.auth.getUser();
-    
+
     if (!authUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
     }
 
     const status = searchParams.get("status");
-    
+
     let query = supabase
       .from("Order")
       .select(`
@@ -86,9 +86,9 @@ export async function GET(request: NextRequest) {
     if (status && status !== "all") {
       query = query.eq("status", status);
     }
-    
-    // CTV chỉ xem đơn hàng của khách mình giới thiệu
-    if (dbUser.role === "ctv" || dbUser.role === "collaborator") {
+
+    // CTV và Đại lý chỉ xem đơn hàng của mình/của khách mình giới thiệu
+    if (dbUser.role === "ctv" || dbUser.role === "collaborator" || dbUser.role === "agent") {
       query = query.eq("referrerId", dbUser.id);
     } else if (dbUser.role === "staff") {
       query = query.eq("assignedToId", dbUser.id);
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
     // Admin xem tất cả (không filter thêm)
 
     const { data: orders, error } = await query;
-    
+
     if (error) {
       console.error("Get orders error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
@@ -108,9 +108,9 @@ export async function GET(request: NextRequest) {
       .from("Service")
       .select("id, name")
       .in("id", serviceIds);
-    
+
     const serviceMap = new Map((services || []).map(s => [s.id, s]));
-    
+
     const ordersWithService = (orders || []).map(order => ({
       ...order,
       service: serviceMap.get(order.serviceId) || { name: "ChatBot" }
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
 
     // Get products from cache or DB
     let products = getCache<{ id: string; name: string; price: number }[]>("products_map");
-    
+
     if (!products) {
       const dbProducts = await prisma.service.findMany({
         where: { active: true },

@@ -5,26 +5,26 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
-// Roles: admin, ctv (cộng tác viên), customer (khách hàng)
+// Roles: admin, agent, ctv, customer
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String
   name      String
-  role      String   @default("customer") // admin, ctv, customer
+  role      String   @default("customer") // admin, agent, ctv, customer
+  balance   Float    @default(0)
   phone     String?
   avatar    String?
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Phân cấp CTV
-  parentId  String?  // ID của cấp trên
+  // Phan cap CTV
+  parentId  String?  // ID cua cap tren
   parent    User?    @relation("AgentHierarchy", fields: [parentId], references: [id])
-  subAgents User[]   @relation("AgentHierarchy") // Danh sách cấp dưới
+  subAgents User[]   @relation("AgentHierarchy") // Danh sach cap duoi
 
   // Relations
   assignedOrders Order[]       @relation("AssignedStaff")
@@ -32,9 +32,10 @@ model User {
   referralLinks  ReferralLink[]
   referredOrders Order[]       @relation("ReferrerOrders")
   ctvApplication CTVApplication?
+  commissions    Commission[]     @relation("Recipient")
 }
 
-// Đơn đăng ký làm CTV
+// Don dang ky lam CTV
 model CTVApplication {
   id          String   @id @default(uuid())
   userId      String   @unique
@@ -45,11 +46,11 @@ model CTVApplication {
   email       String
   facebook    String?
   zalo        String?
-  experience  String?  // Kinh nghiệm bán hàng
-  reason      String?  // Lý do muốn làm CTV
+  experience  String?  // Kinh nghiem ban hang
+  reason      String?  // Ly do muon lam CTV
   
   status      String   @default("pending") // pending, approved, rejected
-  reviewedBy  String?  // Admin duyệt
+  reviewedBy  String?  // Admin duyet
   reviewedAt  DateTime?
   rejectReason String?
   
@@ -57,16 +58,16 @@ model CTVApplication {
   updatedAt   DateTime @updatedAt
 }
 
-// Danh mục/Lĩnh vực chatbot
+// Danh muc/Linh vuc chatbot
 model Category {
   id          String   @id @default(uuid())
-  name        String   // Tên lĩnh vực: Giáo dục, Kinh doanh, Tôn giáo...
+  name        String   // Ten linh vuc: Giao duc, Kinh doanh, Ton giao...
   slug        String   @unique
   description String?
-  icon        String?  // Emoji hoặc icon class
-  image       String?  // Ảnh đại diện
-  color       String?  // Màu chủ đạo (hex)
-  order       Int      @default(0) // Thứ tự hiển thị
+  icon        String?  // Emoji hoac icon class
+  image       String?  // Anh dai dien
+  color       String?  // Mau chu dao (hex)
+  order       Int      @default(0) // Thu tu hien thi
   active      Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -80,10 +81,10 @@ model Service {
   name            String
   slug            String   @unique
   description     String
-  longDescription String?  // Chi tiết sản phẩm (HTML/Markdown)
+  longDescription String?  // Chi tiet san pham (HTML/Markdown)
   price           Float
   unit            String   @default("bot")
-  image           String?  // URL ảnh đại diện sản phẩm (Supabase Storage)
+  image           String?  // URL anh dai dien san pham (Supabase Storage)
   videoUrl        String?  // URL video demo (Supabase Storage)
   featured        Boolean  @default(false)
   active          Boolean  @default(true)
@@ -107,7 +108,7 @@ model Order {
   customerEmail String?
   address       String
   district      String?
-  city          String   @default("Hồ Chí Minh")
+  city          String   @default("Ho Chi Minh")
   
   // Service details
   serviceId     String
@@ -136,16 +137,18 @@ model Order {
   chatSessionId String?
   chatSession   ChatSession? @relation(fields: [chatSessionId], references: [id])
   
-  // Credential được gán khi thanh toán thành công
+  // Credential duoc gan khi thanh toan thanh cong
   credential    ProductCredential?
   
-  // Referral tracking - đơn hàng từ link ref của ai
+  // Referral tracking - don hang tu link ref cua ai
   referrerId    String?
   referrer      User?    @relation("ReferrerOrders", fields: [referrerId], references: [id])
-  referralCode  String?  // Mã ref được sử dụng
+  referralCode  String?  // Ma ref duoc su dung
   
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  
+  commissions   Commission[]
 }
 
 model ChatSession {
@@ -188,36 +191,36 @@ model Setting {
   updatedAt DateTime @updatedAt
 }
 
-// Tài khoản/mật khẩu cho sản phẩm ChatBot
+// Tai khoan/mat khau cho san pham ChatBot
 model ProductCredential {
   id          String   @id @default(uuid())
   serviceId   String
   service     Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   
-  accountInfo String   // Thông tin tài khoản (encrypted)
-  password    String   // Mật khẩu (encrypted)
-  apiKey      String?  // API Key nếu có
-  notes       String?  // Ghi chú thêm
+  accountInfo String   // Thong tin tai khoan (encrypted)
+  password    String   // Mat khau (encrypted)
+  apiKey      String?  // API Key neu co
+  notes       String?  // Ghi chu them
   
-  isUsed      Boolean  @default(false) // Đã gán cho đơn hàng chưa
-  orderId     String?  @unique // Đơn hàng được gán
+  isUsed      Boolean  @default(false) // Da gan cho don hang chua
+  orderId     String?  @unique // Don hang duoc gan
   order       Order?   @relation(fields: [orderId], references: [id])
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-// Hệ thống link giới thiệu (Referral)
+// He thong link gioi thieu (Referral)
 model ReferralLink {
   id          String   @id @default(uuid())
-  code        String   @unique // Mã ref duy nhất (VD: REF-ABC123)
-  userId      String   // Thuộc về user nào (agent/master_agent)
+  code        String   @unique // Ma ref duy nhat (VD: REF-ABC123)
+  userId      String   // Thuoc ve user nao (agent/master_agent)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  // Thống kê
-  clickCount  Int      @default(0) // Số lượt click
-  orderCount  Int      @default(0) // Số đơn thành công
-  revenue     Float    @default(0) // Tổng doanh thu từ ref
+  // Thong ke
+  clickCount  Int      @default(0) // So luot click
+  orderCount  Int      @default(0) // So don thanh cong
+  revenue     Float    @default(0) // Tong doanh thu tu ref
   
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
@@ -227,7 +230,7 @@ model ReferralLink {
   clicks      ReferralClick[]
 }
 
-// Lưu lại mỗi lượt click vào link ref
+// Luu lai moi luot click vao link ref
 model ReferralClick {
   id             String       @id @default(uuid())
   referralLinkId String
@@ -235,11 +238,41 @@ model ReferralClick {
   
   ipAddress      String?
   userAgent      String?
-  referer        String?      // Trang nguồn
+  referer        String?      // Trang nguon
   
-  // Nếu tạo đơn hàng
+  // Neu tao don hang
   converted      Boolean      @default(false)
   orderId        String?
   
   createdAt      DateTime     @default(now())
+}
+
+model Commission {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  
+  userId    String   // Nguoi nhan hoa hong
+  user      User     @relation("Recipient", fields: [userId], references: [id])
+  
+  amount    Float
+  percent   Float    // Phan tram tai thoi diem do
+  level     Int      // 1: truc tiep, 2: cap tren...
+  
+  status    String   @default("pending") // pending, paid
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CommissionSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique // vd: "ctv_retail", "agent_retail", "agent_override"
+  role      String   // admin, agent, ctv
+  type      String   // retail (tu ban), override (huong tu cap duoi)
+  percent   Float
+  description String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

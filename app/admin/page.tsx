@@ -22,14 +22,14 @@ export const fetchCache = "force-no-store";
 async function getDashboardStats(userId: string, role: string) {
   // Prevent any caching
   noStore();
-  
+
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
   // CTV chỉ xem stats của mình
   const isCTV = role === "ctv" || role === "collaborator";
   const orderFilter = isCTV ? { referrerId: userId } : {};
-  const orderFilterMonth = isCTV 
+  const orderFilterMonth = isCTV
     ? { referrerId: userId, createdAt: { gte: startOfMonth } }
     : { createdAt: { gte: startOfMonth } };
 
@@ -42,6 +42,7 @@ async function getDashboardStats(userId: string, role: string) {
     recentOrders,
     recentChats,
     referralStats,
+    subAgentCount,
   ] = await Promise.all([
     prisma.order.count({ where: orderFilterMonth }),
     prisma.order.count({ where: { ...orderFilter, status: "pending" } }),
@@ -84,6 +85,8 @@ async function getDashboardStats(userId: string, role: string) {
       where: { userId, isActive: true },
       select: { code: true, clickCount: true, orderCount: true, revenue: true },
     }) : Promise.resolve(null),
+    // Sub-agents count for Agent
+    role === "agent" ? prisma.user.count({ where: { parentId: userId } }) : Promise.resolve(0),
   ]);
 
   return {
@@ -94,54 +97,77 @@ async function getDashboardStats(userId: string, role: string) {
     recentOrders,
     recentChats,
     referralStats,
+    subAgentCount,
     isCTV,
+    userRole: role,
   };
 }
 
 export default async function AdminDashboard() {
   const supabase = createServerSupabaseClient();
   if (!supabase) redirect("/quan-tri-vien-dang-nhap");
-  
+
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/quan-tri-vien-dang-nhap");
 
-  // Get user role from database
+  // Get user info from database
   const { data: dbUser } = await supabase
     .from("User")
-    .select("id, role")
+    .select("id, role, balance")
     .eq("email", user.email)
     .single();
 
   const userId = dbUser?.id || user.id;
   const role = dbUser?.role || "customer";
+  const userBalance = dbUser?.balance || 0;
 
   const stats = await getDashboardStats(userId, role);
 
   return (
     <div className="space-y-6">
-      {/* CTV Referral Stats */}
-      {stats.isCTV && stats.referralStats && (
-        <div className="bg-gradient-to-r from-primary-500 to-yellow-500 rounded-2xl p-6 text-white">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold">Mã giới thiệu của bạn</h2>
-            <span className="font-mono text-2xl bg-white/20 px-4 py-2 rounded-lg">
-              {stats.referralStats.code}
-            </span>
+      {/* Balance & Referral Stats */}
+      {(role === "ctv" || role === "collaborator" || role === "agent") && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1 bg-gradient-to-br from-green-600 to-teal-500 rounded-2xl p-6 text-white shadow-lg">
+            <div className="flex items-center gap-3 mb-4 opacity-80">
+              <DollarSign className="w-5 h-5" />
+              <span className="font-medium">Số dư hiện tại</span>
+            </div>
+            <p className="text-4xl font-bold mb-2">
+              {formatCurrency(userBalance)}
+            </p>
+            <p className="text-sm opacity-80">Hoa hồng khả dụng để rút</p>
           </div>
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <p className="text-3xl font-bold">{stats.referralStats.clickCount}</p>
-              <p className="text-sm opacity-80">Lượt click</p>
+
+          {stats.referralStats && (
+            <div className="lg:col-span-2 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 text-white shadow-lg border border-slate-700">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <Link2 className="w-5 h-5 text-primary-400" />
+                  <h2 className="text-lg font-bold">Mã giới thiệu: <span className="text-primary-400 font-mono ml-2">{stats.referralStats.code}</span></h2>
+                </div>
+                <div
+                  className="text-xs bg-white/10 px-3 py-1.5 rounded-lg opacity-60 cursor-default"
+                >
+                  Sao chép mã qua link
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div className="bg-white/5 rounded-xl p-3">
+                  <p className="text-2xl font-bold">{stats.referralStats.clickCount}</p>
+                  <p className="text-xs opacity-60 uppercase tracking-wider mt-1">Lượt click</p>
+                </div>
+                <div className="bg-white/5 rounded-xl p-3">
+                  <p className="text-2xl font-bold">{stats.referralStats.orderCount}</p>
+                  <p className="text-xs opacity-60 uppercase tracking-wider mt-1">Đơn hàng</p>
+                </div>
+                <div className="bg-white/5 rounded-xl p-3">
+                  <p className="text-2xl font-bold">{formatCurrency(stats.referralStats.revenue)}</p>
+                  <p className="text-xs opacity-60 uppercase tracking-wider mt-1">Doanh thu</p>
+                </div>
+              </div>
             </div>
-            <div>
-              <p className="text-3xl font-bold">{stats.referralStats.orderCount}</p>
-              <p className="text-sm opacity-80">Đơn thành công</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold">{formatCurrency(stats.referralStats.revenue)}</p>
-              <p className="text-sm opacity-80">Doanh thu</p>
-            </div>
-          </div>
+          )}
         </div>
       )}
 
@@ -192,6 +218,18 @@ export default async function AdminDashboard() {
             </div>
             <p className="text-2xl font-bold text-slate-900">{stats.activeChats}</p>
             <p className="text-sm text-slate-500">Chat đang hoạt động</p>
+          </div>
+        )}
+
+        {stats.userRole === "agent" && (
+          <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center">
+                <Users className="w-6 h-6 text-teal-600" />
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-slate-900">{stats.subAgentCount}</p>
+            <p className="text-sm text-slate-500">CTV đang quản lý</p>
           </div>
         )}
       </div>

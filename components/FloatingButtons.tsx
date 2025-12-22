@@ -12,8 +12,8 @@ export default function FloatingButtons() {
         href="/flash-sale"
         className="group pointer-events-auto w-52 sm:w-64"
       >
-        <div className="relative flex items-center h-14 sm:h-16 pr-4 pl-12 bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-full shadow-lg shadow-red-500/40 hover:shadow-red-500/60 transition-all duration-300 hover:scale-105 animate-pulse-slow border border-white/20">
-          <div className="absolute left-1 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-yellow-400 rounded-full flex items-center justify-center animate-bounce-soft shadow-inner">
+        <div className="relative flex items-center h-14 sm:h-16 pr-4 pl-14 sm:pl-16 bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-full shadow-lg shadow-red-500/40 hover:shadow-red-500/60 transition-all duration-300 hover:scale-105 animate-pulse-slow border border-white/20">
+          <div className="absolute left-1 sm:left-1.5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-yellow-400 rounded-full flex items-center justify-center animate-bounce-soft shadow-inner border border-red-400/30">
             <Gift className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
           </div>
           <div className="flex flex-col">
@@ -29,8 +29,8 @@ export default function FloatingButtons() {
         href="/dung-thu"
         className="group pointer-events-auto w-52 sm:w-64"
       >
-        <div className="relative flex items-center h-14 sm:h-16 pr-4 pl-12 bg-gradient-to-r from-green-600 to-emerald-500 text-white rounded-full shadow-lg shadow-green-500/40 hover:shadow-green-500/60 transition-all duration-300 hover:scale-105 border border-white/20">
-          <div className="absolute left-1 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center animate-pulse">
+        <div className="relative flex items-center h-14 sm:h-16 pr-4 pl-14 sm:pl-16 bg-gradient-to-r from-green-600 to-emerald-500 text-white rounded-full shadow-lg shadow-green-500/40 hover:shadow-green-500/60 transition-all duration-300 hover:scale-105 border border-white/20">
+          <div className="absolute left-1 sm:left-1.5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center animate-pulse shadow-inner">
             <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 fill-green-600" />
           </div>
           <div className="flex flex-col">

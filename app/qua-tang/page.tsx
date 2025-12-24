@@ -75,8 +75,18 @@ export default function QuaTangPage() {
 
           <div className="mt-8 text-white/80 font-bold flex items-center justify-center gap-3">
             <div className="flex -space-x-2">
-              {[1, 2, 3, 4].map(i => (
-                <div key={i} className="w-8 h-8 rounded-full border-2 border-red-600 bg-slate-200"></div>
+              {[
+                "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop",
+                "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
+                "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop",
+                "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&h=100&fit=crop"
+              ].map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  alt="User avatar"
+                  className="w-10 h-10 rounded-full border-2 border-red-600 object-cover bg-slate-200"
+                />
               ))}
             </div>
             1,250+ người đã nhận quà
@@ -100,8 +110,8 @@ export default function QuaTangPage() {
               <div
                 key={index}
                 className={`group p-8 rounded-[2rem] border-2 transition-all duration-500 hover:-translate-y-3 flex flex-col items-center text-center ${gift.highlight
-                    ? "bg-gradient-to-br from-yellow-400 to-amber-500 border-white shadow-2xl shadow-yellow-400/20"
-                    : "bg-white/10 border-white/20 hover:border-yellow-400 active:bg-white/20"
+                  ? "bg-gradient-to-br from-yellow-400 to-amber-500 border-white shadow-2xl shadow-yellow-400/20"
+                  : "bg-white/10 border-white/20 hover:border-yellow-400 active:bg-white/20"
                   }`}
               >
                 <div className="text-7xl mb-6 transform group-hover:scale-110 transition-transform">

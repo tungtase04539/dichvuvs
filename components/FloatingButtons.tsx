@@ -13,21 +13,22 @@ export default function FloatingButtons() {
   const shouldHide = hidePaths.some(path => pathname?.startsWith(path));
 
   return (
-    <div className="fixed bottom-24 right-4 sm:right-6 z-40 flex flex-col gap-3 items-end pointer-events-none">
+    <div className="fixed bottom-24 right-4 sm:right-6 z-40 flex flex-col gap-4 items-end pointer-events-none">
       {/* Tặng quà - Đỏ tươi */}
       <Link
         href="/qua-tang"
         className="group pointer-events-auto w-52 sm:w-64"
       >
-        <div className="relative flex items-center h-14 sm:h-16 pr-4 pl-14 sm:pl-16 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-full shadow-lg shadow-red-500/40 hover:shadow-red-500/60 transition-all duration-300 hover:scale-105 animate-pulse-slow border border-white/20">
-          <div className="absolute left-1 sm:left-1.5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center animate-bounce-soft shadow-inner">
-            <Gift className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
+        <div className="relative flex items-center h-14 sm:h-16 pr-4 pl-14 sm:pl-16 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-full shadow-lg shadow-red-500/40 hover:shadow-red-500/60 transition-all duration-300 hover:scale-110 animate-glow-red border border-white/30 overflow-hidden">
+          <div className="absolute left-1 sm:left-1.5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform">
+            <Gift className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 animate-wiggle" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider leading-none opacity-90">Ưu đãi hôm nay</span>
-            <span className="font-bold text-sm sm:text-base whitespace-nowrap">TẶNG QUÀ MIỄN PHÍ</span>
+            <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] leading-none opacity-90 animate-pulse">Ưu đãi hôm nay</span>
+            <span className="font-black text-sm sm:text-lg whitespace-nowrap drop-shadow-sm uppercase">TẶNG QUÀ MIỄN PHÍ</span>
           </div>
-          <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-yellow-300 animate-spin-slow" />
+          <Sparkles className="absolute top-1 right-2 w-4 h-4 text-yellow-300 animate-twinkle" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
         </div>
       </Link>
 
@@ -36,14 +37,15 @@ export default function FloatingButtons() {
         href="/khuyen-mai-tet"
         className="group pointer-events-auto w-52 sm:w-64"
       >
-        <div className="relative flex items-center h-14 sm:h-16 pr-4 pl-14 sm:pl-16 bg-gradient-to-r from-green-600 to-emerald-500 text-white rounded-full shadow-lg shadow-green-500/40 hover:shadow-green-500/60 transition-all duration-300 hover:scale-105 border border-white/20">
-          <div className="absolute left-1 sm:left-1.5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-inner">
-            <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-green-700 fill-green-700" />
+        <div className="relative flex items-center h-14 sm:h-16 pr-4 pl-14 sm:pl-16 bg-gradient-to-r from-green-600 to-emerald-500 text-white rounded-full shadow-lg shadow-green-500/40 hover:shadow-green-500/60 transition-all duration-300 hover:scale-110 animate-glow-green border border-white/30 overflow-hidden">
+          <div className="absolute left-1 sm:left-1.5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-md">
+            <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-green-700 fill-green-700 animate-flash" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider leading-none opacity-90">Flash Sale</span>
-            <span className="font-bold text-sm sm:text-base whitespace-nowrap">KHUYẾN MẠI TẾT</span>
+            <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] leading-none opacity-90">Flash Sale</span>
+            <span className="font-black text-sm sm:text-lg whitespace-nowrap drop-shadow-sm uppercase italic">KHUYẾN MẠI TẾT</span>
           </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent animate-scan" />
         </div>
       </Link>
 
@@ -52,39 +54,65 @@ export default function FloatingButtons() {
         href="/dung-thu"
         className="group pointer-events-auto w-52 sm:w-64"
       >
-        <div className="relative flex items-center h-14 sm:h-16 pr-4 pl-14 sm:pl-16 bg-gradient-to-r from-yellow-500 to-amber-400 text-slate-900 rounded-full shadow-lg shadow-yellow-500/40 hover:shadow-yellow-500/60 transition-all duration-300 hover:scale-105 border border-white/20">
-          <div className="absolute left-1 sm:left-1.5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-slate-900 rounded-full flex items-center justify-center shadow-inner">
-            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" />
+        <div className="relative flex items-center h-14 sm:h-16 pr-4 pl-14 sm:pl-16 bg-gradient-to-r from-yellow-500 to-amber-400 text-slate-900 rounded-full shadow-lg shadow-yellow-500/40 hover:shadow-yellow-500/60 transition-all duration-300 hover:scale-110 animate-glow-yellow border border-white/30 overflow-hidden">
+          <div className="absolute left-1 sm:left-1.5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-slate-900 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400 animate-spin-slow" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider leading-none opacity-70">Thử ngay 0đ</span>
-            <span className="font-bold text-sm sm:text-base whitespace-nowrap">TRẢI NGHIỆM MIỄN PHÍ</span>
+            <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] leading-none opacity-70">Thực tế 0đ</span>
+            <span className="font-black text-sm sm:text-lg whitespace-nowrap uppercase">Dùng thử ngay</span>
           </div>
+          <div className="absolute top-0 right-4 w-1 h-full bg-white/20 skew-x-12 animate-slide" />
         </div>
       </Link>
 
       <style jsx global>{`
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.95; transform: scale(1.02); }
+        @keyframes wiggle {
+          0%, 100% { transform: rotate(-10deg); }
+          50% { transform: rotate(10deg); }
         }
-        @keyframes bounce-soft {
-          0%, 100% { transform: translateY(-50%) scale(1); }
-          50% { transform: translateY(-55%) scale(1.08); }
+        @keyframes flash {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.7; transform: scale(1.2); }
+        }
+        @keyframes twinkle {
+          0%, 100% { opacity: 1; transform: scale(1) rotate(0); }
+          50% { opacity: 0.5; transform: scale(0.8) rotate(45deg); }
+        }
+        @keyframes glow-red {
+          0%, 100% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+          50% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.6); }
+        }
+        @keyframes glow-green {
+          0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+          50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.6); }
+        }
+        @keyframes glow-yellow {
+          0%, 100% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
+          50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.6); }
+        }
+        @keyframes scan {
+          from { transform: translateY(-100%); }
+          to { transform: translateY(100%); }
+        }
+        @keyframes slide {
+          from { transform: translateX(-200%) skewX(-20deg); }
+          to { transform: translateX(300%) skewX(-20deg); }
         }
         @keyframes spin-slow {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
-        .animate-pulse-slow {
-          animation: pulse-slow 3s infinite ease-in-out;
-        }
-        .animate-bounce-soft {
-          animation: bounce-soft 2s infinite ease-in-out;
-        }
-        .animate-spin-slow {
-          animation: spin-slow 4s linear infinite;
-        }
+
+        .animate-wiggle { animation: wiggle 0.5s infinite ease-in-out; }
+        .animate-flash { animation: flash 0.8s infinite ease-in-out; }
+        .animate-twinkle { animation: twinkle 1s infinite alternate; }
+        .animate-glow-red { animation: glow-red 2s infinite ease-in-out; }
+        .animate-glow-green { animation: glow-green 2s infinite ease-in-out; }
+        .animate-glow-yellow { animation: glow-yellow 2s infinite ease-in-out; }
+        .animate-scan { animation: scan 3s linear infinite; }
+        .animate-slide { animation: slide 4s ease-in-out infinite; }
+        .animate-spin-slow { animation: spin-slow 6s linear infinite; }
       `}</style>
     </div>
   );

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabaseClient } from "@/lib/supabase-server";
+import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -12,19 +12,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Missing order code" }, { status: 400 });
     }
 
-    const supabase = createServerSupabaseClient();
-    if (!supabase) {
-      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
-    }
+    const order = await prisma.order.findUnique({
+      where: { orderCode },
+      include: {
+        service: true,
+        credential: true,
+        chatbotData: true,
+      },
+    });
 
-    const { data: order, error } = await supabase
-      .from("Order")
-      .select("orderCode, totalPrice, status, customerName, customerPhone")
-      .eq("orderCode", orderCode)
-      .single();
-
-    if (error || !order) {
-      // Return default order data if not found
+    if (!order) {
+      // Return default order data if not found (for demo/fallback)
       return NextResponse.json({
         order: {
           orderCode,
@@ -39,7 +37,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ order });
   } catch (error) {
     console.error("Get order error:", error);
-    return NextResponse.json({ error: "Error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 

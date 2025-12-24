@@ -14,7 +14,7 @@ export default function Header({ settings }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const { user, isAuthenticated, isLoading, isAdmin, isCTV } = useAuth();
+  const { user, isAuthenticated, isLoading, isAdmin } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,7 +38,7 @@ export default function Header({ settings }: HeaderProps) {
 
   // Get dashboard link based on role
   const getDashboardLink = () => {
-    if (isAdmin || isCTV) return "/admin";
+    if (isAdmin) return "/admin";
     return "/tai-khoan";
   };
 
@@ -46,7 +46,6 @@ export default function Header({ settings }: HeaderProps) {
     { href: "/", label: "TRANG CHỦ" },
     { href: "/san-pham", label: "SẢN PHẨM" },
     { href: "/tin-tuc", label: "TIN TỨC" },
-    { href: "/dang-ky-ctv", label: "ĐĂNG KÝ CTV" },
   ];
 
   return (
@@ -93,7 +92,7 @@ export default function Header({ settings }: HeaderProps) {
                 <Phone className="w-5 h-5" />
                 {settings.site_phone || "0363 189 699"}
               </a>
-              
+
               {/* User Account */}
               {!isLoading && (
                 isAuthenticated && user ? (
@@ -110,11 +109,11 @@ export default function Header({ settings }: HeaderProps) {
                       </span>
                       <ChevronDown className="w-4 h-4 text-white/70" />
                     </button>
-                    
+
                     {showUserMenu && (
                       <>
-                        <div 
-                          className="fixed inset-0 z-40" 
+                        <div
+                          className="fixed inset-0 z-40"
                           onClick={() => setShowUserMenu(false)}
                         />
                         <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 py-2 z-50">
@@ -128,7 +127,7 @@ export default function Header({ settings }: HeaderProps) {
                             onClick={() => setShowUserMenu(false)}
                           >
                             <User className="w-4 h-4" />
-                            {isAdmin ? "Quản trị" : isCTV ? "Dashboard CTV" : "Tài khoản"}
+                            {isAdmin ? "Quản trị" : "Tài khoản"}
                           </Link>
                         </div>
                       </>
@@ -144,7 +143,7 @@ export default function Header({ settings }: HeaderProps) {
                   </Link>
                 )
               )}
-              
+
               <Link
                 href="/dat-hang"
                 className="flex items-center gap-2 px-5 py-2.5 bg-primary-400 text-slate-900 font-bold rounded-xl hover:bg-primary-300 shadow-lg shadow-primary-400/30 hover:shadow-xl transition-all uppercase"
@@ -179,7 +178,7 @@ export default function Header({ settings }: HeaderProps) {
 
       {/* Mobile menu overlay */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black/60 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
@@ -211,7 +210,7 @@ export default function Header({ settings }: HeaderProps) {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 <User className="w-4 h-4" />
-                {isAdmin ? "Quản trị" : isCTV ? "Dashboard" : "Tài khoản"}
+                {isAdmin ? "Quản trị" : "Tài khoản"}
               </Link>
             </div>
           )}

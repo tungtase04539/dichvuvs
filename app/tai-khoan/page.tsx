@@ -81,8 +81,8 @@ export default function CustomerDashboard() {
         const userData = await userRes.json();
         setUserInfo(userData.user);
 
-        // Redirect admin/ctv to admin panel
-        const adminRoles = ["admin", "ctv", "staff", "master_agent", "agent", "collaborator"];
+        // Redirect admin/staff to admin panel
+        const adminRoles = ["admin", "staff"];
         if (adminRoles.includes(userData.user.role)) {
           router.push("/admin");
           return;
@@ -277,7 +277,7 @@ export default function CustomerDashboard() {
                         </div>
                         <p className="font-mono text-primary-400 break-all">{order.credential.accountInfo}</p>
                       </div>
-                      
+
                       {/* Mã đăng nhập */}
                       <div className="bg-slate-800 rounded-lg p-3">
                         <div className="flex items-center justify-between mb-1">
@@ -289,7 +289,7 @@ export default function CustomerDashboard() {
                         </div>
                         <p className="font-mono font-bold text-white">{order.credential.password}</p>
                       </div>
-                      
+
                       {/* Ghi chú */}
                       {order.credential.notes && (
                         <div className="bg-slate-800 rounded-lg p-3">

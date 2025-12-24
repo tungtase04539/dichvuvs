@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { generateOrderCode } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
-import { getCurrentReferralCode } from "@/components/ReferralTracker";
 import { useAuth } from "@/contexts/AuthContext";
 import VideoModal from "@/components/VideoModal";
 import { Plus, Minus, Trash2, ShoppingCart, User, Phone, Mail, MessageSquare, Loader2, Gift, Play, Search, ChevronLeft, ChevronRight } from "lucide-react";
@@ -34,8 +33,6 @@ export default function OrderForm() {
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [referralCode, setReferralCode] = useState<string | null>(null);
-  const [referrerName, setReferrerName] = useState<string | null>(null);
   const [videoModal, setVideoModal] = useState({ isOpen: false, url: "", title: "" });
   const [searchQuery, setSearchQuery] = useState("");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -95,28 +92,7 @@ export default function OrderForm() {
       }
     };
 
-    const savedCart = sessionStorage.getItem("cart");
-    if (savedCart) {
-      sessionStorage.setItem("pendingCart", savedCart);
-      sessionStorage.removeItem("cart");
-    }
-
     loadProducts();
-
-    // Load referral code from localStorage
-    const refCode = getCurrentReferralCode();
-    if (refCode) {
-      setReferralCode(refCode);
-      // Validate and get referrer name
-      fetch(`/api/referral/track?code=${refCode}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.valid) {
-            setReferrerName(data.referrerName);
-          }
-        })
-        .catch(() => {});
-    }
   }, []);
 
   useEffect(() => {
@@ -185,7 +161,7 @@ export default function OrderForm() {
     }
 
     setIsSubmitting(true);
-    
+
     try {
       const items = cart.map((item) => ({
         serviceId: item.product.id,
@@ -201,7 +177,7 @@ export default function OrderForm() {
           email,
           notes,
           items,
-          referralCode,
+          referralCode: null,
         }),
       });
 
@@ -274,7 +250,7 @@ export default function OrderForm() {
             </button>
 
             {/* Mobile: Grid layout, Desktop: Horizontal scroll */}
-            <div 
+            <div
               ref={scrollContainerRef}
               className="grid grid-cols-2 gap-2 sm:flex sm:gap-3 sm:overflow-x-auto sm:pb-2 sm:px-6 sm:snap-x sm:snap-mandatory scroll-smooth max-h-[50vh] sm:max-h-none overflow-y-auto sm:overflow-y-visible"
               style={{ scrollbarWidth: "thin" }}
@@ -284,11 +260,10 @@ export default function OrderForm() {
                 return (
                   <div
                     key={product.id}
-                    className={`sm:flex-shrink-0 sm:w-36 rounded-xl border-2 cursor-pointer transition-all overflow-hidden snap-start ${
-                      inCart
+                    className={`sm:flex-shrink-0 sm:w-36 rounded-xl border-2 cursor-pointer transition-all overflow-hidden snap-start ${inCart
                         ? "bg-primary-50 border-primary-500 shadow-md"
                         : "bg-slate-50 border-transparent hover:border-primary-200 active:scale-95"
-                    }`}
+                      }`}
                     onClick={() => addToCart(product)}
                   >
                     {/* Product Image */}
@@ -326,7 +301,7 @@ export default function OrderForm() {
                     <div className="p-2">
                       <h3 className="font-medium text-slate-900 text-[11px] sm:text-xs mb-0.5 line-clamp-2 min-h-[2rem]">{product.name}</h3>
                       <p className="text-primary-600 font-bold text-xs sm:text-sm">{formatCurrency(product.price)}</p>
-                      
+
                       {/* Quantity Controls */}
                       {inCart && (
                         <div className="flex items-center justify-center gap-1 mt-1.5">
@@ -481,85 +456,6 @@ export default function OrderForm() {
                 />
               </div>
             </div>
-          </div>
-
-          {/* Referral Code Input/Display */}
-          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-3 sm:mb-4 flex items-center gap-2">
-              <Gift className="w-5 h-5 text-green-600" />
-              Mã giới thiệu
-            </h2>
-            {referralCode ? (
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-3 border border-green-200">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                    <Gift className="w-5 h-5 text-green-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-green-800">✓ Mã giới thiệu đã áp dụng</p>
-                    <p className="text-xs text-green-600 truncate">
-                      <code className="font-mono font-bold text-lg">{referralCode}</code>
-                      {referrerName && <span> - {referrerName}</span>}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setReferralCode(null);
-                      setReferrerName(null);
-                      localStorage.removeItem("referralCode");
-                    }}
-                    className="text-xs text-red-500 hover:text-red-700"
-                  >
-                    Xóa
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-700 mb-2">
-                  Nhập mã giới thiệu (nếu có)
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    id="refCodeInput"
-                    className="input text-sm flex-1 uppercase"
-                    placeholder="VD: ABC12"
-                    maxLength={10}
-                  />
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      const input = document.getElementById("refCodeInput") as HTMLInputElement;
-                      const code = input.value.trim().toUpperCase();
-                      if (!code) return;
-                      
-                      try {
-                        const res = await fetch(`/api/referral/track?code=${code}`);
-                        const data = await res.json();
-                        if (data.valid) {
-                          setReferralCode(code);
-                          setReferrerName(data.referrerName);
-                          localStorage.setItem("referralCode", code);
-                          input.value = "";
-                        } else {
-                          alert("Mã giới thiệu không hợp lệ");
-                        }
-                      } catch {
-                        alert("Lỗi kiểm tra mã giới thiệu");
-                      }
-                    }}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
-                  >
-                    Áp dụng
-                  </button>
-                </div>
-                <p className="text-xs text-slate-500 mt-2">
-                  Nhập mã từ CTV để được hỗ trợ tốt hơn
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Submit Button - Sticky on mobile */}

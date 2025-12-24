@@ -44,112 +44,6 @@ async function main() {
 
   const password = await bcrypt.hash("123456", 10);
 
-  // =====================================
-  // TẠO 5 TỔNG ĐẠI LÝ (Master Agents)
-  // =====================================
-  const masterAgents = [];
-  for (let i = 1; i <= 5; i++) {
-    const masterAgent = await prisma.user.upsert({
-      where: { email: `tongdaily${i}@chatbotvn.com` },
-      update: {},
-      create: {
-        email: `tongdaily${i}@chatbotvn.com`,
-        password: password,
-        name: randomName(),
-        role: "master_agent",
-        phone: randomPhone(),
-      },
-    });
-    masterAgents.push(masterAgent);
-
-    // Tạo referral link cho Tổng đại lý
-    await prisma.referralLink.upsert({
-      where: { code: randomCode("TDL", i) },
-      update: {},
-      create: {
-        code: randomCode("TDL", i),
-        userId: masterAgent.id,
-        clickCount: Math.floor(Math.random() * 500) + 100,
-        orderCount: Math.floor(Math.random() * 50) + 10,
-        revenue: Math.floor(Math.random() * 5000000) + 500000,
-      },
-    });
-  }
-
-  // =====================================
-  // TẠO 15 ĐẠI LÝ (Agents) - Mỗi Tổng đại lý có 3 Đại lý
-  // =====================================
-  const agents = [];
-  let agentIndex = 1;
-  for (const masterAgent of masterAgents) {
-    for (let j = 1; j <= 3; j++) {
-      const agent = await prisma.user.upsert({
-        where: { email: `daily${agentIndex}@chatbotvn.com` },
-        update: {},
-        create: {
-          email: `daily${agentIndex}@chatbotvn.com`,
-          password: password,
-          name: randomName(),
-          role: "agent",
-          phone: randomPhone(),
-          parentId: masterAgent.id,
-        },
-      });
-      agents.push(agent);
-
-      // Tạo referral link cho Đại lý
-      await prisma.referralLink.upsert({
-        where: { code: randomCode("DL", agentIndex) },
-        update: {},
-        create: {
-          code: randomCode("DL", agentIndex),
-          userId: agent.id,
-          clickCount: Math.floor(Math.random() * 200) + 50,
-          orderCount: Math.floor(Math.random() * 30) + 5,
-          revenue: Math.floor(Math.random() * 2000000) + 200000,
-        },
-      });
-
-      agentIndex++;
-    }
-  }
-
-  // =====================================
-  // TẠO 30 CỘNG TÁC VIÊN (Collaborators) - Mỗi Đại lý có 2 CTV
-  // =====================================
-  let ctvIndex = 1;
-  for (const agent of agents) {
-    for (let k = 1; k <= 2; k++) {
-      const collab = await prisma.user.upsert({
-        where: { email: `ctv${ctvIndex}@chatbotvn.com` },
-        update: {},
-        create: {
-          email: `ctv${ctvIndex}@chatbotvn.com`,
-          password: password,
-          name: randomName(),
-          role: "collaborator",
-          phone: randomPhone(),
-          parentId: agent.id,
-        },
-      });
-
-      // Tạo referral link cho CTV
-      await prisma.referralLink.upsert({
-        where: { code: randomCode("CTV", ctvIndex) },
-        update: {},
-        create: {
-          code: randomCode("CTV", ctvIndex),
-          userId: collab.id,
-          clickCount: Math.floor(Math.random() * 100) + 10,
-          orderCount: Math.floor(Math.random() * 15) + 1,
-          revenue: Math.floor(Math.random() * 500000) + 50000,
-        },
-      });
-
-      ctvIndex++;
-    }
-  }
-
   // Create staff users
   const staffPassword = await bcrypt.hash("staff123", 10);
   await prisma.user.upsert({
@@ -284,14 +178,56 @@ async function main() {
     });
   }
 
+  // --- DORMANT: MLM DATA SEEDING (GIỮ LẠI THEO YÊU CẦU) ---
+  /*
+  // Create Master Agent
+  const masterAgent = await prisma.user.upsert({
+    where: { email: "master@chatbotvn.com" },
+    update: {},
+    create: {
+      email: "master@chatbotvn.com",
+      password,
+      name: "Tổng Đại Lý A",
+      role: "master_agent",
+      phone: "0988888888",
+    },
+  });
+
+  // Create Agent under Master Agent
+  const agent = await prisma.user.upsert({
+    where: { email: "agent@chatbotvn.com" },
+    update: {},
+    create: {
+      email: "agent@chatbotvn.com",
+      password,
+      name: "Đại Lý B",
+      role: "agent",
+      phone: "0977777777",
+      parentId: masterAgent.id,
+    },
+  });
+
+  // Create CTV under Agent
+  await prisma.user.upsert({
+    where: { email: "ctv@chatbotvn.com" },
+    update: {},
+    create: {
+      email: "ctv@chatbotvn.com",
+      password,
+      name: "Cộng Tác Viên C",
+      role: "ctv",
+      phone: "0966666666",
+      parentId: agent.id,
+    },
+  });
+  */
+  // ------------------------------------------------------
+
   console.log("✅ Database seeded successfully!");
   console.log("\n════════════════════════════════════════");
   console.log("📊 DỮ LIỆU ĐÃ TẠO:");
   console.log("════════════════════════════════════════");
   console.log("👑 1 Admin");
-  console.log("🏢 5 Tổng Đại Lý (mỗi TĐL có 3 Đại lý)");
-  console.log("👔 15 Đại Lý (mỗi ĐL có 2 CTV)");
-  console.log("👤 30 Cộng Tác Viên");
   console.log("👷 1 Nhân Viên");
   console.log("📦 10 Sản Phẩm ChatBot");
   console.log("\n════════════════════════════════════════");
@@ -300,24 +236,10 @@ async function main() {
   console.log("\n🔴 ADMIN:");
   console.log("   Email: admin@chatbotvn.com");
   console.log("   Password: admin123");
-  console.log("\n🟠 TỔNG ĐẠI LÝ (5 tài khoản):");
-  console.log("   Email: tongdaily1@chatbotvn.com → tongdaily5@chatbotvn.com");
-  console.log("   Password: 123456");
-  console.log("   Mã giới thiệu: TDL001 → TDL005");
-  console.log("\n🟡 ĐẠI LÝ (15 tài khoản):");
-  console.log("   Email: daily1@chatbotvn.com → daily15@chatbotvn.com");
-  console.log("   Password: 123456");
-  console.log("   Mã giới thiệu: DL001 → DL015");
-  console.log("\n🟢 CỘNG TÁC VIÊN (30 tài khoản):");
-  console.log("   Email: ctv1@chatbotvn.com → ctv30@chatbotvn.com");
-  console.log("   Password: 123456");
-  console.log("   Mã giới thiệu: CTV001 → CTV030");
   console.log("\n🔵 NHÂN VIÊN:");
   console.log("   Email: nhanvien1@chatbotvn.com");
   console.log("   Password: staff123");
-  console.log("\n════════════════════════════════════════");
-  console.log("📊 PHÂN CẤP: Admin > Tổng đại lý > Đại lý > CTV");
-  console.log("════════════════════════════════════════\n");
+  console.log("\n════════════════════════════════════════\n");
 }
 
 main()

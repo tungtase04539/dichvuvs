@@ -20,25 +20,16 @@ interface Account {
 
 const roleLabels: Record<string, string> = {
   admin: "Quản trị viên",
-  master_agent: "Tổng đại lý",
-  agent: "Đại lý",
-  collaborator: "Cộng tác viên",
   staff: "Nhân viên",
 };
 
 const roleIcons: Record<string, React.ReactNode> = {
   admin: <Shield className="w-4 h-4" />,
-  master_agent: <Building2 className="w-4 h-4" />,
-  agent: <UserCheck className="w-4 h-4" />,
-  collaborator: <User className="w-4 h-4" />,
   staff: <User className="w-4 h-4" />,
 };
 
 const roleColors: Record<string, string> = {
   admin: "bg-purple-100 text-purple-700",
-  master_agent: "bg-blue-100 text-blue-700",
-  agent: "bg-green-100 text-green-700",
-  collaborator: "bg-orange-100 text-orange-700",
   staff: "bg-slate-100 text-slate-700",
 };
 
@@ -57,7 +48,7 @@ export default function AccountsPage() {
     email: "",
     password: "",
     name: "",
-    role: "agent",
+    role: "staff",
     phone: "",
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -251,10 +242,7 @@ export default function AccountsPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${account.role === "admin" ? "bg-purple-500" :
-                          account.role === "master_agent" ? "bg-blue-500" :
-                            account.role === "agent" ? "bg-green-500" :
-                              account.role === "collaborator" ? "bg-orange-500" :
-                                "bg-slate-500"
+                        "bg-slate-500"
                         }`}>
                         {account.name.charAt(0).toUpperCase()}
                       </div>
@@ -387,11 +375,8 @@ export default function AccountsPage() {
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                   className="input"
                 >
-                  <option value="admin">Quản trị viên</option>
-                  <option value="master_agent">Tổng đại lý</option>
-                  <option value="agent">Đại lý</option>
-                  <option value="collaborator">Cộng tác viên</option>
                   <option value="staff">Nhân viên</option>
+                  <option value="admin">Quản trị viên</option>
                 </select>
               </div>
 

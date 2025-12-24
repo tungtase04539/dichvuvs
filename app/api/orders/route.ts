@@ -87,10 +87,8 @@ export async function GET(request: NextRequest) {
       query = query.eq("status", status);
     }
 
-    // CTV và Đại lý chỉ xem đơn hàng của mình/của khách mình giới thiệu
-    if (dbUser.role === "ctv" || dbUser.role === "collaborator" || dbUser.role === "agent") {
-      query = query.eq("referrerId", dbUser.id);
-    } else if (dbUser.role === "staff") {
+    // Nhân viên chỉ xem đơn hàng được gán cho mình
+    if (dbUser.role === "staff") {
       query = query.eq("assignedToId", dbUser.id);
     }
     // Admin xem tất cả (không filter thêm)
@@ -174,17 +172,9 @@ export async function POST(request: NextRequest) {
     const mainProduct = productMap.get(items[0].serviceId);
     const orderCode = generateOrderCode();
 
-    // Find referrer if referral code provided
-    let referrerId: string | null = null;
-    if (referralCode) {
-      const referralLink = await prisma.referralLink.findUnique({
-        where: { code: referralCode },
-        select: { userId: true },
-      });
-      if (referralLink) {
-        referrerId = referralLink.userId;
-      }
-    }
+    // Referral features are disabled in this MVP
+    const referrerId = null;
+    const finalReferralCode = null;
 
     // Single insert query - Tài khoản sẽ được tạo sau khi thanh toán thành công
     const order = await prisma.order.create({
@@ -204,7 +194,7 @@ export async function POST(request: NextRequest) {
         basePrice: mainProduct?.price || 29000,
         totalPrice,
         status: "pending",
-        referralCode: referralCode || null,
+        referralCode: finalReferralCode,
         referrerId: referrerId,
       },
       select: {

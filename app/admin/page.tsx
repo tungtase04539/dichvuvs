@@ -19,19 +19,12 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
-async function getDashboardStats(userId: string, role: string) {
+async function getDashboardStats() {
   // Prevent any caching
   noStore();
 
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-  // CTV chỉ xem stats của mình
-  const isCTV = role === "ctv" || role === "collaborator";
-  const orderFilter = isCTV ? { referrerId: userId } : {};
-  const orderFilterMonth = isCTV
-    ? { referrerId: userId, createdAt: { gte: startOfMonth } }
-    : { createdAt: { gte: startOfMonth } };
 
   // Run all queries in parallel
   const [
@@ -39,20 +32,28 @@ async function getDashboardStats(userId: string, role: string) {
     pendingOrders,
     totalRevenue,
     activeChats,
+    totalAgents,
+    totalCTVs,
+    totalCommissions,
+    ctvApplications,
     recentOrders,
     recentChats,
-    referralStats,
-    subAgentCount,
   ] = await Promise.all([
-    prisma.order.count({ where: orderFilterMonth }),
-    prisma.order.count({ where: { ...orderFilter, status: "pending" } }),
+    prisma.order.count({ where: { createdAt: { gte: startOfMonth } } }),
+    prisma.order.count({ where: { status: "pending" } }),
     prisma.order.aggregate({
-      where: { ...orderFilter, status: { in: ["confirmed", "completed"] }, createdAt: { gte: startOfMonth } },
+      where: { status: { in: ["confirmed", "completed"] }, createdAt: { gte: startOfMonth } },
       _sum: { totalPrice: true },
     }),
-    isCTV ? Promise.resolve(0) : prisma.chatSession.count({ where: { status: "active" } }),
+    prisma.chatSession.count({ where: { status: "active" } }),
+    prisma.user.count({ where: { role: { in: ["agent", "master_agent"] } } }),
+    prisma.user.count({ where: { role: "ctv" } }),
+    prisma.commission.aggregate({
+      where: { createdAt: { gte: startOfMonth } },
+      _sum: { amount: true },
+    }),
+    prisma.cTVApplication.count({ where: { status: "pending" } }),
     prisma.order.findMany({
-      where: orderFilter,
       select: {
         id: true,
         orderCode: true,
@@ -66,7 +67,7 @@ async function getDashboardStats(userId: string, role: string) {
       orderBy: { createdAt: "desc" },
       take: 5,
     }),
-    isCTV ? Promise.resolve([]) : prisma.chatSession.findMany({
+    prisma.chatSession.findMany({
       where: { status: "active" },
       select: {
         id: true,
@@ -80,13 +81,6 @@ async function getDashboardStats(userId: string, role: string) {
       orderBy: { lastActivity: "desc" },
       take: 5,
     }),
-    // Referral stats for CTV
-    isCTV ? prisma.referralLink.findFirst({
-      where: { userId, isActive: true },
-      select: { code: true, clickCount: true, orderCount: true, revenue: true },
-    }) : Promise.resolve(null),
-    // Sub-agents count for Agent
-    role === "agent" ? prisma.user.count({ where: { parentId: userId } }) : Promise.resolve(0),
   ]);
 
   return {
@@ -94,12 +88,12 @@ async function getDashboardStats(userId: string, role: string) {
     pendingOrders,
     totalRevenue: totalRevenue._sum.totalPrice || 0,
     activeChats,
+    totalAgents,
+    totalCTVs,
+    totalCommissions: totalCommissions._sum.amount || 0,
+    ctvApplications,
     recentOrders,
     recentChats,
-    referralStats,
-    subAgentCount,
-    isCTV,
-    userRole: role,
   };
 }
 
@@ -110,69 +104,12 @@ export default async function AdminDashboard() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/quan-tri-vien-dang-nhap");
 
-  // Get user info from database
-  const { data: dbUser } = await supabase
-    .from("User")
-    .select("id, role, balance")
-    .eq("email", user.email)
-    .single();
-
-  const userId = dbUser?.id || user.id;
-  const role = dbUser?.role || "customer";
-  const userBalance = dbUser?.balance || 0;
-
-  const stats = await getDashboardStats(userId, role);
+  const stats = await getDashboardStats();
 
   return (
     <div className="space-y-6">
-      {/* Balance & Referral Stats */}
-      {(role === "ctv" || role === "collaborator" || role === "agent") && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1 bg-gradient-to-br from-green-600 to-teal-500 rounded-2xl p-6 text-white shadow-lg">
-            <div className="flex items-center gap-3 mb-4 opacity-80">
-              <DollarSign className="w-5 h-5" />
-              <span className="font-medium">Số dư hiện tại</span>
-            </div>
-            <p className="text-4xl font-bold mb-2">
-              {formatCurrency(userBalance)}
-            </p>
-            <p className="text-sm opacity-80">Hoa hồng khả dụng để rút</p>
-          </div>
-
-          {stats.referralStats && (
-            <div className="lg:col-span-2 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 text-white shadow-lg border border-slate-700">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <Link2 className="w-5 h-5 text-primary-400" />
-                  <h2 className="text-lg font-bold">Mã giới thiệu: <span className="text-primary-400 font-mono ml-2">{stats.referralStats.code}</span></h2>
-                </div>
-                <div
-                  className="text-xs bg-white/10 px-3 py-1.5 rounded-lg opacity-60 cursor-default"
-                >
-                  Sao chép mã qua link
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div className="bg-white/5 rounded-xl p-3">
-                  <p className="text-2xl font-bold">{stats.referralStats.clickCount}</p>
-                  <p className="text-xs opacity-60 uppercase tracking-wider mt-1">Lượt click</p>
-                </div>
-                <div className="bg-white/5 rounded-xl p-3">
-                  <p className="text-2xl font-bold">{stats.referralStats.orderCount}</p>
-                  <p className="text-xs opacity-60 uppercase tracking-wider mt-1">Đơn hàng</p>
-                </div>
-                <div className="bg-white/5 rounded-xl p-3">
-                  <p className="text-2xl font-bold">{formatCurrency(stats.referralStats.revenue)}</p>
-                  <p className="text-xs opacity-60 uppercase tracking-wider mt-1">Doanh thu</p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* Stats cards */}
-      <div className={`grid grid-cols-1 md:grid-cols-2 ${stats.isCTV ? 'lg:grid-cols-3' : 'lg:grid-cols-4'} gap-6`}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
@@ -180,9 +117,7 @@ export default async function AdminDashboard() {
             </div>
           </div>
           <p className="text-2xl font-bold text-slate-900">{stats.totalOrders}</p>
-          <p className="text-sm text-slate-500">
-            {stats.isCTV ? "Đơn của bạn tháng này" : "Đơn hàng tháng này"}
-          </p>
+          <p className="text-sm text-slate-500">Đơn hàng tháng này</p>
         </div>
 
         <div className="bg-white rounded-2xl p-6 shadow-sm">
@@ -204,43 +139,25 @@ export default async function AdminDashboard() {
           <p className="text-2xl font-bold text-slate-900">
             {formatCurrency(stats.totalRevenue)}
           </p>
-          <p className="text-sm text-slate-500">
-            {stats.isCTV ? "Doanh thu của bạn" : "Doanh thu tháng này"}
-          </p>
+          <p className="text-sm text-slate-500">Doanh thu tháng này</p>
         </div>
 
-        {!stats.isCTV && (
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
-                <MessageCircle className="w-6 h-6 text-purple-600" />
-              </div>
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
+              <MessageCircle className="w-6 h-6 text-purple-600" />
             </div>
-            <p className="text-2xl font-bold text-slate-900">{stats.activeChats}</p>
-            <p className="text-sm text-slate-500">Chat đang hoạt động</p>
           </div>
-        )}
-
-        {stats.userRole === "agent" && (
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center">
-                <Users className="w-6 h-6 text-teal-600" />
-              </div>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">{stats.subAgentCount}</p>
-            <p className="text-sm text-slate-500">CTV đang quản lý</p>
-          </div>
-        )}
+          <p className="text-2xl font-bold text-slate-900">{stats.activeChats}</p>
+          <p className="text-sm text-slate-500">Chat đang hoạt động</p>
+        </div>
       </div>
 
-      <div className={`grid ${stats.isCTV ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-6`}>
+      <div className="grid lg:grid-cols-3 gap-6">
         {/* Recent orders */}
-        <div className={`${stats.isCTV ? '' : 'lg:col-span-2'} bg-white rounded-2xl p-6 shadow-sm`}>
+        <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-slate-900">
-              {stats.isCTV ? "Đơn hàng từ khách của bạn" : "Đơn hàng gần đây"}
-            </h2>
+            <h2 className="text-lg font-semibold text-slate-900">Đơn hàng gần đây</h2>
             <Link
               href="/admin/don-hang"
               className="text-sm text-primary-600 hover:underline"
@@ -252,17 +169,10 @@ export default async function AdminDashboard() {
             {stats.recentOrders.length === 0 ? (
               <div className="text-center py-8">
                 <Package className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                <p className="text-slate-500">
-                  {stats.isCTV ? "Chưa có khách hàng nào từ link giới thiệu của bạn" : "Chưa có đơn hàng"}
-                </p>
-                {stats.isCTV && (
-                  <Link href="/admin/san-pham-ctv" className="text-primary-600 hover:underline text-sm mt-2 inline-block">
-                    Copy link giới thiệu →
-                  </Link>
-                )}
+                <p className="text-slate-500">Chưa có đơn hàng</p>
               </div>
             ) : (
-              stats.recentOrders.map((order) => (
+              stats.recentOrders.map((order: any) => (
                 <Link
                   key={order.id}
                   href={`/admin/don-hang/${order.id}`}
@@ -285,48 +195,46 @@ export default async function AdminDashboard() {
           </div>
         </div>
 
-        {/* Active chats - Admin only */}
-        {!stats.isCTV && (
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-slate-900">Chat mới</h2>
-              <Link
-                href="/admin/chat"
-                className="text-sm text-primary-600 hover:underline"
-              >
-                Xem tất cả
-              </Link>
-            </div>
-            <div className="space-y-4">
-              {stats.recentChats.length === 0 ? (
-                <p className="text-slate-500 text-sm text-center py-4">
-                  Không có chat nào
-                </p>
-              ) : (
-                stats.recentChats.map((chat) => (
-                  <Link
-                    key={chat.id}
-                    href={`/admin/chat?session=${chat.id}`}
-                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-semibold">
-                      {(chat.guestName || "K").charAt(0).toUpperCase()}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-slate-900 truncate">
-                        {chat.guestName || "Khách"}
-                      </p>
-                      <p className="text-sm text-slate-500 truncate">
-                        {chat.messages[0]?.content || "Chưa có tin nhắn"}
-                      </p>
-                    </div>
-                    <div className="w-2 h-2 bg-green-500 rounded-full" />
-                  </Link>
-                ))
-              )}
-            </div>
+        {/* Active chats */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-slate-900">Chat mới</h2>
+            <Link
+              href="/admin/chat"
+              className="text-sm text-primary-600 hover:underline"
+            >
+              Xem tất cả
+            </Link>
           </div>
-        )}
+          <div className="space-y-4">
+            {stats.recentChats.length === 0 ? (
+              <p className="text-slate-500 text-sm text-center py-4">
+                Không có chat nào
+              </p>
+            ) : (
+              stats.recentChats.map((chat: any) => (
+                <Link
+                  key={chat.id}
+                  href={`/admin/chat?session=${chat.id}`}
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-semibold">
+                    {(chat.guestName || "K").charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-slate-900 truncate">
+                      {chat.guestName || "Khách"}
+                    </p>
+                    <p className="text-sm text-slate-500 truncate">
+                      {chat.messages[0]?.content || "Chưa có tin nhắn"}
+                    </p>
+                  </div>
+                  <div className="w-2 h-2 bg-green-500 rounded-full" />
+                </Link>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

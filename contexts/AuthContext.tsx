@@ -9,14 +9,12 @@ interface User {
   name: string;
   role: string;
   phone?: string;
-  referralCode?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  isCTV: boolean;
   isAdmin: boolean;
   isCustomer: boolean;
   refetch: () => Promise<void>;
@@ -26,10 +24,9 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
   isAuthenticated: false,
-  isCTV: false,
   isAdmin: false,
   isCustomer: false,
-  refetch: async () => {},
+  refetch: async () => { },
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -46,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (!session?.user) {
         setUser(null);
         setIsLoading(false);
@@ -93,7 +90,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     isLoading,
     isAuthenticated: !!user,
-    isCTV: user?.role === "ctv" || user?.role === "collaborator",
     isAdmin: user?.role === "admin",
     isCustomer: user?.role === "customer",
     refetch: fetchUser,

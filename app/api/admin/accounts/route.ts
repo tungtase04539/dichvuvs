@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
 
     // Kiểm tra quyền tạo role
     const allowedRoles: Record<string, string[]> = {
-      admin: ["admin", "master_agent", "agent", "collaborator", "staff"],
+      admin: ["master_agent", "agent", "collaborator", "staff"],
       master_agent: ["agent"],
       agent: ["collaborator"],
     };

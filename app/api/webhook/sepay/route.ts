@@ -82,97 +82,60 @@ export async function POST(request: NextRequest) {
       data: updateData,
     });
 
-    // --- LOGIC HOA HỒNG CTV/ĐẠI LÝ ---
+    // --- LOGIC HOA HỒNG (DORMANT - GIỮ LẠI THEO YÊU CẦU) ---
+    /*
     if (order.referrerId) {
-      try {
-        const referrer = await prisma.user.findUnique({
-          where: { id: order.referrerId },
+      // 1. Tính hoa hồng cho người giới thiệu trực tiếp
+      const commissionSettings = await prisma.commissionSetting.findMany();
+      const directPercent = commissionSettings.find(s => s.key === "direct_referral")?.percent || 10;
+      
+      const directAmount = (order.totalPrice * directPercent) / 100;
+      await prisma.commission.create({
+        data: {
+          orderId: order.id,
+          userId: order.referrerId,
+          amount: directAmount,
+          percent: directPercent,
+          level: 1,
+          status: "pending"
+        }
+      });
+      
+      // Cập nhật số dư cho người giới thiệu
+      await prisma.user.update({
+        where: { id: order.referrerId },
+        data: { balance: { increment: directAmount } }
+      });
+
+      // 2. Tính hoa hồng tầng cho cấp trên (nếu có)
+      const referrer = await prisma.user.findUnique({
+        where: { id: order.referrerId },
+        select: { parentId: true }
+      });
+
+      if (referrer?.parentId) {
+        const overridePercent = commissionSettings.find(s => s.key === "override_referral")?.percent || 5;
+        const overrideAmount = (order.totalPrice * overridePercent) / 100;
+        
+        await prisma.commission.create({
+          data: {
+            orderId: order.id,
+            userId: referrer.parentId,
+            amount: overrideAmount,
+            percent: overridePercent,
+            level: 2,
+            status: "pending"
+          }
         });
 
-        if (referrer) {
-          let directCommissionPercent = 0;
-          let indirectCommissionPercent = 0;
-          let agentIdToCredit = null;
-
-          // Xác định % dựa trên role (Phương án A)
-          const isDirectLowTier = ["ctv", "collaborator"].includes(referrer.role);
-          const isDirectHighTier = ["agent", "master_agent"].includes(referrer.role);
-
-          if (isDirectLowTier) {
-            directCommissionPercent = 15; // CTV/Collaborator hưởng 15%
-
-            // Tìm cấp trên để hưởng hoa hồng chênh lệch
-            if (referrer.parentId) {
-              const parent = await prisma.user.findUnique({
-                where: { id: referrer.parentId }
-              });
-              // Nếu cấp trên là Agent hoặc Master Agent thì hưởng 5%
-              if (parent && ["agent", "master_agent"].includes(parent.role)) {
-                agentIdToCredit = parent.id;
-                indirectCommissionPercent = 5;
-              }
-            }
-          } else if (isDirectHighTier) {
-            directCommissionPercent = 20; // Đại lý/Tổng đại lý tự bán hưởng 20%
-          }
-
-          // 1. Cộng tiền cho người giới thiệu trực tiếp
-          if (directCommissionPercent > 0) {
-            const amount = (order.totalPrice * directCommissionPercent) / 100;
-            await prisma.user.update({
-              where: { id: referrer.id },
-              data: { balance: { increment: amount } }
-            });
-
-            await prisma.commission.create({
-              data: {
-                orderId: order.id,
-                userId: referrer.id,
-                amount: amount,
-                percent: directCommissionPercent,
-                level: 1,
-                status: "paid"
-              }
-            });
-          }
-
-          // 2. Cộng tiền cho Đại lý cấp trên (nếu có)
-          if (agentIdToCredit && indirectCommissionPercent > 0) {
-            const amount = (order.totalPrice * indirectCommissionPercent) / 100;
-            await prisma.user.update({
-              where: { id: agentIdToCredit },
-              data: { balance: { increment: amount } }
-            });
-
-            await prisma.commission.create({
-              data: {
-                orderId: order.id,
-                userId: agentIdToCredit,
-                amount: amount,
-                percent: indirectCommissionPercent,
-                level: 2,
-                status: "paid"
-              }
-            });
-          }
-
-          // 3. Cập nhật thống kê Link Referral
-          if (order.referralCode) {
-            await prisma.referralLink.update({
-              where: { code: order.referralCode },
-              data: {
-                orderCount: { increment: 1 },
-                revenue: { increment: order.totalPrice }
-              }
-            });
-          }
-        }
-      } catch (commissionError) {
-        console.error("Commission calculation failed:", commissionError);
-        // Không block flow chính nếu lỗi tính hoa hồng
+        await prisma.user.update({
+          where: { id: referrer.parentId },
+          data: { balance: { increment: overrideAmount } }
+        });
       }
     }
-    // --------------------------------
+    */
+    // ---------------------------------------------------
 
     // Assign credential if available
     if (availableCredential) {

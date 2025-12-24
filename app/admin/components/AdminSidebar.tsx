@@ -49,59 +49,21 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
   const getNavItems = (): NavItem[] => {
     const baseItems: NavItem[] = [
       { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
+      { href: "/admin/don-hang", icon: Package, label: "Đơn hàng" },
+      { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" },
+      { href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" },
+      { href: "/admin/tai-khoan", icon: Key, label: "Tài khoản" },
     ];
 
     if (user.role === "admin") {
       return [
         ...baseItems,
-        { href: "/admin/don-hang", icon: Package, label: "Đơn hàng" },
-        { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" },
-        { href: "/admin/ctv", icon: Users, label: "CTV" },
-        { href: "/admin/ctv/duyet", icon: UserCheck, label: "Duyệt CTV" },
-        { href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" },
-        { href: "/admin/dai-ly", icon: Building2, label: "Đại lý" },
-        { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
-        { href: "/admin/vi-tien", icon: Wallet, label: "Ví tiền" },
-        { href: "/admin/tai-khoan", icon: Key, label: "Tài khoản" },
+        // Admin specific extra items if any, but keeping it simple now
       ];
     }
 
-    if (user.role === "master_agent") {
-      return [
-        ...baseItems,
-        { href: "/admin/don-hang", icon: Package, label: "Đơn hàng của tôi" },
-        { href: "/admin/dai-ly", icon: Users, label: "Đại lý của tôi" },
-        { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
-        { href: "/admin/vi-tien", icon: Wallet, label: "Ví tiền" },
-      ];
-    }
-
-    if (user.role === "agent") {
-      return [
-        ...baseItems,
-        { href: "/admin/don-hang", icon: Package, label: "Đơn hàng của tôi" },
-        { href: "/admin/ctv", icon: Users, label: "CTV của tôi" },
-        { href: "/admin/ctv/duyet", icon: UserCheck, label: "Duyệt CTV" },
-        { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
-        { href: "/admin/vi-tien", icon: Wallet, label: "Ví tiền" },
-      ];
-    }
-
-    if (user.role === "collaborator") {
-      return [
-        ...baseItems,
-        { href: "/admin/don-hang", icon: Package, label: "Đơn hàng của tôi" },
-        { href: "/admin/gioi-thieu", icon: Link2, label: "Mã giới thiệu" },
-        { href: "/admin/vi-tien", icon: Wallet, label: "Ví tiền" },
-      ];
-    }
-
-    // Staff
-    return [
-      ...baseItems,
-      { href: "/admin/don-hang", icon: Package, label: "Đơn hàng" },
-      { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" },
-    ];
+    // Staff / Default
+    return baseItems;
   };
 
   const navItems = getNavItems();

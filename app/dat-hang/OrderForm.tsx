@@ -351,7 +351,7 @@ export default function OrderForm() {
         {/* Right Column: Suggestions & Total */}
         <div className="lg:w-[360px] space-y-6">
           {/* Summary Card */}
-          <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-primary-500/10 sticky top-24">
+          <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-primary-500/10">
             <h2 className="text-lg font-bold mb-6 text-primary-400 uppercase tracking-wider">Tóm tắt đơn hàng</h2>
 
             <div className="space-y-4 mb-8">

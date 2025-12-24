@@ -23,7 +23,7 @@ function getSupabaseAdmin() {
 export async function GET() {
   try {
     const user = await getSession();
-    if (!user || user.role !== "agent") {
+    if (!user || !["admin", "agent"].includes(user.role)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -66,8 +66,8 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const user = await getSession();
-    if (!user || user.role !== "agent") {
-      return NextResponse.json({ error: "Chỉ Đại lý mới có quyền tạo CTV" }, { status: 403 });
+    if (!user || !["admin", "agent"].includes(user.role)) {
+      return NextResponse.json({ error: "Không có quyền tạo CTV" }, { status: 403 });
     }
 
     const body = await request.json();

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  Users, Plus, Trash2, Edit2, Loader2, Search, 
+import {
+  Users, Plus, Trash2, Edit2, Loader2, Search,
   UserPlus, Shield, Building2, UserCheck, User,
   Eye, EyeOff, X, Check
 } from "lucide-react";
@@ -83,7 +83,7 @@ export default function AccountsPage() {
 
   // Filter accounts
   const filteredAccounts = accounts.filter((acc) => {
-    const matchSearch = 
+    const matchSearch =
       acc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       acc.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       acc.phone.includes(searchQuery);
@@ -98,10 +98,10 @@ export default function AccountsPage() {
     setIsSubmitting(true);
 
     try {
-      const url = editingAccount 
+      const url = editingAccount
         ? `/api/admin/accounts/${editingAccount.id}`
         : "/api/admin/accounts";
-      
+
       const res = await fetch(url, {
         method: editingAccount ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
@@ -218,9 +218,8 @@ export default function AccountsPage() {
           return (
             <div
               key={role}
-              className={`p-4 rounded-xl border ${
-                filterRole === role ? "border-primary-500 bg-primary-50" : "border-slate-200 bg-white"
-              } cursor-pointer transition-all`}
+              className={`p-4 rounded-xl border ${filterRole === role ? "border-primary-500 bg-primary-50" : "border-slate-200 bg-white"
+                } cursor-pointer transition-all`}
               onClick={() => setFilterRole(filterRole === role ? "" : role)}
             >
               <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-lg text-xs font-medium ${roleColors[role]}`}>
@@ -251,13 +250,12 @@ export default function AccountsPage() {
                 <tr key={account.id} className="hover:bg-slate-50">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${
-                        account.role === "admin" ? "bg-purple-500" :
-                        account.role === "master_agent" ? "bg-blue-500" :
-                        account.role === "agent" ? "bg-green-500" :
-                        account.role === "collaborator" ? "bg-orange-500" :
-                        "bg-slate-500"
-                      }`}>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${account.role === "admin" ? "bg-purple-500" :
+                          account.role === "master_agent" ? "bg-blue-500" :
+                            account.role === "agent" ? "bg-green-500" :
+                              account.role === "collaborator" ? "bg-orange-500" :
+                                "bg-slate-500"
+                        }`}>
                         {account.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
@@ -389,6 +387,7 @@ export default function AccountsPage() {
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                   className="input"
                 >
+                  <option value="admin">Quản trị viên</option>
                   <option value="master_agent">Tổng đại lý</option>
                   <option value="agent">Đại lý</option>
                   <option value="collaborator">Cộng tác viên</option>

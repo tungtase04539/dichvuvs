@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from "./supabase-server";
+import prisma from "./prisma";
 
 export interface UserPayload {
   id: string;
@@ -15,14 +16,33 @@ export async function getSession(): Promise<UserPayload | null> {
     if (!supabase) return null;
 
     const { data: { user } } = await supabase.auth.getUser();
-    
+
     if (!user) return null;
 
+    // Logic đồng bộ: Đảm bảo user có trong database Prisma
+    // Điều này quan trọng cho các user mới đăng nhập qua OAuth hoặc được tạo qua Admin API mà chưa có trong bảng User
+    let dbUser = await prisma.user.findUnique({
+      where: { email: user.email || "" }
+    });
+
+    if (!dbUser) {
+      // Tự động tạo record trong database Prisma nếu chưa có
+      dbUser = await prisma.user.create({
+        data: {
+          id: user.id,
+          email: user.email || "",
+          name: user.user_metadata?.name || user.email?.split("@")[0] || "User",
+          role: user.user_metadata?.role || "staff",
+          password: "", // Không cần password cho Supabase Auth users trong Prisma
+        }
+      });
+    }
+
     return {
-      id: user.id,
-      email: user.email || "",
-      name: user.user_metadata?.name || user.email?.split("@")[0] || "User",
-      role: user.user_metadata?.role || "staff",
+      id: dbUser.id,
+      email: dbUser.email || "",
+      name: dbUser.name,
+      role: dbUser.role,
     };
   } catch (error) {
     console.error("getSession error:", error);
@@ -30,21 +50,19 @@ export async function getSession(): Promise<UserPayload | null> {
   }
 }
 
-// Các hàm cũ giữ lại để không break code khác (nhưng không dùng)
+// Các hàm cũ sẽ trả ra null/empty vì không sử dụng nữa
 export async function signToken(payload: UserPayload): Promise<string> {
-  // Không dùng nữa - Supabase Auth quản lý token
   return "";
 }
 
 export async function verifyToken(token: string): Promise<UserPayload | null> {
-  // Không dùng nữa
   return null;
 }
 
 export async function setSession(token: string): Promise<void> {
-  // Không dùng nữa - Supabase Auth quản lý session
+  // Supabase Auth manages cookies automatically
 }
 
 export async function clearSession(): Promise<void> {
-  // Logout sẽ dùng supabase.auth.signOut()
+  // Logout will use supabase.auth.signOut() from the client/server
 }

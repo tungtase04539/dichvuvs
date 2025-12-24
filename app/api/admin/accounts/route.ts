@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
+import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +38,7 @@ export async function GET() {
 
     const { data: { user } } = await supabase.auth.getUser();
     console.log("[GET /api/admin/accounts] Current user:", user?.id, user?.email, user?.user_metadata);
-    
+
     // Cho phép admin (role = admin hoặc chưa set role)
     const userRole = user?.user_metadata?.role || "admin";
     if (!user || userRole !== "admin") {
@@ -47,12 +48,12 @@ export async function GET() {
 
     // Get all users using database function (bypass Auth Admin API)
     const supabaseAdmin = getSupabaseAdmin();
-    
+
     const { data: authUsers, error: dbError } = await supabaseAdmin.rpc('get_all_users');
 
     if (dbError) {
       console.error("[GET /api/admin/accounts] RPC error:", dbError);
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: dbError.message,
         hint: "Đảm bảo đã chạy SQL tạo function get_all_users() trong Supabase"
       }, { status: 500 });
@@ -80,10 +81,10 @@ export async function GET() {
   } catch (error) {
     console.error("[GET /api/admin/accounts] Error:", error);
     const errorMessage = error instanceof Error ? error.message : "Lỗi hệ thống";
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: errorMessage,
-      hint: errorMessage.includes("SUPABASE_SERVICE_ROLE_KEY") 
-        ? "Cần cấu hình SUPABASE_SERVICE_ROLE_KEY trong file .env.local" 
+      hint: errorMessage.includes("SUPABASE_SERVICE_ROLE_KEY")
+        ? "Cần cấu hình SUPABASE_SERVICE_ROLE_KEY trong file .env.local"
         : undefined
     }, { status: 500 });
   }
@@ -130,7 +131,7 @@ export async function POST(request: NextRequest) {
 
     // Tạo user trong Supabase Auth
     console.log("[POST /api/admin/accounts] Creating user:", { email, name, role, phone });
-    
+
     const supabaseAdmin = getSupabaseAdmin();
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
       email,
@@ -150,6 +151,27 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 400 });
       }
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // ĐỒNG BỘ: Tạo record trong database Prisma
+    try {
+      const { id: authId } = data.user;
+      await prisma.user.create({
+        data: {
+          id: authId,
+          email,
+          password: "", // Không dùng password trong Prisma
+          name,
+          role,
+          phone: phone || "",
+          parentId: user.id, // Lưu mối quan hệ cha-con
+        }
+      });
+      console.log("[POST /api/admin/accounts] Prisma user created sync:", authId);
+    } catch (prismaError) {
+      console.error("[POST /api/admin/accounts] Prisma sync error:", prismaError);
+      // Không return error ở đây vì Auth user đã được tạo thành công
+      // getSession() sẽ handle việc tự động tạo lại nếu thiếu
     }
 
     console.log("[POST /api/admin/accounts] User created successfully:", data.user.id, data.user.email, data.user.user_metadata);

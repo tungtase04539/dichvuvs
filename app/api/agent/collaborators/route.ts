@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getSession } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -36,8 +37,8 @@ export async function GET() {
 
     // Filter collaborators belonging to this agent
     const collaborators = (authUsers || [])
-      .filter((u: { raw_user_meta_data: Record<string, unknown> | null }) => 
-        u.raw_user_meta_data?.role === "collaborator" && 
+      .filter((u: { raw_user_meta_data: Record<string, unknown> | null }) =>
+        u.raw_user_meta_data?.role === "collaborator" &&
         u.raw_user_meta_data?.parentId === user.id
       )
       .map((u: {
@@ -107,6 +108,26 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 400 });
       }
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // ĐỒNG BỘ: Tạo record trong database Prisma
+    try {
+      const { id: authId } = data.user;
+      await prisma.user.create({
+        data: {
+          id: authId,
+          email,
+          password: "", // Không dùng password trong Prisma
+          name,
+          role: "collaborator",
+          phone: phone || "",
+          parentId: user.id, // CTV thuộc đại lý này
+        }
+      });
+      console.log("[POST /api/agent/collaborators] Prisma user created sync:", authId);
+    } catch (prismaError) {
+      console.error("[POST /api/agent/collaborators] Prisma sync error:", prismaError);
+      // getSession() will handle auto-sync if missing
     }
 
     return NextResponse.json({

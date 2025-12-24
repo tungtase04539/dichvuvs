@@ -61,8 +61,8 @@ export async function GET(request: NextRequest) {
         credential: {
           chatbotLink: order.chatbotData.chatbotLink,
           activationCode: order.chatbotData.activationCode,
-          accountInfo: order.chatbotData.chatbotLink, // Unified field
-          password: order.chatbotData.activationCode, // Unified field
+          accountInfo: order.chatbotData.chatbotLink,
+          password: order.chatbotData.activationCode,
           notes: order.notes,
         },
       });

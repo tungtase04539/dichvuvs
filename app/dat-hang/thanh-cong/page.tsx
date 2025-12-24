@@ -151,7 +151,7 @@ function OrderSuccessContent() {
           setOrder(data.order);
           if (data.order.status === "confirmed" || data.order.status === "completed") {
             setIsPaid(true);
-            const deliveryData = data.order.chatbotData || data.order.credential;
+            const deliveryData = data.order.deliveryData || data.order.chatbotData || data.order.credential;
             if (deliveryData) {
               setCredential(deliveryData);
               setShowSuccessModal(true);

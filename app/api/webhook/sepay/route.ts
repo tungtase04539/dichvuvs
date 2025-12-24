@@ -69,86 +69,40 @@ export async function POST(request: NextRequest) {
       orderBy: { createdAt: "asc" }, // First in, first out
     });
 
-    // Update order status to confirmed and assign credential
-    const updateData: Record<string, unknown> = {
-      status: "confirmed",
-      notes: order.notes
-        ? `${order.notes}\n\n✅ Đã thanh toán ${transaction.transferAmount.toLocaleString('vi-VN')}đ qua ${transaction.gateway} lúc ${transaction.transactionDate}${!isAmountMatch ? ' (Số tiền không khớp)' : ''}`
-        : `✅ Đã thanh toán ${transaction.transferAmount.toLocaleString('vi-VN')}đ qua ${transaction.gateway} lúc ${transaction.transactionDate}${!isAmountMatch ? ' (Số tiền không khớp)' : ''}`,
-    };
-
-    await prisma.order.update({
-      where: { id: order.id },
-      data: updateData,
-    });
-
-    // --- LOGIC HOA HỒNG (DORMANT - GIỮ LẠI THEO YÊU CẦU) ---
-    /*
-    if (order.referrerId) {
-      // 1. Tính hoa hồng cho người giới thiệu trực tiếp
-      const commissionSettings = await prisma.commissionSetting.findMany();
-      const directPercent = commissionSettings.find(s => s.key === "direct_referral")?.percent || 10;
-      
-      const directAmount = (order.totalPrice * directPercent) / 100;
-      await prisma.commission.create({
-        data: {
-          orderId: order.id,
-          userId: order.referrerId,
-          amount: directAmount,
-          percent: directPercent,
-          level: 1,
-          status: "pending"
-        }
-      });
-      
-      // Cập nhật số dư cho người giới thiệu
-      await prisma.user.update({
-        where: { id: order.referrerId },
-        data: { balance: { increment: directAmount } }
-      });
-
-      // 2. Tính hoa hồng tầng cho cấp trên (nếu có)
-      const referrer = await prisma.user.findUnique({
-        where: { id: order.referrerId },
-        select: { parentId: true }
-      });
-
-      if (referrer?.parentId) {
-        const overridePercent = commissionSettings.find(s => s.key === "override_referral")?.percent || 5;
-        const overrideAmount = (order.totalPrice * overridePercent) / 100;
-        
-        await prisma.commission.create({
-          data: {
-            orderId: order.id,
-            userId: referrer.parentId,
-            amount: overrideAmount,
-            percent: overridePercent,
-            level: 2,
-            status: "pending"
-          }
-        });
-
-        await prisma.user.update({
-          where: { id: referrer.parentId },
-          data: { balance: { increment: overrideAmount } }
-        });
-      }
-    }
-    */
-    // ---------------------------------------------------
-
     // Assign chatbot data if available
     if (availableChatbot) {
-      await prisma.chatbotInventory.update({
-        where: { id: availableChatbot.id },
+      // Use transaction to ensure both are updated or none
+      await prisma.$transaction([
+        prisma.chatbotInventory.update({
+          where: { id: availableChatbot.id },
+          data: {
+            isUsed: true,
+            orderId: order.id,
+          },
+        }),
+        prisma.order.update({
+          where: { id: order.id },
+          data: {
+            status: "confirmed",
+            notes: order.notes
+              ? `${order.notes}\n\n✅ Đã tự động bàn giao ChatBot: ${availableChatbot.activationCode}`
+              : `✅ Đã tự động bàn giao ChatBot: ${availableChatbot.activationCode}`,
+          },
+        })
+      ]);
+      console.log(`✅ Chatbot data [${availableChatbot.activationCode}] assigned and order ${orderCode} confirmed`);
+    } else {
+      // Just confirm order if no chatbot data (legacy or missing)
+      await prisma.order.update({
+        where: { id: order.id },
         data: {
-          isUsed: true,
-          orderId: order.id,
+          status: "confirmed",
+          notes: order.notes
+            ? `${order.notes}\n\n⚠️ Không có sẵn dữ liệu ChatBot để bàn giao tự động.`
+            : `⚠️ Không có sẵn dữ liệu ChatBot để bàn giao tự động.`,
         },
       });
-      console.log(`✅ Chatbot data assigned to order ${orderCode}`);
-    } else {
-      console.log(`⚠️ No chatbot data available for service ${order.service.name}`);
+      console.log(`⚠️ No chatbot data available for service ${order.service.name} (ID: ${order.serviceId}) - Order ${orderCode} confirmed without delivery`);
     }
 
     console.log(`✅ Order ${orderCode} confirmed with payment ${transaction.transferAmount}`);

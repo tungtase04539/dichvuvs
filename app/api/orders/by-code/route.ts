@@ -34,7 +34,21 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ order });
+    // Unify delivery data for the frontend
+    const deliveryData = order.chatbotData ? {
+      chatbotLink: order.chatbotData.chatbotLink,
+      activationCode: order.chatbotData.activationCode,
+      accountInfo: order.chatbotData.chatbotLink,
+      password: order.chatbotData.activationCode,
+      notes: order.notes,
+    } : order.credential;
+
+    return NextResponse.json({
+      order: {
+        ...order,
+        deliveryData // New unified field
+      }
+    });
   } catch (error) {
     console.error("Get order error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

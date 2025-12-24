@@ -76,10 +76,10 @@ export default function QuaTangPage() {
           <div className="mt-8 text-white/80 font-bold flex items-center justify-center gap-3">
             <div className="flex -space-x-2">
               {[
-                "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop",
-                "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop",
-                "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop",
-                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop"
+                "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&h=100&fit=crop",
+                "https://images.unsplash.com/photo-1595152772835-219674b2a8a6?w=100&h=100&fit=crop",
+                "https://images.unsplash.com/photo-1581403341630-a6e0b9d2d257?w=100&h=100&fit=crop",
+                "https://images.unsplash.com/photo-1614283233556-f35b0c801efc?w=100&h=100&fit=crop"
               ].map((src, i) => (
                 <img
                   key={i}

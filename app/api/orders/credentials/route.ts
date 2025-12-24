@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
       include: {
         service: true,
         credential: true,
+        chatbotData: true,
       },
     });
 
@@ -49,7 +50,23 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Return credentials (plain text - Supabase handles security)
+    // Return chatbot data (new system)
+    if (order.chatbotData) {
+      return NextResponse.json({
+        order: {
+          orderCode: order.orderCode,
+          status: order.status,
+          service: order.service.name,
+        },
+        credential: {
+          chatbotLink: order.chatbotData.chatbotLink,
+          activationCode: order.chatbotData.activationCode,
+          notes: order.notes, // Or use a static note
+        },
+      });
+    }
+
+    // Return credentials (legacy system)
     if (order.credential) {
       return NextResponse.json({
         order: {

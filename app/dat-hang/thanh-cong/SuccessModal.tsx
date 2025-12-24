@@ -14,8 +14,10 @@ interface SuccessModalProps {
         customerName: string;
     };
     credential?: {
-        accountInfo: string;
-        password: string;
+        chatbotLink?: string;
+        activationCode?: string;
+        accountInfo?: string;
+        password?: string;
         notes: string | null;
     } | null;
 }
@@ -76,13 +78,13 @@ export default function SuccessModal({ isOpen, onClose, order, credential }: Suc
 
                             <div className="space-y-3">
                                 <div className="space-y-1.5">
-                                    <p className="text-xs font-medium text-slate-500">Đường dẫn đăng nhập</p>
+                                    <p className="text-xs font-medium text-slate-500 uppercase tracking-tighter">Link ChatBot</p>
                                     <div className="flex items-center gap-2">
                                         <div className="flex-1 bg-slate-100 px-3 py-2.5 rounded-xl text-sm font-mono text-slate-700 truncate border border-slate-200">
-                                            {credential.accountInfo}
+                                            {credential.chatbotLink || credential.accountInfo || ""}
                                         </div>
                                         <button
-                                            onClick={() => copyToClipboard(credential.accountInfo, 'link')}
+                                            onClick={() => copyToClipboard(credential.chatbotLink || credential.accountInfo || "", 'link')}
                                             className="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-colors shrink-0"
                                         >
                                             {copied === 'link' ? <Check className="w-5 h-5 text-green-600" /> : <Copy className="w-5 h-5" />}
@@ -91,13 +93,13 @@ export default function SuccessModal({ isOpen, onClose, order, credential }: Suc
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <p className="text-xs font-medium text-slate-500">Mã kích hoạt/Mật khẩu</p>
+                                    <p className="text-xs font-medium text-slate-500 uppercase tracking-tighter">Mã kích hoạt</p>
                                     <div className="flex items-center gap-2">
                                         <div className="flex-1 bg-slate-100 px-3 py-2.5 rounded-xl text-sm font-bold font-mono text-green-600 border border-slate-200">
-                                            {credential.password}
+                                            {credential.activationCode || credential.password || ""}
                                         </div>
                                         <button
-                                            onClick={() => copyToClipboard(credential.password, 'pwd')}
+                                            onClick={() => copyToClipboard(credential.activationCode || credential.password || "", 'pwd')}
                                             className="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-colors shrink-0"
                                         >
                                             {copied === 'pwd' ? <Check className="w-5 h-5 text-green-600" /> : <Copy className="w-5 h-5" />}

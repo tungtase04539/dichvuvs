@@ -60,8 +60,8 @@ export async function POST(request: NextRequest) {
     const tolerance = 1000;
     const isAmountMatch = Math.abs(transaction.transferAmount - order.totalPrice) <= tolerance;
 
-    // Find available credential for this service
-    const availableCredential = await prisma.productCredential.findFirst({
+    // Find available chatbot data for this service
+    const availableChatbot = await prisma.chatbotInventory.findFirst({
       where: {
         serviceId: order.serviceId,
         isUsed: false,
@@ -137,18 +137,18 @@ export async function POST(request: NextRequest) {
     */
     // ---------------------------------------------------
 
-    // Assign credential if available
-    if (availableCredential) {
-      await prisma.productCredential.update({
-        where: { id: availableCredential.id },
+    // Assign chatbot data if available
+    if (availableChatbot) {
+      await prisma.chatbotInventory.update({
+        where: { id: availableChatbot.id },
         data: {
           isUsed: true,
           orderId: order.id,
         },
       });
-      console.log(`✅ Credential assigned to order ${orderCode}`);
+      console.log(`✅ Chatbot data assigned to order ${orderCode}`);
     } else {
-      console.log(`⚠️ No credential available for service ${order.service.name}`);
+      console.log(`⚠️ No chatbot data available for service ${order.service.name}`);
     }
 
     console.log(`✅ Order ${orderCode} confirmed with payment ${transaction.transferAmount}`);

@@ -36,9 +36,11 @@ interface Order {
 }
 
 interface Credential {
-  accountInfo: string;
-  password: string;
-  apiKey: string | null;
+  chatbotLink?: string;
+  activationCode?: string;
+  accountInfo?: string; // fallback
+  password?: string; // fallback
+  apiKey?: string | null;
   notes: string | null;
 }
 
@@ -52,68 +54,57 @@ function CredentialDisplay({ credential }: { credential: Credential }) {
     setTimeout(() => setCopied(null), 2000);
   };
 
+  const accountValue = credential.chatbotLink || credential.accountInfo || "";
+  const passwordValue = credential.activationCode || credential.password || "";
+
   return (
     <div className="bg-green-50 rounded-2xl p-6 border border-green-200">
       <div className="flex items-center gap-2 text-green-600 mb-4">
         <Key className="w-5 h-5" />
-        <span className="font-bold">Thông tin tài khoản ChatBot</span>
+        <span className="font-bold">Thông tin bàn giao ChatBot</span>
       </div>
 
-      <div className="space-y-3 bg-white rounded-xl p-4">
+      <div className="space-y-3 bg-white rounded-xl p-4 shadow-sm">
         <div>
-          <p className="text-xs text-slate-500 mb-1">Tài khoản</p>
+          <p className="text-xs text-slate-500 mb-1 font-semibold uppercase tracking-wider">Link ChatBot</p>
           <div className="flex items-center gap-2">
-            <code className="flex-1 text-sm font-mono bg-slate-100 px-3 py-2 rounded text-green-600 font-semibold">
-              {credential.accountInfo}
+            <code className="flex-1 text-sm font-mono bg-slate-50 px-3 py-2.5 rounded-lg border border-slate-100 text-green-700 font-bold break-all">
+              {accountValue}
             </code>
             <button
-              onClick={() => copyToClipboard(credential.accountInfo, "acc")}
-              className="p-2 hover:bg-slate-100 rounded-lg"
+              onClick={() => copyToClipboard(accountValue, "acc")}
+              className="p-2.5 hover:bg-slate-100 rounded-xl transition-colors border border-transparent active:border-slate-200"
             >
-              {copied === "acc" ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-slate-400" />}
+              {copied === "acc" ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5 text-slate-400" />}
             </button>
           </div>
         </div>
 
         <div>
-          <p className="text-xs text-slate-500 mb-1">Mật khẩu</p>
+          <p className="text-xs text-slate-500 mb-1 font-semibold uppercase tracking-wider">Mã kích hoạt</p>
           <div className="flex items-center gap-2">
-            <code className="flex-1 text-sm font-mono bg-slate-100 px-3 py-2 rounded text-green-600 font-semibold">
-              {showPassword ? credential.password : "••••••••••"}
+            <code className="flex-1 text-sm font-mono bg-slate-50 px-3 py-2.5 rounded-lg border border-slate-100 text-green-700 font-bold">
+              {showPassword ? passwordValue : "••••••••••"}
             </code>
-            <button onClick={() => setShowPassword(!showPassword)} className="p-2 hover:bg-slate-100 rounded-lg">
-              {showPassword ? <EyeOff className="w-4 h-4 text-slate-400" /> : <Eye className="w-4 h-4 text-slate-400" />}
+            <button onClick={() => setShowPassword(!showPassword)} className="p-2.5 hover:bg-slate-100 rounded-xl transition-colors">
+              {showPassword ? <EyeOff className="w-5 h-5 text-slate-400" /> : <Eye className="w-5 h-5 text-slate-400" />}
             </button>
-            <button onClick={() => copyToClipboard(credential.password, "pwd")} className="p-2 hover:bg-slate-100 rounded-lg">
-              {copied === "pwd" ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-slate-400" />}
+            <button onClick={() => copyToClipboard(passwordValue, "pwd")} className="p-2.5 hover:bg-slate-100 rounded-xl transition-colors border border-transparent active:border-slate-200">
+              {copied === "pwd" ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5 text-slate-400" />}
             </button>
           </div>
         </div>
 
-        {credential.apiKey && (
-          <div>
-            <p className="text-xs text-slate-500 mb-1">API Key</p>
-            <div className="flex items-center gap-2">
-              <code className="flex-1 text-sm font-mono bg-slate-100 px-3 py-2 rounded text-green-600 truncate">
-                {credential.apiKey}
-              </code>
-              <button onClick={() => copyToClipboard(credential.apiKey!, "api")} className="p-2 hover:bg-slate-100 rounded-lg">
-                {copied === "api" ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-slate-400" />}
-              </button>
-            </div>
-          </div>
-        )}
-
         {credential.notes && (
-          <div className="pt-2 border-t border-slate-100">
-            <p className="text-xs text-slate-500 mb-1">Hướng dẫn</p>
-            <p className="text-sm text-slate-600 whitespace-pre-wrap">{credential.notes}</p>
+          <div className="pt-3 mt-1 border-t border-slate-100">
+            <p className="text-xs text-slate-500 mb-1 font-semibold uppercase tracking-wider">Hướng dẫn sử dụng</p>
+            <p className="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed">{credential.notes}</p>
           </div>
         )}
       </div>
 
-      <p className="text-xs text-slate-500 mt-3">
-        🔒 Vui lòng bảo mật thông tin này. Không chia sẻ cho người khác.
+      <p className="text-xs text-slate-400 mt-4 flex items-center gap-1.5">
+        <span>🔒</span> Vui lòng bảo mật thông tin này. Không chia sẻ cho người khác.
       </p>
     </div>
   );
@@ -225,9 +216,8 @@ function OrderSuccessContent() {
     setIsPaid(true);
     if (!credential) {
       setCredential({
-        accountInfo: "https://demo.chatbotvn.com",
-        password: "DEMO-PASSWORD-123",
-        apiKey: "demo_api_key_xyz",
+        chatbotLink: "https://demo.chatbotvn.com",
+        activationCode: "VS-PRO-X1A2B3C4D5",
         notes: "Đây là dữ liệu dùng thử để kiểm tra giao diện thông báo thành công."
       });
     }

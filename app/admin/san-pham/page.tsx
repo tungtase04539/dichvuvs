@@ -94,6 +94,13 @@ export default async function AdminProductsPage() {
                 <td className="px-6 py-4">
                   <div className="flex items-center justify-end gap-2">
                     <Link
+                      href={`/admin/san-pham/${product.id}/kho`}
+                      className="p-2 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                      title="Quản lý kho (Link & Mã)"
+                    >
+                      <Package className="w-4 h-4" />
+                    </Link>
+                    <Link
                       href={`/admin/san-pham/${product.id}`}
                       className="p-2 text-slate-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
                       title="Chỉnh sửa"

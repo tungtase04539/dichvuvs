@@ -98,6 +98,7 @@ model Service {
   // Relations
   orders      Order[]
   credentials ProductCredential[]
+  inventory   ChatbotInventory[]
 }
 
 model Order {
@@ -139,6 +140,7 @@ model Order {
   
   // Credential duoc gan khi thanh toan thanh cong
   credential    ProductCredential?
+  chatbotData   ChatbotInventory?
   
   // Referral tracking - don hang tu link ref cua ai
   referrerId    String?
@@ -208,6 +210,23 @@ model ProductCredential {
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// Kho du lieu ChatBot (Link & Ma kich hoat)
+model ChatbotInventory {
+  id              String   @id @default(uuid())
+  serviceId       String
+  service         Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  
+  chatbotLink     String   // Link chatbot
+  activationCode  String   // Ma kich hoat
+  
+  isUsed          Boolean  @default(false)
+  orderId         String?  @unique
+  order           Order?   @relation(fields: [orderId], references: [id])
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 // He thong link gioi thieu (Referral)

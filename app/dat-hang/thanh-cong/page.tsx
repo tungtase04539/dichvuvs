@@ -213,13 +213,36 @@ function OrderSuccessContent() {
   };
 
   // Demo Success Function
-  const handleDemoSuccess = () => {
+  const handleDemoSuccess = async () => {
     setIsPaid(true);
+
+    // Attempt to fetch a real available item for this service to "simulate" correctly
+    try {
+      if (order && order.serviceId) {
+        const res = await fetch(`/api/admin/inventory?serviceId=${order.serviceId}`);
+        const data = await res.json();
+        const availableItem = data.inventory?.find((item: any) => !item.isUsed);
+
+        if (availableItem) {
+          setCredential({
+            chatbotLink: availableItem.chatbotLink,
+            activationCode: availableItem.activationCode,
+            notes: "Đây là dữ liệu lấy từ kho thật (Mô phỏng bàn giao)."
+          });
+          setShowSuccessModal(true);
+          return;
+        }
+      }
+    } catch (err) {
+      console.error("Simulation fetch error:", err);
+    }
+
+    // Fallback to demo if nothing found
     if (!credential) {
       setCredential({
         chatbotLink: "https://demo.chatbotvn.com",
         activationCode: "VS-PRO-X1A2B3C4D5",
-        notes: "Đây là dữ liệu dùng thử để kiểm tra giao diện thông báo thành công."
+        notes: "Đây là dữ liệu dùng thử (Kho đang trống hoặc không tìm thấy)."
       });
     }
     setShowSuccessModal(true);

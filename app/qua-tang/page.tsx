@@ -76,17 +76,17 @@ export default function QuaTangPage() {
           <div className="mt-8 text-white/80 font-bold flex items-center justify-center gap-3">
             <div className="flex -space-x-2">
               {[
-                "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&h=100&fit=crop",
-                "https://images.unsplash.com/photo-1595152772835-219674b2a8a6?w=100&h=100&fit=crop",
-                "https://images.unsplash.com/photo-1581403341630-a6e0b9d2d257?w=100&h=100&fit=crop",
-                "https://images.unsplash.com/photo-1614283233556-f35b0c801efc?w=100&h=100&fit=crop"
-              ].map((src, i) => (
-                <img
+                { name: "A", color: "bg-blue-500" },
+                { name: "H", color: "bg-emerald-500" },
+                { name: "M", color: "bg-orange-500" },
+                { name: "T", color: "bg-purple-500" }
+              ].map((user, i) => (
+                <div
                   key={i}
-                  src={src}
-                  alt="User avatar"
-                  className="w-10 h-10 rounded-full border-2 border-red-600 object-cover bg-slate-200"
-                />
+                  className={`w-10 h-10 rounded-full border-2 border-red-600 flex items-center justify-center text-white font-bold shadow-lg ${user.color}`}
+                >
+                  {user.name}
+                </div>
               ))}
             </div>
             1,250+ người đã nhận quà

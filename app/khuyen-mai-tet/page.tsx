@@ -79,7 +79,7 @@ export default function KhuyenMaiTetPage() {
                 <div className="container mx-auto px-4 relative z-10">
                     <div className="inline-flex items-center gap-3 px-6 py-2 bg-red-600/20 border border-red-500/30 rounded-full text-red-400 font-bold uppercase tracking-widest mb-8 animate-bounce shadow-[0_0_20px_rgba(220,38,38,0.3)]">
                         <Flame className="w-5 h-5 fill-current" />
-                        SỰ KIỆN TẾT GIÁP THÌN 2024 - GIẢM GIÁ CỰC MẠNH
+                        SỰ KIỆN TẾT BÍNH NGỌ 2026 - GIẢM GIÁ CỰC MẠNH
                     </div>
 
                     <h1 className="text-5xl md:text-8xl font-black mb-6 leading-tight uppercase drop-shadow-[0_5px_15px_rgba(0,0,0,0.5)]">

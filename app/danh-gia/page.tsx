@@ -13,7 +13,7 @@ export default function DanhGiaPage() {
       avatar: "A",
       rating: 5,
       content: "ChatBot giúp shop tôi tiết kiệm 80% thời gian trả lời tin nhắn. Doanh số tăng 40% sau 2 tháng sử dụng! Rất đáng tiền, mình đã giới thiệu cho nhiều bạn bè.",
-      date: "10/12/2024",
+      date: "10/12/2025",
       verified: true,
     },
     {
@@ -23,7 +23,7 @@ export default function DanhGiaPage() {
       avatar: "B",
       rating: 5,
       content: "Rất hài lòng với dịch vụ. ChatBot thông minh, hiểu khách hàng và tư vấn chính xác. Đội ngũ support rất nhiệt tình, hỗ trợ 24/7!",
-      date: "09/12/2024",
+      date: "09/12/2025",
       verified: true,
     },
     {
@@ -33,7 +33,7 @@ export default function DanhGiaPage() {
       avatar: "C",
       rating: 5,
       content: "Giá cả phải chăng, hiệu quả cao. ChatBot giúp team tôi focus vào những việc quan trọng hơn. Đầu tư 29K mà tiết kiệm được cả triệu đồng/tháng.",
-      date: "08/12/2024",
+      date: "08/12/2025",
       verified: true,
     },
     {
@@ -43,7 +43,7 @@ export default function DanhGiaPage() {
       avatar: "D",
       rating: 5,
       content: "Ban đầu còn nghi ngờ, nhưng sau khi dùng thử 3 ngày thì quyết định mua luôn. ChatBot trả lời nhanh, chính xác, khách hàng rất hài lòng.",
-      date: "07/12/2024",
+      date: "07/12/2025",
       verified: true,
     },
     {
@@ -53,7 +53,7 @@ export default function DanhGiaPage() {
       avatar: "E",
       rating: 5,
       content: "Mình dùng ChatBot đặt lịch cho spa, khách hàng có thể tự đặt lịch 24/7 mà không cần gọi điện. Tiện lợi vô cùng, không còn bỏ lỡ khách nữa!",
-      date: "06/12/2024",
+      date: "06/12/2025",
       verified: true,
     },
     {
@@ -63,7 +63,7 @@ export default function DanhGiaPage() {
       avatar: "P",
       rating: 5,
       content: "ChatBot giúp nhận đơn đặt bàn và tư vấn menu tự động. Nhân viên giờ có thể tập trung phục vụ khách thay vì trả lời tin nhắn.",
-      date: "05/12/2024",
+      date: "05/12/2025",
       verified: true,
     },
   ];
@@ -141,9 +141,8 @@ export default function DanhGiaPage() {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-5 h-5 ${
-                        i < review.rating ? "text-primary-400 fill-primary-400" : "text-slate-600"
-                      }`}
+                      className={`w-5 h-5 ${i < review.rating ? "text-primary-400 fill-primary-400" : "text-slate-600"
+                        }`}
                     />
                   ))}
                 </div>

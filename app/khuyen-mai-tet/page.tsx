@@ -51,7 +51,7 @@ export default function KhuyenMaiTetPage() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#064e3b] via-[#065f46] to-[#047857] text-white overflow-x-hidden relative">
+        <div className="min-h-screen bg-gradient-to-br from-[#064e3b] via-[#052e16] to-[#022c22] text-white overflow-x-hidden relative">
             <Header settings={{}} />
 
             {/* Tet Decorations - Floating Elements */}
@@ -82,9 +82,9 @@ export default function KhuyenMaiTetPage() {
                         SỰ KIỆN TẾT BÍNH NGỌ 2026 - GIẢM GIÁ CỰC MẠNH
                     </div>
 
-                    <h1 className="text-5xl md:text-8xl font-black mb-6 leading-tight uppercase drop-shadow-[0_5px_15px_rgba(0,0,0,0.5)]">
-                        XẢ KHO <span className="text-red-500">ĐÓN XUÂN</span><br />
-                        <span className="text-yellow-400">SALE UP TO 70%</span>
+                    <h1 className="text-5xl md:text-8xl font-black mb-6 leading-tight uppercase drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
+                        XẢ KHO <span className="text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]">ĐÓN XUÂN</span><br />
+                        <span className="text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]">SALE UP TO 70%</span>
                     </h1>
 
                     <p className="text-xl md:text-2xl text-emerald-50/90 max-w-2xl mx-auto mb-12 font-medium">
@@ -163,7 +163,7 @@ export default function KhuyenMaiTetPage() {
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
                         {products.map(p => (
-                            <div key={p.id} className="group bg-white/5 border border-white/10 rounded-[3rem] overflow-hidden hover:border-yellow-400/50 transition-all duration-500 hover:-translate-y-3 shadow-xl">
+                            <div key={p.id} className="group bg-[#042f2e]/50 backdrop-blur-xl border border-white/10 rounded-[3rem] overflow-hidden hover:border-yellow-400/50 transition-all duration-500 hover:-translate-y-3 shadow-2xl">
                                 <div className="aspect-[4/3] bg-emerald-900/50 relative overflow-hidden">
                                     {p.image ? (
                                         <img src={p.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
@@ -184,7 +184,7 @@ export default function KhuyenMaiTetPage() {
                                     </div>
                                     <Link
                                         href={`/san-pham/${p.slug}`}
-                                        className="w-full py-5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-white hover:to-white hover:text-red-700 text-white flex items-center justify-center gap-3 font-black rounded-[1.5rem] transition-all duration-300 uppercase shadow-lg shadow-red-900/40"
+                                        className="w-full py-5 bg-gradient-to-r from-red-600 via-red-700 to-red-800 hover:from-yellow-400 hover:to-yellow-500 hover:text-red-900 text-white flex items-center justify-center gap-3 font-black rounded-[1.5rem] transition-all duration-300 uppercase shadow-lg shadow-red-950/60"
                                     >
                                         MUA NGAY <Sparkles className="w-6 h-6 animate-twinkle" />
                                     </Link>

@@ -14,21 +14,21 @@ export default function FloatingButtons() {
 
   return (
     <div className="fixed bottom-24 right-4 sm:right-6 z-40 flex flex-col gap-4 items-end pointer-events-none">
-      {/* Tặng quà - Đỏ tươi */}
+      {/* Tặng quà - Xanh Emerald & Vàng Gold */}
       <Link
         href="/qua-tang"
         className="group pointer-events-auto w-52 sm:w-64"
       >
-        <div className="relative flex items-center h-14 sm:h-16 pr-4 pl-14 sm:pl-16 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-full shadow-lg shadow-red-500/40 hover:shadow-red-500/60 transition-all duration-300 hover:scale-110 animate-glow-red border border-white/30 overflow-hidden">
+        <div className="relative flex items-center h-14 sm:h-16 pr-4 pl-14 sm:pl-16 bg-gradient-to-r from-emerald-600 via-green-600 to-teal-700 text-white rounded-full shadow-lg shadow-emerald-500/40 hover:shadow-emerald-500/60 transition-all duration-300 hover:scale-110 animate-glow-green border border-yellow-400/30 overflow-hidden">
           <div className="absolute left-1 sm:left-1.5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform">
-            <Gift className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 animate-wiggle" />
+            <Gift className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600 animate-wiggle" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] leading-none opacity-90 animate-pulse">Ưu đãi hôm nay</span>
+            <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] leading-none opacity-90 animate-pulse text-yellow-200">Ưu đãi hôm nay</span>
             <span className="font-black text-sm sm:text-lg whitespace-nowrap drop-shadow-sm uppercase">TẶNG QUÀ MIỄN PHÍ</span>
           </div>
           <Sparkles className="absolute top-1 right-2 w-4 h-4 text-yellow-300 animate-twinkle" />
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
         </div>
       </Link>
 

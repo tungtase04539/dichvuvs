@@ -222,7 +222,9 @@ export default function OrderForm() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-slate-700 ml-1">Họ và tên</label>
+                  <label className="text-sm font-semibold text-slate-700 ml-1">
+                    Họ và tên <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="text"
                     value={customerName}
@@ -233,7 +235,9 @@ export default function OrderForm() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-slate-700 ml-1">Số điện thoại</label>
+                  <label className="text-sm font-semibold text-slate-700 ml-1">
+                    Số điện thoại <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="tel"
                     value={phone}
@@ -246,7 +250,9 @@ export default function OrderForm() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-slate-700 ml-1">Địa chỉ Email</label>
+                <label className="text-sm font-semibold text-slate-700 ml-1">
+                  Địa chỉ Email <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="email"
                   value={email}
@@ -273,6 +279,10 @@ export default function OrderForm() {
                   placeholder="Yêu cầu thêm hoặc ghi chú đơn hàng..."
                 />
               </div>
+
+              <p className="text-[11px] text-slate-400 italic">
+                <span className="text-red-500">*</span> Thông tin bắt buộc phải nhập
+              </p>
             </div>
           </div>
 

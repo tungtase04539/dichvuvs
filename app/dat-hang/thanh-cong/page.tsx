@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import QRPayment from "./QRPayment";
 import CopyButton from "./CopyButton";
+import SuccessModal from "./SuccessModal";
 import { formatCurrency } from "@/lib/utils";
 import {
   CheckCircle,
@@ -137,6 +138,7 @@ function OrderSuccessContent() {
   const [credential, setCredential] = useState<Credential | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPaid, setIsPaid] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [error, setError] = useState("");
   const [checkingPayment, setCheckingPayment] = useState(false);
 
@@ -157,6 +159,10 @@ function OrderSuccessContent() {
           setOrder(data.order);
           if (data.order.status === "confirmed" || data.order.status === "completed") {
             setIsPaid(true);
+            if (data.order.credential) {
+              setCredential(data.order.credential);
+              setShowSuccessModal(true);
+            }
           }
         } else {
           setOrder({
@@ -177,7 +183,7 @@ function OrderSuccessContent() {
           customerPhone: "",
         });
       }
-      
+
       setIsLoading(false);
     };
 
@@ -187,9 +193,9 @@ function OrderSuccessContent() {
   // Check payment status and fetch credentials
   const checkPaymentStatus = async () => {
     if (!order || !order.customerPhone) return;
-    
+
     setCheckingPayment(true);
-    
+
     try {
       const res = await fetch(
         `/api/orders/credentials?orderCode=${encodeURIComponent(order.orderCode)}&phone=${encodeURIComponent(order.customerPhone)}`
@@ -198,14 +204,18 @@ function OrderSuccessContent() {
 
       if (data.credential) {
         setCredential(data.credential);
+        const wasPaid = isPaid;
         setIsPaid(true);
+        if (!wasPaid) {
+          setShowSuccessModal(true);
+        }
       } else if (data.order?.status === "confirmed" || data.order?.status === "completed") {
         setIsPaid(true);
       }
     } catch (e) {
       console.error("Check payment error:", e);
     }
-    
+
     setCheckingPayment(false);
   };
 
@@ -399,6 +409,17 @@ function OrderSuccessContent() {
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
+
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        order={{
+          orderCode: order.orderCode,
+          totalPrice: order.totalPrice,
+          customerName: order.customerName
+        }}
+        credential={credential}
+      />
     </>
   );
 }

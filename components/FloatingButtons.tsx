@@ -37,13 +37,15 @@ export default function FloatingButtons() {
         href="/khuyen-mai-tet"
         className="group pointer-events-auto w-52 sm:w-64"
       >
-        <div className="relative flex items-center h-14 sm:h-16 pr-4 pl-14 sm:pl-16 bg-gradient-to-r from-green-600 to-emerald-500 text-white rounded-full shadow-lg shadow-green-500/40 hover:shadow-green-500/60 transition-all duration-300 hover:scale-110 animate-glow-green border border-white/30 overflow-hidden">
+        <div className="relative flex items-center h-14 sm:h-16 pr-4 pl-14 sm:pl-16 bg-gradient-to-r from-red-600 to-green-600 text-white rounded-full shadow-lg shadow-red-500/40 hover:shadow-green-500/60 transition-all duration-300 hover:scale-110 animate-glow-green border border-yellow-400/50 overflow-hidden">
           <div className="absolute left-1 sm:left-1.5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-md">
-            <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-green-700 fill-green-700 animate-flash" />
+            <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 fill-red-600 animate-flash" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] leading-none opacity-90">Flash Sale</span>
-            <span className="font-black text-sm sm:text-lg whitespace-nowrap drop-shadow-sm uppercase italic">KHUYẾN MẠI TẾT</span>
+            <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] leading-none opacity-90 text-yellow-200">🏮 Lễ Hội Xuân 🏮</span>
+            <span className="font-black text-sm sm:text-lg whitespace-nowrap drop-shadow-sm uppercase italic text-white flex items-center gap-1">
+              KHUYẾN MẠI TẾT 🌸
+            </span>
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent animate-scan" />
         </div>

@@ -24,6 +24,7 @@ import {
   Copy,
   Check,
   RefreshCw,
+  Sparkles,
 } from "lucide-react";
 
 interface Order {
@@ -219,6 +220,20 @@ function OrderSuccessContent() {
     setCheckingPayment(false);
   };
 
+  // Demo Success Function
+  const handleDemoSuccess = () => {
+    setIsPaid(true);
+    if (!credential) {
+      setCredential({
+        accountInfo: "https://demo.chatbotvn.com",
+        password: "DEMO-PASSWORD-123",
+        apiKey: "demo_api_key_xyz",
+        notes: "Đây là dữ liệu dùng thử để kiểm tra giao diện thông báo thành công."
+      });
+    }
+    setShowSuccessModal(true);
+  };
+
   // Auto-check payment every 10 seconds if not paid
   useEffect(() => {
     if (!isPaid && order && order.customerPhone) {
@@ -391,6 +406,18 @@ function OrderSuccessContent() {
       <p className="text-xs text-slate-400 text-center mb-4">
         Tự động kiểm tra mỗi 10 giây
       </p>
+
+      {/* Demo Success Button */}
+      <div className="mb-6 p-4 bg-amber-50 rounded-2xl border border-dashed border-amber-200">
+        <p className="text-xs text-amber-700 font-bold mb-2 uppercase text-center">Chế độ Thử nghiệm (Demo)</p>
+        <button
+          onClick={handleDemoSuccess}
+          className="w-full py-2.5 px-4 bg-amber-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-amber-600 shadow-md transition-all active:scale-95"
+        >
+          <Sparkles className="w-5 h-5" />
+          MÔ PHỎNG THANH TOÁN THÀNH CÔNG
+        </button>
+      </div>
 
       {/* Actions */}
       <div className="flex gap-3">

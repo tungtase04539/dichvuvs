@@ -6,7 +6,7 @@ import { generateOrderCode } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import VideoModal from "@/components/VideoModal";
-import { Plus, Minus, Trash2, ShoppingCart, User, Phone, Mail, MessageSquare, Loader2, Gift, Play, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Minus, Trash2, ShoppingCart, User, Phone, Mail, MessageSquare, Loader2, Gift, Play, Search, ChevronLeft, ChevronRight, Bot } from "lucide-react";
 
 interface Product {
   id: string;
@@ -97,10 +97,10 @@ export default function OrderForm() {
 
   useEffect(() => {
     if (products.length > 0) {
-      const pendingCart = sessionStorage.getItem("pendingCart");
-      if (pendingCart) {
+      const cartData = sessionStorage.getItem("cart");
+      if (cartData) {
         try {
-          const items = JSON.parse(pendingCart);
+          const items = JSON.parse(cartData);
           const cartItems: CartItem[] = [];
           items.forEach((item: { id: string; quantity: number }) => {
             const product = products.find((p) => p.id === item.id);
@@ -109,7 +109,7 @@ export default function OrderForm() {
             }
           });
           if (cartItems.length > 0) setCart(cartItems);
-          sessionStorage.removeItem("pendingCart");
+          sessionStorage.removeItem("cart");
         } catch (e) {
           console.error(e);
         }
@@ -206,264 +206,173 @@ export default function OrderForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="space-y-6 lg:grid lg:grid-cols-2 lg:gap-8 lg:space-y-0">
-        {/* Product Selection */}
-        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100">
-          <div className="flex items-center justify-between mb-3 sm:mb-4">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
-              <ShoppingCart className="w-5 h-5 text-primary-600" />
-              Chọn ChatBot
-            </h2>
-            <span className="text-xs sm:text-sm text-slate-500">{products.length} sản phẩm</span>
-          </div>
-
-          {/* Search */}
-          <div className="relative mb-3 sm:mb-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Tìm ChatBot..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 sm:py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-            />
-          </div>
-
-          {/* Product Grid - Mobile: 2 cols scrollable, Desktop: horizontal scroll */}
-          <div className="relative">
-            {/* Navigation Arrows - Hidden on mobile */}
-            <button
-              type="button"
-              onClick={scrollLeft}
-              className="hidden sm:flex absolute -left-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white shadow-lg rounded-full items-center justify-center hover:bg-primary-50 transition-all border border-slate-200"
-            >
-              <ChevronLeft className="w-4 h-4 text-slate-700" />
-            </button>
-
-            <button
-              type="button"
-              onClick={scrollRight}
-              className="hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white shadow-lg rounded-full items-center justify-center hover:bg-primary-50 transition-all border border-slate-200"
-            >
-              <ChevronRight className="w-4 h-4 text-slate-700" />
-            </button>
-
-            {/* Mobile: Grid layout, Desktop: Horizontal scroll */}
-            <div
-              ref={scrollContainerRef}
-              className="grid grid-cols-2 gap-2 sm:flex sm:gap-3 sm:overflow-x-auto sm:pb-2 sm:px-6 sm:snap-x sm:snap-mandatory scroll-smooth max-h-[50vh] sm:max-h-none overflow-y-auto sm:overflow-y-visible"
-              style={{ scrollbarWidth: "thin" }}
-            >
-              {filteredProducts.map((product) => {
-                const inCart = cart.find((item) => item.product.id === product.id);
-                return (
-                  <div
-                    key={product.id}
-                    className={`sm:flex-shrink-0 sm:w-36 rounded-xl border-2 cursor-pointer transition-all overflow-hidden snap-start ${inCart
-                        ? "bg-primary-50 border-primary-500 shadow-md"
-                        : "bg-slate-50 border-transparent hover:border-primary-200 active:scale-95"
-                      }`}
-                    onClick={() => addToCart(product)}
-                  >
-                    {/* Product Image */}
-                    <div className="relative aspect-square bg-gradient-to-br from-primary-50 to-primary-100 overflow-hidden">
-                      {product.image ? (
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <span className="text-3xl sm:text-4xl">🤖</span>
-                        </div>
-                      )}
-                      {inCart && (
-                        <div className="absolute top-1 right-1 w-5 h-5 sm:w-6 sm:h-6 bg-primary-500 text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold shadow-lg">
-                          {inCart.quantity}
-                        </div>
-                      )}
-                      {/* Video Demo Overlay */}
-                      {product.videoUrl && (
-                        <button
-                          type="button"
-                          onClick={(e) => openVideoModal(e, product)}
-                          className="absolute bottom-1 left-1 flex items-center gap-1 px-1.5 py-0.5 bg-black/70 text-white text-[10px] rounded hover:bg-black/90 transition-colors"
-                        >
-                          <Play className="w-2.5 h-2.5 fill-current" />
-                          Demo
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Product Info */}
-                    <div className="p-2">
-                      <h3 className="font-medium text-slate-900 text-[11px] sm:text-xs mb-0.5 line-clamp-2 min-h-[2rem]">{product.name}</h3>
-                      <p className="text-primary-600 font-bold text-xs sm:text-sm">{formatCurrency(product.price)}</p>
-
-                      {/* Quantity Controls */}
-                      {inCart && (
-                        <div className="flex items-center justify-center gap-1 mt-1.5">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateQuantity(product.id, -1);
-                            }}
-                            className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center active:bg-red-100"
-                          >
-                            <Minus className="w-3 h-3" />
-                          </button>
-                          <span className="font-bold text-slate-900 w-4 text-center text-xs">{inCart.quantity}</span>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateQuantity(product.id, 1);
-                            }}
-                            className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center active:bg-green-100"
-                          >
-                            <Plus className="w-3 h-3" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* No results */}
-          {filteredProducts.length === 0 && (
-            <p className="text-center text-slate-500 py-6 text-sm">Không tìm thấy ChatBot phù hợp</p>
-          )}
-        </div>
-
-        {/* Order Summary & Customer Info */}
-        <div className="space-y-4 sm:space-y-6">
-          {/* Cart Summary */}
-          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-3 sm:mb-4 flex items-center justify-between">
-              <span>🛒 Giỏ hàng</span>
-              {totalItems > 0 && (
-                <span className="text-sm font-normal bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full">
-                  {totalItems} sản phẩm
-                </span>
-              )}
-            </h2>
-
-            {cart.length === 0 ? (
-              <p className="text-slate-500 text-center py-6 text-sm">Chọn sản phẩm ở trên ☝️</p>
-            ) : (
-              <div className="space-y-2">
-                {cart.map((item) => (
-                  <div key={item.product.id} className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-slate-50 rounded-xl">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                      {item.product.image ? (
-                        <img src={item.product.image} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-lg sm:text-xl">🤖</span>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs sm:text-sm font-medium text-slate-900 truncate">{item.product.name}</p>
-                      <p className="text-primary-600 text-xs font-semibold">
-                        {formatCurrency(item.product.price)} × {item.quantity}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeFromCart(item.product.id)}
-                      className="p-1.5 sm:p-2 text-red-500 hover:bg-red-50 active:bg-red-100 rounded-lg"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-                <div className="pt-2 sm:pt-3 border-t border-slate-200 flex justify-between items-center">
-                  <span className="font-semibold text-slate-900 text-sm sm:text-base">Tổng cộng:</span>
-                  <span className="text-lg sm:text-xl font-bold text-primary-600">{formatCurrency(totalPrice)}</span>
-                </div>
+    <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Left Column: Form & Cart */}
+        <div className="flex-1 space-y-6">
+          {/* Customer Info Card */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100">
+            <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-primary-100 flex items-center justify-center">
+                <User className="w-5 h-5 text-primary-600" />
               </div>
-            )}
-          </div>
+              Thông tin nhận tài khoản
+            </h2>
 
-          {/* Customer Info */}
-          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-3 sm:mb-4">📝 Thông tin khách hàng</h2>
-            <div className="space-y-3 sm:space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div>
-                  <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-700 mb-1.5 sm:mb-2">
-                    <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400" />
-                    Họ tên <span className="text-red-500">*</span>
-                  </label>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-slate-700 ml-1">Họ và tên</label>
                   <input
                     type="text"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     required
-                    className="input text-sm"
-                    placeholder="Nhập họ tên"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none transition-all"
+                    placeholder="Nguyễn Văn A"
                   />
                 </div>
-                <div>
-                  <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-700 mb-1.5 sm:mb-2">
-                    <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400" />
-                    Số điện thoại <span className="text-red-500">*</span>
-                  </label>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-slate-700 ml-1">Số điện thoại</label>
                   <input
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     required
-                    className="input text-sm"
-                    placeholder="0912345678"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none transition-all"
+                    placeholder="0912 345 678"
                   />
                 </div>
               </div>
-              <div>
-                <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-700 mb-1.5 sm:mb-2">
-                  <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400" />
-                  Email <span className="text-red-500">*</span>
-                </label>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-slate-700 ml-1">Địa chỉ Email</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="input text-sm"
-                  placeholder="email@example.com"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none transition-all"
+                  placeholder="your@email.com"
                 />
-                <p className="text-xs text-amber-600 mt-1 flex items-start gap-1">
-                  <span>⚠️</span>
-                  <span>Email dùng làm <strong>tên đăng nhập</strong>, mật khẩu là <strong>số điện thoại</strong> của bạn để quản lý ChatBot đã mua.</span>
-                </p>
+                <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 flex gap-2">
+                  <Gift className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                  <p className="text-xs text-blue-800 leading-relaxed">
+                    Tài khoản ChatBot sẽ được tạo qua <strong>Email</strong> này. Mật khẩu mặc định là <strong>Số điện thoại</strong> của bạn.
+                  </p>
+                </div>
               </div>
-              <div>
-                <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-700 mb-1.5 sm:mb-2">
-                  <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400" />
-                  Ghi chú
-                </label>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-slate-700 ml-1">Ghi chú (Tùy chọn)</label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={2}
-                  className="input resize-none text-sm"
-                  placeholder="Ghi chú thêm..."
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none transition-all resize-none"
+                  placeholder="Yêu cầu thêm hoặc ghi chú đơn hàng..."
                 />
               </div>
             </div>
           </div>
 
-          {/* Submit Button - Sticky on mobile */}
-          <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm -mx-4 px-4 py-3 sm:relative sm:mx-0 sm:px-0 sm:py-0 sm:bg-transparent border-t sm:border-0 border-slate-100">
+          {/* Cart Card */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100">
+            <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-primary-100 flex items-center justify-center">
+                  <ShoppingCart className="w-5 h-5 text-primary-600" />
+                </div>
+                ChatBot đã chọn
+              </div>
+              {totalItems > 0 && (
+                <span className="text-sm font-medium text-slate-400">{totalItems} bot</span>
+              )}
+            </h2>
+
+            {cart.length === 0 ? (
+              <div className="text-center py-10 border-2 border-dashed border-slate-100 rounded-3xl">
+                <Bot className="w-12 h-12 text-slate-200 mx-auto mb-3" />
+                <p className="text-slate-400 font-medium">Bạn chưa chọn ChatBot nào</p>
+                <p className="text-xs text-slate-300 mt-1">Hãy xem các gợi ý bên cạnh 👉</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {cart.map((item) => (
+                  <div key={item.product.id} className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-transparent hover:border-slate-100 transition-all">
+                    <div className="w-16 h-16 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+                      {item.product.image ? (
+                        <img src={item.product.image} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-3xl">🤖</span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-slate-900 truncate">{item.product.name}</h3>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-primary-600 font-bold">{formatCurrency(item.product.price)}</span>
+                        <span className="text-slate-300">/tháng</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center bg-white rounded-lg border border-slate-200 p-1">
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(item.product.id, -1)}
+                          className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-all"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </button>
+                        <span className="w-6 text-center font-bold text-slate-900">{item.quantity}</span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(item.product.id, 1)}
+                          className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-green-500 hover:bg-green-50 rounded-md transition-all"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeFromCart(item.product.id)}
+                        className="w-9 h-9 flex items-center justify-center bg-white border border-slate-200 text-slate-300 hover:text-red-500 hover:border-red-100 rounded-lg transition-all"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column: Suggestions & Total */}
+        <div className="lg:w-[360px] space-y-6">
+          {/* Summary Card */}
+          <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-primary-500/10 sticky top-24">
+            <h2 className="text-lg font-bold mb-6 text-primary-400 uppercase tracking-wider">Tóm tắt đơn hàng</h2>
+
+            <div className="space-y-4 mb-8">
+              <div className="flex justify-between text-slate-400">
+                <span>Số lượng Bot</span>
+                <span className="font-bold text-white">{totalItems}</span>
+              </div>
+              <div className="flex justify-between text-slate-400">
+                <span>Thời hạn</span>
+                <span className="font-bold text-white">1 Tháng</span>
+              </div>
+              <div className="pt-4 border-t border-slate-800 flex justify-between items-end">
+                <span className="text-slate-400 pb-1">Tổng cộng</span>
+                <span className="text-3xl font-bold text-primary-400">{formatCurrency(totalPrice)}</span>
+              </div>
+            </div>
+
             <button
               type="submit"
               disabled={isSubmitting || cart.length === 0}
-              className="btn btn-primary w-full text-base sm:text-lg py-3 sm:py-4"
+              className="w-full py-4 bg-primary-500 hover:bg-primary-400 text-slate-900 font-bold rounded-2xl shadow-lg shadow-primary-500/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale flex items-center justify-center gap-3 uppercase tracking-wide"
             >
               {isSubmitting ? (
                 <>
@@ -473,10 +382,53 @@ export default function OrderForm() {
               ) : (
                 <>
                   <ShoppingCart className="w-5 h-5" />
-                  Đặt hàng {totalPrice > 0 && `- ${formatCurrency(totalPrice)}`}
+                  Xác nhận đơn hàng
                 </>
               )}
             </button>
+            <p className="text-center text-[10px] text-slate-500 mt-4 px-4">
+              Bằng việc đặt hàng, bạn đồng ý với các Điều khoản & Chính sách của chúng tôi.
+            </p>
+          </div>
+
+          {/* Suggestions Card */}
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+            <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <Plus className="w-4 h-4 text-primary-500" />
+              Gợi ý Bot khác
+            </h3>
+
+            <div className="space-y-3">
+              {products
+                .filter(p => !cart.find(c => c.product.id === p.id))
+                .slice(0, 5)
+                .map(product => (
+                  <div
+                    key={product.id}
+                    className="group flex items-center gap-3 p-2 hover:bg-slate-50 rounded-xl cursor-pointer transition-all border border-transparent hover:border-slate-100"
+                    onClick={() => addToCart(product)}
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                      <span className="text-xl">🤖</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[11px] font-bold text-slate-900 truncate">{product.name}</p>
+                      <p className="text-[10px] text-primary-600 font-bold">{formatCurrency(product.price)}</p>
+                    </div>
+                    <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-primary-500 group-hover:text-white transition-all">
+                      <Plus className="w-3 h-3" />
+                    </div>
+                  </div>
+                ))}
+              {products.length > 5 && (
+                <button
+                  type="button"
+                  className="w-full py-2 text-xs font-bold text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all"
+                >
+                  Xem thêm tất cả ChatBot
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

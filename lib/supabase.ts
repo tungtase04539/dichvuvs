@@ -16,11 +16,19 @@ export const getSupabase = (): SupabaseClient | null => {
   return _supabase;
 };
 
-// For backward compatibility - initialize on first access in browser
+// Helper to check if URL is valid
+const isValidUrl = (url: string) => {
+  try {
+    return url.startsWith('http://') || url.startsWith('https://');
+  } catch {
+    return false;
+  }
+};
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
-export const supabase = (supabaseUrl && supabaseAnonKey)
+export const supabase = (isValidUrl(supabaseUrl) && supabaseAnonKey)
   ? createClient(supabaseUrl, supabaseAnonKey)
   : (null as unknown as SupabaseClient);
 

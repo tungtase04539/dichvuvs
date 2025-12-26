@@ -8,7 +8,7 @@ export async function GET() {
   try {
     const supabase = createServerSupabaseClient();
     const adminSupabase = createAdminSupabaseClient();
-    
+
     if (!supabase || !adminSupabase) {
       return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
     }
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = createServerSupabaseClient();
     const adminSupabase = createAdminSupabaseClient();
-    
+
     if (!supabase || !adminSupabase) {
       return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
     }
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, slug, description, longDescription, price, image, videoUrl, categoryId, featured, active } = body;
+    const { name, slug, description, longDescription, price, image, videoUrl, categoryId, featured, active, chatbotLink } = body;
 
     if (!name || !slug || !price) {
       return NextResponse.json(
@@ -115,6 +115,7 @@ export async function POST(request: NextRequest) {
         categoryId: categoryId || null,
         featured: featured === true,
         active: true, // Force active = true cho sản phẩm mới
+        chatbotLink: chatbotLink || null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       })
@@ -142,7 +143,7 @@ export async function POST(request: NextRequest) {
         .eq("id", product.id)
         .select()
         .single();
-      
+
       if (updatedProduct) {
         console.log("Product active fixed:", updatedProduct.id, "active:", updatedProduct.active);
         return NextResponse.json({ product: updatedProduct });

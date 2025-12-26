@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // Roles: admin, agent, ctv, customer
@@ -22,58 +22,58 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Phan cap CTV
-  parentId  String?  // ID cua cap tren
-  parent    User?    @relation("AgentHierarchy", fields: [parentId], references: [id])
-  subAgents User[]   @relation("AgentHierarchy") // Danh sach cap duoi
+  parentId  String? // ID cua cap tren
+  parent    User?   @relation("AgentHierarchy", fields: [parentId], references: [id])
+  subAgents User[]  @relation("AgentHierarchy") // Danh sach cap duoi
 
   // Relations
-  assignedOrders Order[]       @relation("AssignedStaff")
+  assignedOrders Order[]         @relation("AssignedStaff")
   messages       Message[]
   referralLinks  ReferralLink[]
-  referredOrders Order[]       @relation("ReferrerOrders")
+  referredOrders Order[]         @relation("ReferrerOrders")
   ctvApplication CTVApplication?
-  commissions    Commission[]     @relation("Recipient")
+  commissions    Commission[]    @relation("Recipient")
 }
 
 // Don dang ky lam CTV
 model CTVApplication {
-  id          String   @id @default(uuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  fullName    String
-  phone       String
-  email       String
-  facebook    String?
-  zalo        String?
-  experience  String?  // Kinh nghiem ban hang
-  reason      String?  // Ly do muon lam CTV
-  
-  status      String   @default("pending") // pending, approved, rejected
-  reviewedBy  String?  // Admin duyet
-  reviewedAt  DateTime?
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  fullName   String
+  phone      String
+  email      String
+  facebook   String?
+  zalo       String?
+  experience String? // Kinh nghiem ban hang
+  reason     String? // Ly do muon lam CTV
+
+  status       String    @default("pending") // pending, approved, rejected
+  reviewedBy   String? // Admin duyet
+  reviewedAt   DateTime?
   rejectReason String?
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Danh muc/Linh vuc chatbot
 model Category {
   id          String   @id @default(uuid())
-  name        String   // Ten linh vuc: Giao duc, Kinh doanh, Ton giao...
+  name        String // Ten linh vuc: Giao duc, Kinh doanh, Ton giao...
   slug        String   @unique
   description String?
-  icon        String?  // Emoji hoac icon class
-  image       String?  // Anh dai dien
-  color       String?  // Mau chu dao (hex)
+  icon        String? // Emoji hoac icon class
+  image       String? // Anh dai dien
+  color       String? // Mau chu dao (hex)
   order       Int      @default(0) // Thu tu hien thi
   active      Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   // Relations
-  services    Service[]
+  services Service[]
 }
 
 model Service {
@@ -81,20 +81,20 @@ model Service {
   name            String
   slug            String   @unique
   description     String
-  longDescription String?  // Chi tiet san pham (HTML/Markdown)
+  longDescription String? // Chi tiet san pham (HTML/Markdown)
   price           Float
   unit            String   @default("bot")
-  image           String?  // URL anh dai dien san pham (Supabase Storage)
-  videoUrl        String?  // URL video demo (Supabase Storage)
+  image           String? // URL anh dai dien san pham (Supabase Storage)
+  videoUrl        String? // URL video demo (Supabase Storage)
   featured        Boolean  @default(false)
   active          Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  chatbotLink     String?  // Link chatbot mac dinh cho san pham nay
-  
+  chatbotLink     String? // Link chatbot mac dinh cho san pham nay
+
   // Category
-  categoryId      String?
-  category        Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
 
   // Relations
   orders      Order[]
@@ -103,87 +103,87 @@ model Service {
 }
 
 model Order {
-  id            String   @id @default(uuid())
-  orderCode     String   @unique
+  id            String  @id @default(uuid())
+  orderCode     String  @unique
   customerName  String
   customerPhone String
   customerEmail String?
   address       String
   district      String?
-  city          String   @default("Ho Chi Minh")
-  
+  city          String  @default("Ho Chi Minh")
+
   // Service details
-  serviceId     String
-  service       Service  @relation(fields: [serviceId], references: [id])
-  quantity      Float    @default(1)
-  unit          String
-  
+  serviceId String
+  service   Service @relation(fields: [serviceId], references: [id])
+  quantity  Float   @default(1)
+  unit      String
+
   // Scheduling
   scheduledDate DateTime
   scheduledTime String
-  
+
   // Pricing
-  basePrice     Float
-  discount      Float    @default(0)
-  totalPrice    Float
-  
+  basePrice  Float
+  discount   Float @default(0)
+  totalPrice Float
+
   // Status
-  status        String   @default("pending") // pending, confirmed, in_progress, completed, cancelled
-  notes         String?
-  
+  status String  @default("pending") // pending, confirmed, in_progress, completed, cancelled
+  notes  String?
+
   // Assignment
-  assignedToId  String?
-  assignedTo    User?    @relation("AssignedStaff", fields: [assignedToId], references: [id])
-  
+  assignedToId String?
+  assignedTo   User?   @relation("AssignedStaff", fields: [assignedToId], references: [id])
+
   // Chat
   chatSessionId String?
   chatSession   ChatSession? @relation(fields: [chatSessionId], references: [id])
-  
+
   // Credential duoc gan khi thanh toan thanh cong
-  credential    ProductCredential?
-  chatbotData   ChatbotInventory?
-  
+  credential  ProductCredential?
+  chatbotData ChatbotInventory?
+
   // Referral tracking - don hang tu link ref cua ai
-  referrerId    String?
-  referrer      User?    @relation("ReferrerOrders", fields: [referrerId], references: [id])
-  referralCode  String?  // Ma ref duoc su dung
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  commissions   Commission[]
+  referrerId   String?
+  referrer     User?   @relation("ReferrerOrders", fields: [referrerId], references: [id])
+  referralCode String? // Ma ref duoc su dung
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  commissions Commission[]
 }
 
 model ChatSession {
-  id           String    @id @default(uuid())
-  guestId      String    @unique // UUID for anonymous guest
+  id           String   @id @default(uuid())
+  guestId      String   @unique // UUID for anonymous guest
   guestName    String?
   guestPhone   String?
-  status       String    @default("active") // active, closed
-  lastActivity DateTime  @default(now())
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  
+  status       String   @default("active") // active, closed
+  lastActivity DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
   // Relations
-  messages     Message[]
-  orders       Order[]
+  messages Message[]
+  orders   Order[]
 }
 
 model Message {
   id            String      @id @default(uuid())
   chatSessionId String
   chatSession   ChatSession @relation(fields: [chatSessionId], references: [id], onDelete: Cascade)
-  
-  senderId      String?     // null for guest messages
-  sender        User?       @relation(fields: [senderId], references: [id])
-  senderType    String      // guest, staff, admin, system
-  senderName    String
-  
-  content       String
-  type          String      @default("text") // text, image, file
-  read          Boolean     @default(false)
-  
-  createdAt     DateTime    @default(now())
+
+  senderId   String? // null for guest messages
+  sender     User?   @relation(fields: [senderId], references: [id])
+  senderType String // guest, staff, admin, system
+  senderName String
+
+  content String
+  type    String  @default("text") // text, image, file
+  read    Boolean @default(false)
+
+  createdAt DateTime @default(now())
 }
 
 model Setting {
@@ -196,57 +196,57 @@ model Setting {
 
 // Tai khoan/mat khau cho san pham ChatBot
 model ProductCredential {
-  id          String   @id @default(uuid())
-  serviceId   String
-  service     Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  
-  accountInfo String   // Thong tin tai khoan (encrypted)
-  password    String   // Mat khau (encrypted)
-  apiKey      String?  // API Key neu co
-  notes       String?  // Ghi chu them
-  
-  isUsed      Boolean  @default(false) // Da gan cho don hang chua
-  orderId     String?  @unique // Don hang duoc gan
-  order       Order?   @relation(fields: [orderId], references: [id])
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String  @id @default(uuid())
+  serviceId String
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  accountInfo String // Thong tin tai khoan (encrypted)
+  password    String // Mat khau (encrypted)
+  apiKey      String? // API Key neu co
+  notes       String? // Ghi chu them
+
+  isUsed  Boolean @default(false) // Da gan cho don hang chua
+  orderId String? @unique // Don hang duoc gan
+  order   Order?  @relation(fields: [orderId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Kho du lieu ChatBot (Link & Ma kich hoat)
 model ChatbotInventory {
-  id              String   @id @default(uuid())
-  serviceId       String
-  service         Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  
-  activationCode  String   // Ma kich hoat
-  
-  isUsed          Boolean  @default(false)
-  orderId         String?  @unique
-  order           Order?   @relation(fields: [orderId], references: [id])
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id        String  @id @default(uuid())
+  serviceId String
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  activationCode String // Ma kich hoat
+
+  isUsed  Boolean @default(false)
+  orderId String? @unique
+  order   Order?  @relation(fields: [orderId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // He thong link gioi thieu (Referral)
 model ReferralLink {
-  id          String   @id @default(uuid())
-  code        String   @unique // Ma ref duy nhat (VD: REF-ABC123)
-  userId      String   // Thuoc ve user nao (agent/master_agent)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id     String @id @default(uuid())
+  code   String @unique // Ma ref duy nhat (VD: REF-ABC123)
+  userId String // Thuoc ve user nao (agent/master_agent)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   // Thong ke
-  clickCount  Int      @default(0) // So luot click
-  orderCount  Int      @default(0) // So don thanh cong
-  revenue     Float    @default(0) // Tong doanh thu tu ref
-  
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  clickCount Int   @default(0) // So luot click
+  orderCount Int   @default(0) // So don thanh cong
+  revenue    Float @default(0) // Tong doanh thu tu ref
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  clicks      ReferralClick[]
+  clicks ReferralClick[]
 }
 
 // Luu lai moi luot click vao link ref
@@ -254,44 +254,44 @@ model ReferralClick {
   id             String       @id @default(uuid())
   referralLinkId String
   referralLink   ReferralLink @relation(fields: [referralLinkId], references: [id], onDelete: Cascade)
-  
-  ipAddress      String?
-  userAgent      String?
-  referer        String?      // Trang nguon
-  
+
+  ipAddress String?
+  userAgent String?
+  referer   String? // Trang nguon
+
   // Neu tao don hang
-  converted      Boolean      @default(false)
-  orderId        String?
-  
-  createdAt      DateTime     @default(now())
+  converted Boolean @default(false)
+  orderId   String?
+
+  createdAt DateTime @default(now())
 }
 
 model Commission {
-  id        String   @id @default(uuid())
-  orderId   String
-  order     Order    @relation(fields: [orderId], references: [id])
-  
-  userId    String   // Nguoi nhan hoa hong
-  user      User     @relation("Recipient", fields: [userId], references: [id])
-  
-  amount    Float
-  percent   Float    // Phan tram tai thoi diem do
-  level     Int      // 1: truc tiep, 2: cap tren...
-  
-  status    String   @default("pending") // pending, paid
-  
+  id      String @id @default(uuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  userId String // Nguoi nhan hoa hong
+  user   User   @relation("Recipient", fields: [userId], references: [id])
+
+  amount  Float
+  percent Float // Phan tram tai thoi diem do
+  level   Int // 1: truc tiep, 2: cap tren...
+
+  status String @default("pending") // pending, paid
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model CommissionSetting {
-  id        String   @id @default(uuid())
-  key       String   @unique // vd: "ctv_retail", "agent_retail", "agent_override"
-  role      String   // admin, agent, ctv
-  type      String   // retail (tu ban), override (huong tu cap duoi)
-  percent   Float
+  id          String  @id @default(uuid())
+  key         String  @unique // vd: "ctv_retail", "agent_retail", "agent_override"
+  role        String // admin, agent, ctv
+  type        String // retail (tu ban), override (huong tu cap duoi)
+  percent     Float
   description String?
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

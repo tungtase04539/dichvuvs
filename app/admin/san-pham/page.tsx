@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import { createAdminSupabaseClient } from "@/lib/supabase-server";
 import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
 import { Plus, Pencil, Package } from "lucide-react";
@@ -7,9 +7,26 @@ import DeleteProductButton from "./DeleteProductButton";
 export const dynamic = "force-dynamic";
 
 async function getProducts() {
-  return prisma.service.findMany({
-    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
-  });
+  try {
+    const adminSupabase = createAdminSupabaseClient();
+    if (!adminSupabase) return [];
+
+    const { data: products, error } = await adminSupabase
+      .from("Service")
+      .select("*")
+      .order("featured", { ascending: false })
+      .order("createdAt", { ascending: false });
+
+    if (error) {
+      console.error("DEBUG: Supabase getProducts failed:", error);
+      return [];
+    }
+
+    return products || [];
+  } catch (error) {
+    console.error("DEBUG: getProducts caught error:", error);
+    return [];
+  }
 }
 
 export default async function AdminProductsPage() {

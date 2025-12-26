@@ -18,7 +18,7 @@ export default function AddProductPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
-  
+
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -30,6 +30,7 @@ export default function AddProductPage() {
     categoryId: "",
     featured: false,
     active: true,
+    chatbotLink: "",
   });
 
   // Load categories
@@ -245,6 +246,23 @@ VD:
 - Hướng dẫn cài đặt
 - Hỗ trợ kỹ thuật`}
             />
+          </div>
+
+          {/* Chatbot Link */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Link ChatBot mặc định
+            </label>
+            <input
+              type="url"
+              value={formData.chatbotLink}
+              onChange={(e) => setFormData({ ...formData, chatbotLink: e.target.value })}
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-primary-600 font-medium"
+              placeholder="https://t.me/your_bot..."
+            />
+            <p className="text-xs text-slate-500 mt-2">
+              Link này dùng để bàn giao cho khách hàng (có thể chỉnh sửa sau ở mục Quản lý kho)
+            </p>
           </div>
 
           {/* Price */}

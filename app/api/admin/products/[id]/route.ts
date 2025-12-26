@@ -7,9 +7,9 @@ export const dynamic = "force-dynamic";
 async function checkAdminAuth() {
   const supabase = createServerSupabaseClient();
   const adminSupabase = createAdminSupabaseClient();
-  
+
   if (!supabase || !adminSupabase) return { user: null, adminSupabase: null };
-  
+
   const { data: { user: authUser } } = await supabase.auth.getUser();
   if (!authUser) return { user: null, adminSupabase: null };
 
@@ -63,7 +63,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { name, slug, description, longDescription, price, image, videoUrl, categoryId, featured, active } = body;
+    const { name, slug, description, longDescription, price, image, videoUrl, categoryId, featured, active, chatbotLink } = body;
 
     if (!name || !slug || !price) {
       return NextResponse.json(
@@ -100,6 +100,7 @@ export async function PUT(
         categoryId: categoryId || null,
         featured: featured || false,
         active: active !== false, // Đảm bảo active được cập nhật đúng
+        chatbotLink: chatbotLink || null,
         updatedAt: new Date().toISOString(),
       })
       .eq("id", params.id)
@@ -153,9 +154,9 @@ export async function DELETE(
         return NextResponse.json({ error: updateError.message }, { status: 500 });
       }
 
-      return NextResponse.json({ 
-        success: true, 
-        message: `Sản phẩm đã được ẩn (có ${count} đơn hàng)` 
+      return NextResponse.json({
+        success: true,
+        message: `Sản phẩm đã được ẩn (có ${count} đơn hàng)`
       });
     }
 

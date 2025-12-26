@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { createAdminSupabaseClient } from "@/lib/supabase-server";
 
 export const dynamic = "force-dynamic";
 
@@ -15,28 +15,31 @@ export async function GET(
             return NextResponse.json({ error: "Thiếu serviceId" }, { status: 400 });
         }
 
-        // Fetch service to get its chatbotLink
-        const service = await prisma.service.findUnique({
-            where: { id: serviceId },
-            select: {
-                id: true,
-                name: true,
-                chatbotLink: true
-            }
-        });
+        const adminSupabase = createAdminSupabaseClient();
+        if (!adminSupabase) {
+            return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+        }
 
-        const inventory = await prisma.chatbotInventory.findMany({
-            where: { serviceId },
-            orderBy: { createdAt: "desc" },
-            include: {
-                order: {
-                    select: {
-                        orderCode: true,
-                        customerName: true
-                    }
-                }
-            }
-        });
+        // Fetch service to get its chatbotLink
+        const { data: service, error: sError } = await adminSupabase
+            .from("Service")
+            .select("id, name, chatbotLink")
+            .eq("id", serviceId)
+            .single();
+
+        if (sError) console.error("Get service error:", sError);
+
+        // Fetch inventory
+        const { data: inventory, error: iError } = await adminSupabase
+            .from("ChatbotInventory")
+            .select(`
+                *,
+                order:Order(orderCode, customerName)
+            `)
+            .eq("serviceId", serviceId)
+            .order("createdAt", { ascending: false });
+
+        if (iError) console.error("Get inventory inventory error:", iError);
 
         return NextResponse.json({ service, inventory });
     } catch (error) {
@@ -55,12 +58,24 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Thiếu thông tin bắt buộc" }, { status: 400 });
         }
 
-        const newItem = await prisma.chatbotInventory.create({
-            data: {
+        const adminSupabase = createAdminSupabaseClient();
+        if (!adminSupabase) return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+
+        const { data: newItem, error } = await adminSupabase
+            .from("ChatbotInventory")
+            .insert({
                 serviceId,
                 activationCode,
-            },
-        });
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+            })
+            .select()
+            .single();
+
+        if (error) {
+            console.error("Add inventory error:", error);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
 
         return NextResponse.json({ item: newItem });
     } catch (error) {
@@ -79,10 +94,21 @@ export async function PUT(request: NextRequest) {
             return NextResponse.json({ error: "Thiếu serviceId" }, { status: 400 });
         }
 
-        await prisma.service.update({
-            where: { id: serviceId },
-            data: { chatbotLink }
-        });
+        const adminSupabase = createAdminSupabaseClient();
+        if (!adminSupabase) return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+
+        const { error } = await adminSupabase
+            .from("Service")
+            .update({
+                chatbotLink,
+                updatedAt: new Date().toISOString()
+            })
+            .eq("id", serviceId);
+
+        if (error) {
+            console.error("Update chatbot link error:", error);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
 
         return NextResponse.json({ success: true });
     } catch (error) {
@@ -101,9 +127,18 @@ export async function DELETE(request: NextRequest) {
             return NextResponse.json({ error: "Thiếu ID" }, { status: 400 });
         }
 
-        await prisma.chatbotInventory.delete({
-            where: { id },
-        });
+        const adminSupabase = createAdminSupabaseClient();
+        if (!adminSupabase) return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+
+        const { error } = await adminSupabase
+            .from("ChatbotInventory")
+            .delete()
+            .eq("id", id);
+
+        if (error) {
+            console.error("Delete inventory error:", error);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
 
         return NextResponse.json({ success: true });
     } catch (error) {

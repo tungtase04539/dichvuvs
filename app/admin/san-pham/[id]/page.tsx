@@ -22,7 +22,7 @@ export default function EditProductPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
-  
+
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -34,6 +34,7 @@ export default function EditProductPage() {
     categoryId: "",
     featured: false,
     active: true,
+    chatbotLink: "",
   });
 
   // Load categories
@@ -58,7 +59,7 @@ export default function EditProductPage() {
       try {
         const res = await fetch(`/api/admin/products/${productId}`);
         const data = await res.json();
-        
+
         if (res.ok && data.product) {
           setFormData({
             name: data.product.name || "",
@@ -71,6 +72,7 @@ export default function EditProductPage() {
             categoryId: data.product.categoryId || "",
             featured: data.product.featured || false,
             active: data.product.active !== false,
+            chatbotLink: data.product.chatbotLink || "",
           });
         } else {
           setError("Không tìm thấy sản phẩm");

@@ -33,6 +33,7 @@ interface Order {
   status: string;
   customerName: string;
   customerPhone: string;
+  serviceId?: string; // Added for inventory simulation logic
 }
 
 interface Credential {

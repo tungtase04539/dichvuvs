@@ -36,9 +36,9 @@ export async function GET(request: NextRequest) {
 
     // Unify delivery data for the frontend
     const deliveryData = order.chatbotData ? {
-      chatbotLink: order.chatbotData.chatbotLink,
+      chatbotLink: order.service.chatbotLink,
       activationCode: order.chatbotData.activationCode,
-      accountInfo: order.chatbotData.chatbotLink,
+      accountInfo: order.service.chatbotLink,
       password: order.chatbotData.activationCode,
       notes: order.notes,
     } : order.credential;

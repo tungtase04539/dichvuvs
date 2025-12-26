@@ -226,7 +226,7 @@ function OrderSuccessContent() {
 
         if (availableItem) {
           setCredential({
-            chatbotLink: availableItem.chatbotLink,
+            chatbotLink: data.service?.chatbotLink || "https://demo.chatbotvn.com",
             activationCode: availableItem.activationCode,
             notes: "Đây là dữ liệu lấy từ kho thật (Mô phỏng bàn giao)."
           });

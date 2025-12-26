@@ -59,9 +59,9 @@ export async function GET(request: NextRequest) {
           service: order.service.name,
         },
         credential: {
-          chatbotLink: order.chatbotData.chatbotLink,
+          chatbotLink: order.service.chatbotLink,
           activationCode: order.chatbotData.activationCode,
-          accountInfo: order.chatbotData.chatbotLink,
+          accountInfo: order.service.chatbotLink,
           password: order.chatbotData.activationCode,
           notes: order.notes,
         },

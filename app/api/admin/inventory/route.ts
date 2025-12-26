@@ -5,8 +5,7 @@ export const dynamic = "force-dynamic";
 
 // Get inventory for a product
 export async function GET(
-    request: NextRequest,
-    { params }: { params: { id: string } }
+    request: NextRequest
 ) {
     try {
         const { searchParams } = new URL(request.url);
@@ -15,6 +14,16 @@ export async function GET(
         if (!serviceId) {
             return NextResponse.json({ error: "Thiếu serviceId" }, { status: 400 });
         }
+
+        // Fetch service to get its chatbotLink
+        const service = await prisma.service.findUnique({
+            where: { id: serviceId },
+            select: {
+                id: true,
+                name: true,
+                chatbotLink: true
+            }
+        });
 
         const inventory = await prisma.chatbotInventory.findMany({
             where: { serviceId },
@@ -29,7 +38,7 @@ export async function GET(
             }
         });
 
-        return NextResponse.json({ inventory });
+        return NextResponse.json({ service, inventory });
     } catch (error) {
         console.error("Get inventory error:", error);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -40,16 +49,15 @@ export async function GET(
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { serviceId, chatbotLink, activationCode } = body;
+        const { serviceId, activationCode } = body;
 
-        if (!serviceId || !chatbotLink || !activationCode) {
+        if (!serviceId || !activationCode) {
             return NextResponse.json({ error: "Thiếu thông tin bắt buộc" }, { status: 400 });
         }
 
         const newItem = await prisma.chatbotInventory.create({
             data: {
                 serviceId,
-                chatbotLink,
                 activationCode,
             },
         });
@@ -57,6 +65,28 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ item: newItem });
     } catch (error) {
         console.error("Add inventory error:", error);
+        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    }
+}
+
+// Update service chatbot link
+export async function PUT(request: NextRequest) {
+    try {
+        const body = await request.json();
+        const { serviceId, chatbotLink } = body;
+
+        if (!serviceId) {
+            return NextResponse.json({ error: "Thiếu serviceId" }, { status: 400 });
+        }
+
+        await prisma.service.update({
+            where: { id: serviceId },
+            data: { chatbotLink }
+        });
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error("Update chatbot link error:", error);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
 }

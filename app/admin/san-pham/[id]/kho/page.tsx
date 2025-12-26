@@ -7,7 +7,6 @@ import { ArrowLeft, Plus, Trash2, Loader2, Package, ExternalLink, ShieldCheck, C
 
 interface InventoryItem {
     id: string;
-    chatbotLink: string;
     activationCode: string;
     isUsed: boolean;
     createdAt: string;
@@ -20,6 +19,7 @@ interface InventoryItem {
 interface Product {
     id: string;
     name: string;
+    chatbotLink?: string;
 }
 
 export default function InventoryManagementPage() {
@@ -31,25 +31,23 @@ export default function InventoryManagementPage() {
     const [inventory, setInventory] = useState<InventoryItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isUpdatingLink, setIsUpdatingLink] = useState(false);
 
-    const [formData, setFormData] = useState({
-        chatbotLink: "",
-        activationCode: "",
-    });
+    const [newChatbotLink, setNewChatbotLink] = useState("");
+    const [activationCode, setActivationCode] = useState("");
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Fetch product info
-                const prodRes = await fetch(`/api/admin/products/${productId}`);
-                const prodData = await prodRes.json();
-                if (prodData.product) {
-                    setProduct(prodData.product);
-                }
-
-                // Fetch inventory
+                // Fetch inventory - it now returns service too
                 const invRes = await fetch(`/api/admin/inventory?serviceId=${productId}`);
                 const invData = await invRes.json();
+
+                if (invData.service) {
+                    setProduct(invData.service);
+                    setNewChatbotLink(invData.service.chatbotLink || "");
+                }
+
                 if (invData.inventory) {
                     setInventory(invData.inventory);
                 }
@@ -63,7 +61,32 @@ export default function InventoryManagementPage() {
         fetchData();
     }, [productId]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleUpdateLink = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsUpdatingLink(true);
+
+        try {
+            const res = await fetch("/api/admin/inventory", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    serviceId: productId,
+                    chatbotLink: newChatbotLink
+                }),
+            });
+
+            if (res.ok) {
+                setProduct(prev => prev ? { ...prev, chatbotLink: newChatbotLink } : null);
+                alert("Đã cập nhật Link ChatBot thành công!");
+            }
+        } catch (error) {
+            console.error("Update link error:", error);
+        } finally {
+            setIsUpdatingLink(false);
+        }
+    };
+
+    const handleAddInventory = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
 
@@ -73,14 +96,14 @@ export default function InventoryManagementPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     serviceId: productId,
-                    ...formData
+                    activationCode
                 }),
             });
 
             if (res.ok) {
                 const data = await res.json();
                 setInventory([data.item, ...inventory]);
-                setFormData({ chatbotLink: "", activationCode: "" });
+                setActivationCode("");
             }
         } catch (error) {
             console.error("Add inventory error:", error);
@@ -127,44 +150,60 @@ export default function InventoryManagementPage() {
                     <h1 className="text-2xl font-bold text-slate-900">Quản lý kho: {product?.name}</h1>
                     <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">ChatBot Data</span>
                 </div>
-                <p className="text-slate-500 mt-1">Quản lý Link ChatBot và Mã kích hoạt bàn giao cho khách hàng</p>
+                <p className="text-slate-500 mt-1">Quản lý một Link ChatBot dùng chung và danh sách Mã kích hoat bàn giao</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Add Form */}
-                <div className="lg:col-span-1">
-                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sticky top-8">
-                        <h2 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                            <Plus className="w-5 h-5 text-emerald-500" />
-                            Thêm dữ liệu mới
+                <div className="lg:col-span-1 space-y-8">
+                    {/* Link Chatbot Editor (One for all) */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            <ExternalLink className="w-5 h-5 text-blue-500" />
+                            Link ChatBot chung
                         </h2>
-
-                        <form onSubmit={handleSubmit} className="space-y-5">
+                        <form onSubmit={handleUpdateLink} className="space-y-4">
                             <div>
                                 <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                    Link ChatBot
+                                    Link truy cập (Dùng chung cho tất cả mã)
                                 </label>
                                 <input
                                     type="url"
-                                    value={formData.chatbotLink}
-                                    onChange={(e) => setFormData({ ...formData, chatbotLink: e.target.value })}
+                                    value={newChatbotLink}
+                                    onChange={(e) => setNewChatbotLink(e.target.value)}
+                                    placeholder="https://t.me/your_bot..."
+                                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium text-blue-600"
                                     required
-                                    placeholder="https://..."
-                                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
                                 />
                             </div>
+                            <button
+                                type="submit"
+                                disabled={isUpdatingLink}
+                                className="w-full flex items-center justify-center gap-2 py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-all"
+                            >
+                                {isUpdatingLink ? <Loader2 className="w-4 h-4 animate-spin" /> : "Lưu Link ChatBot"}
+                            </button>
+                        </form>
+                    </div>
 
+                    {/* Add Form (Only activation code) */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sticky top-8">
+                        <h2 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                            <Plus className="w-5 h-5 text-emerald-500" />
+                            Thêm mã kích hoạt mới
+                        </h2>
+
+                        <form onSubmit={handleAddInventory} className="space-y-5">
                             <div>
                                 <label className="block text-sm font-semibold text-slate-700 mb-2">
                                     Mã kích hoạt
                                 </label>
                                 <input
                                     type="text"
-                                    value={formData.activationCode}
-                                    onChange={(e) => setFormData({ ...formData, activationCode: e.target.value })}
+                                    value={activationCode}
+                                    onChange={(e) => setActivationCode(e.target.value)}
                                     required
                                     placeholder="VD: VS-CHAT-XXXX"
-                                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono transition-all"
+                                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono transition-all uppercase"
                                 />
                             </div>
 
@@ -190,7 +229,7 @@ export default function InventoryManagementPage() {
                         <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                             <h3 className="font-bold text-slate-800 flex items-center gap-2">
                                 <Package className="w-5 h-5 text-slate-400" />
-                                Danh sách trong kho ({inventory.length})
+                                Danh sách Mã ({inventory.length})
                             </h3>
                             <div className="flex gap-4">
                                 <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">
@@ -215,18 +254,13 @@ export default function InventoryManagementPage() {
                                                 </div>
                                                 <div>
                                                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-0.5">Mã kích hoạt</p>
-                                                    <p className="font-mono font-black text-lg text-slate-900">{item.activationCode}</p>
+                                                    <p className="font-mono font-black text-lg text-slate-900 uppercase">{item.activationCode}</p>
                                                 </div>
                                                 {item.isUsed && (
                                                     <span className="ml-2 px-2.5 py-1 bg-slate-100 text-slate-500 text-[10px] font-black uppercase rounded-md border border-slate-200">
                                                         Đã bán
                                                     </span>
                                                 )}
-                                            </div>
-
-                                            <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-100/50 p-2.5 rounded-xl border border-slate-100">
-                                                <ExternalLink className="w-4 h-4 text-slate-400" />
-                                                <span className="truncate flex-1">{item.chatbotLink}</span>
                                             </div>
 
                                             {item.isUsed && item.order && (
@@ -263,8 +297,8 @@ export default function InventoryManagementPage() {
                             {inventory.length === 0 && (
                                 <div className="py-20 text-center">
                                     <Package className="w-16 h-16 text-slate-200 mx-auto mb-4" />
-                                    <p className="text-slate-400 font-medium">Kho hiện đang trống</p>
-                                    <p className="text-xs text-slate-400 mt-1">Hãy thêm dữ liệu vào cột bên trái</p>
+                                    <p className="text-slate-400 font-medium">Chưa có mã trong kho</p>
+                                    <p className="text-xs text-slate-400 mt-1">Hãy thêm mã kích hoạt ở bảng bên trái</p>
                                 </div>
                             )}
                         </div>

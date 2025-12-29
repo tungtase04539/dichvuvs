@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Use admin client to bypass RLS
-    const { data: product, error } = await adminSupabase
+    let { data: product, error } = await adminSupabase
       .from("Service")
       .insert({
         id: crypto.randomUUID(),
@@ -121,6 +121,34 @@ export async function POST(request: NextRequest) {
       })
       .select()
       .single();
+
+    // Resilience: if chatbotLink column is missing, retry without it
+    if (error && error.message?.includes("chatbotLink") && (error.message?.includes("column") || error.message?.includes("cache"))) {
+      console.warn("Retrying insert without chatbotLink due to missing column");
+      const { data: retryProduct, error: retryError } = await adminSupabase
+        .from("Service")
+        .insert({
+          id: crypto.randomUUID(),
+          name,
+          slug,
+          description: description || null,
+          longDescription: longDescription || null,
+          price: parseFloat(price),
+          unit: "bot",
+          image: image || null,
+          videoUrl: videoUrl || null,
+          categoryId: categoryId || null,
+          featured: featured === true,
+          active: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      product = retryProduct;
+      error = retryError;
+    }
 
     if (error) {
       console.error("Create product error:", error);

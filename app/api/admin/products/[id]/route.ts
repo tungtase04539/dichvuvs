@@ -87,7 +87,7 @@ export async function PUT(
       );
     }
 
-    const { data: product, error } = await adminSupabase
+    let { data: product, error } = await adminSupabase
       .from("Service")
       .update({
         name,
@@ -99,13 +99,39 @@ export async function PUT(
         videoUrl: videoUrl || null,
         categoryId: categoryId || null,
         featured: featured || false,
-        active: active !== false, // Đảm bảo active được cập nhật đúng
+        active: active !== false,
         chatbotLink: chatbotLink || null,
         updatedAt: new Date().toISOString(),
       })
       .eq("id", params.id)
       .select()
       .single();
+
+    // Resilience: if chatbotLink column is missing, retry without it
+    if (error && error.message?.includes("chatbotLink") && (error.message?.includes("column") || error.message?.includes("cache"))) {
+      console.warn("Retrying update without chatbotLink due to missing column");
+      const { data: retryProduct, error: retryError } = await adminSupabase
+        .from("Service")
+        .update({
+          name,
+          slug,
+          description: description || null,
+          longDescription: longDescription || null,
+          price: parseFloat(price),
+          image: image || null,
+          videoUrl: videoUrl || null,
+          categoryId: categoryId || null,
+          featured: featured || false,
+          active: active !== false,
+          updatedAt: new Date().toISOString(),
+        })
+        .eq("id", params.id)
+        .select()
+        .single();
+
+      product = retryProduct;
+      error = retryError;
+    }
 
     if (error) {
       console.error("Update product error:", error);

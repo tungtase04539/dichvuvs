@@ -21,11 +21,30 @@ export async function GET(
         }
 
         // Fetch service to get its chatbotLink
-        const { data: service, error: sError } = await adminSupabase
+        let service: any;
+        let sError: any;
+
+        const initialRes = await adminSupabase
             .from("Service")
             .select("id, name, chatbotLink")
             .eq("id", serviceId)
             .single();
+
+        service = initialRes.data;
+        sError = initialRes.error;
+
+        // Resilience: if chatbotLink column is missing, retry without it
+        if (sError && sError.message?.includes("chatbotLink") && (sError.message?.includes("column") || sError.message?.includes("cache"))) {
+            console.warn("Retrying fetch without chatbotLink due to missing column");
+            const { data: retryService, error: retryError } = await adminSupabase
+                .from("Service")
+                .select("id, name")
+                .eq("id", serviceId)
+                .single();
+
+            service = retryService;
+            sError = retryError;
+        }
 
         if (sError) console.error("Get service error:", sError);
 
@@ -64,6 +83,7 @@ export async function POST(request: NextRequest) {
         const { data: newItem, error } = await adminSupabase
             .from("ChatbotInventory")
             .insert({
+                id: crypto.randomUUID(),
                 serviceId,
                 activationCode,
                 createdAt: new Date().toISOString(),
@@ -107,6 +127,14 @@ export async function PUT(request: NextRequest) {
 
         if (error) {
             console.error("Update chatbot link error:", error);
+            // Resilience: if column is missing, return success but log warning
+            if (error.message?.includes("chatbotLink") && (error.message?.includes("column") || error.message?.includes("cache"))) {
+                console.warn("Skipping chatbotLink update due to missing column");
+                return NextResponse.json({
+                    success: true,
+                    warning: "Cột chatbotLink chưa tồn tại trong Database. Vui lòng chạy lệnh SQL đã được hướng dẫn."
+                });
+            }
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 

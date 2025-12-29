@@ -75,12 +75,21 @@ export default function InventoryManagementPage() {
                 }),
             });
 
+            const data = await res.json();
+
             if (res.ok) {
                 setProduct(prev => prev ? { ...prev, chatbotLink: newChatbotLink } : null);
-                alert("Đã cập nhật Link ChatBot thành công!");
+                if (data.warning) {
+                    alert("Lưu thành công nhưng có cảnh báo: " + data.warning);
+                } else {
+                    alert("Đã cập nhật Link ChatBot thành công!");
+                }
+            } else {
+                alert("Lỗi: " + (data.error || "Không thể cập nhật link"));
             }
         } catch (error) {
             console.error("Update link error:", error);
+            alert("Có lỗi xảy ra khi kết nối máy chủ");
         } finally {
             setIsUpdatingLink(false);
         }
@@ -100,13 +109,18 @@ export default function InventoryManagementPage() {
                 }),
             });
 
+            const data = await res.json();
+
             if (res.ok) {
-                const data = await res.json();
                 setInventory([data.item, ...inventory]);
                 setActivationCode("");
+                alert("Đã thêm mã mới vào kho thành công!");
+            } else {
+                alert("Lỗi: " + (data.error || "Không thể thêm mã"));
             }
         } catch (error) {
             console.error("Add inventory error:", error);
+            alert("Có lỗi xảy ra khi kết nối máy chủ");
         } finally {
             setIsSubmitting(false);
         }

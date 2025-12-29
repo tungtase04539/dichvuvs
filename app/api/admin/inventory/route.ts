@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
         const adminSupabase = createAdminSupabaseClient();
         if (!adminSupabase) return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
 
-        const { data: newItem, error } = await adminSupabase
+        let { data: newItem, error } = await adminSupabase
             .from("ChatbotInventory")
             .insert({
                 id: crypto.randomUUID(),
@@ -91,6 +91,26 @@ export async function POST(request: NextRequest) {
             })
             .select()
             .single();
+
+        // Resilience: handle legacy NOT NULL constraint on chatbotLink if it still exists
+        if (error && (error.message?.includes("chatbotLink") || error.code === "23502")) {
+            console.warn("Retrying inventory insert with dummy chatbotLink due to constraint");
+            const { data: retryItem, error: retryError } = await adminSupabase
+                .from("ChatbotInventory")
+                .insert({
+                    id: crypto.randomUUID(),
+                    serviceId,
+                    activationCode,
+                    chatbotLink: "transferred-to-service", // Dummy value to satisfy NOT NULL constraint
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                })
+                .select()
+                .single();
+
+            newItem = retryItem;
+            error = retryError;
+        }
 
         if (error) {
             console.error("Add inventory error:", error);

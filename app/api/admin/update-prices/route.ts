@@ -1,27 +1,30 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createAdminSupabaseClient } from "@/lib/supabase-server";
+import { isAdmin } from "@/lib/auth";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
+    if (!(await isAdmin())) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { price } = await request.json();
-    
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-    
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    
-    const { error } = await supabase
+    const adminSupabase = createAdminSupabaseClient()!;
+
+    const { error } = await adminSupabase
       .from("Service")
       .update({ price: price || 29000 })
       .neq("id", "");
-    
+
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
-    
+
     return NextResponse.json({ success: true, message: `Updated all prices to ${price || 29000}đ` });
   } catch (error) {
+    console.error("Update prices error:", error);
     return NextResponse.json({ error: "Failed to update prices" }, { status: 500 });
   }
 }
-

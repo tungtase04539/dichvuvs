@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { isStaff } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 // Get all credentials for a service
 export async function GET(request: NextRequest) {
   try {
+    if (!(await isStaff())) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { searchParams } = new URL(request.url);
     const serviceId = searchParams.get("serviceId");
 
@@ -30,6 +34,9 @@ export async function GET(request: NextRequest) {
 // Create new credential
 export async function POST(request: NextRequest) {
   try {
+    if (!(await isStaff())) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json();
     const { serviceId, accountInfo, password, apiKey, notes } = body;
 

@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { isStaff } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const user = await getSession();
-    
-    if (!user || (user.role !== "admin" && user.role !== "staff")) {
+    if (!(await isStaff())) {
       return NextResponse.json({ count: 0 });
     }
 

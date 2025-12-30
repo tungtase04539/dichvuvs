@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { isStaff } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +10,9 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    if (!(await isStaff())) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json();
     const { accountInfo, password, apiKey, notes } = body;
 
@@ -42,6 +46,9 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    if (!(await isStaff())) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const credential = await prisma.productCredential.findUnique({
       where: { id: params.id },
     });

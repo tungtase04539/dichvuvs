@@ -20,12 +20,17 @@ export default async function AdminLayout({
     redirect("/quan-tri-vien-dang-nhap");
   }
 
-  // Get user metadata
-  const role = user.user_metadata?.role;
+  // Get user info from Prisma to be ABSOLUTELY certain of the role
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { role: true }
+  });
+
+  const role = dbUser?.role || user.user_metadata?.role;
 
   // STRICT ACCESS CONTROL: Only admin and staff can access /admin
   if (!role || !["admin", "staff"].includes(role)) {
-    console.warn(`[AdminLayout] Unauthorized access attempt by user ${user.email} with role ${role}`);
+    console.warn(`[AdminLayout] Unauthorized access attempt by user ${user.email}. Metadata Role: ${user.user_metadata?.role}, DB Role: ${dbUser?.role}`);
     redirect("/tai-khoan");
   }
 

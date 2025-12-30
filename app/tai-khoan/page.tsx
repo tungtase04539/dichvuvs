@@ -55,8 +55,8 @@ function CopyBtn({ text, label }: { text: string; label?: string }) {
     <button
       onClick={handleCopy}
       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all text-xs font-semibold ${copied
-          ? "bg-green-500/20 text-green-400 border border-green-500/30"
-          : "bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white border border-white/5"
+        ? "bg-green-500/20 text-green-400 border border-green-500/30"
+        : "bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white border border-white/5"
         }`}
     >
       {copied ? (
@@ -99,10 +99,11 @@ export default function CustomerDashboard() {
         const userData = await userRes.json();
         setUserInfo(userData.user);
 
-        // Redirect admin/staff to admin panel
-        const adminRoles = ["admin", "staff"];
-        if (adminRoles.includes(userData.user.role)) {
-          router.push("/admin");
+        // Redirect admin/staff to admin panel immediately
+        // We use the role from /api/auth/me which is now synchronized with the DB
+        if (userData.user.role === "admin" || userData.user.role === "staff") {
+          console.log("[Dashboard] Admin detected, redirecting to /admin");
+          router.replace("/admin");
           return;
         }
 

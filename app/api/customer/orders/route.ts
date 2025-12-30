@@ -47,9 +47,9 @@ export async function GET() {
     const formattedOrders = orders.map((order) => ({
       ...order,
       credential: order.credential ? {
-        username: order.credential.accountInfo,
+        accountInfo: order.credential.accountInfo,
         password: order.credential.password,
-        note: order.credential.notes,
+        notes: order.credential.notes,
       } : null,
     }));
 

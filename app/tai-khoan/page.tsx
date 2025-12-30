@@ -16,6 +16,7 @@ import {
   Copy,
   Check,
   Link2,
+  User,
 } from "lucide-react";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 
@@ -144,22 +145,22 @@ export default function CustomerDashboard() {
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-2xl p-6 mb-8 border border-slate-600">
+      <div className="bg-slate-800 rounded-2xl p-6 mb-8 border border-slate-700 shadow-xl">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-primary-500 flex items-center justify-center text-2xl font-bold text-white">
-              {userInfo?.name?.charAt(0).toUpperCase() || "K"}
+            <div className="w-14 h-14 rounded-full bg-primary-500/20 flex items-center justify-center text-primary-400 border border-primary-500/30">
+              <User className="w-7 h-7" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">
-                Xin chào, {userInfo?.name || "Khách hàng"}!
+              <h1 className="text-xl font-bold text-white mb-0.5">
+                {userInfo?.name || "Khách hàng"}
               </h1>
-              <p className="text-slate-400">{userInfo?.email}</p>
+              <p className="text-slate-400 text-sm">{userInfo?.email}</p>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500/20 transition-all border border-red-500/20 text-sm font-medium"
           >
             <LogOut className="w-4 h-4" />
             Đăng xuất
@@ -167,46 +168,6 @@ export default function CustomerDashboard() {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-slate-800 rounded-xl p-5 border border-slate-700">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
-              <Package className="w-6 h-6 text-blue-400" />
-            </div>
-            <div>
-              <p className="text-sm text-slate-400">Tổng đơn hàng</p>
-              <p className="text-2xl font-bold text-white">{orders.length}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-slate-800 rounded-xl p-5 border border-slate-700">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-green-400" />
-            </div>
-            <div>
-              <p className="text-sm text-slate-400">Đã thanh toán</p>
-              <p className="text-2xl font-bold text-white">
-                {orders.filter(o => o.status === "confirmed" || o.status === "completed").length}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-slate-800 rounded-xl p-5 border border-slate-700">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
-              <Bot className="w-6 h-6 text-purple-400" />
-            </div>
-            <div>
-              <p className="text-sm text-slate-400">ChatBot đang dùng</p>
-              <p className="text-2xl font-bold text-white">
-                {orders.filter(o => o.status === "confirmed" || o.status === "completed").length}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Orders */}
       <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">

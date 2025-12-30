@@ -32,7 +32,7 @@ export async function getSession(): Promise<UserPayload | null> {
           id: user.id,
           email: user.email || "",
           name: user.user_metadata?.name || user.email?.split("@")[0] || "User",
-          role: user.user_metadata?.role || "staff",
+          role: user.user_metadata?.role || "customer",
           password: "", // Không cần password cho Supabase Auth users trong Prisma
         }
       });

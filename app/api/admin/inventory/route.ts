@@ -147,13 +147,11 @@ export async function PUT(request: NextRequest) {
 
         if (error) {
             console.error("Update chatbot link error:", error);
-            // Resilience: if column is missing, return success but log warning
+            // Resilience: if column is missing, return error with clear instruction
             if (error.message?.includes("chatbotLink") && (error.message?.includes("column") || error.message?.includes("cache"))) {
-                console.warn("Skipping chatbotLink update due to missing column");
                 return NextResponse.json({
-                    success: true,
-                    warning: "Cột chatbotLink chưa tồn tại trong Database. Vui lòng chạy lệnh SQL đã được hướng dẫn."
-                });
+                    error: "Lỗi: Database thiếu cột 'chatbotLink'. Vui lòng chạy lệnh SQL trong file fix_missing_columns.sql được cung cấp trong Supabase SQL Editor."
+                }, { status: 400 });
             }
             return NextResponse.json({ error: error.message }, { status: 500 });
         }

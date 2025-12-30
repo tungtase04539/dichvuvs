@@ -9,7 +9,7 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const supabase = createServerSupabaseClient();
-  
+
   if (!supabase) {
     redirect("/quan-tri-vien-dang-nhap");
   }
@@ -21,11 +21,19 @@ export default async function AdminLayout({
   }
 
   // Get user metadata
+  const role = user.user_metadata?.role;
+
+  // STRICT ACCESS CONTROL: Only admin and staff can access /admin
+  if (!role || !["admin", "staff"].includes(role)) {
+    console.warn(`[AdminLayout] Unauthorized access attempt by user ${user.email} with role ${role}`);
+    redirect("/tai-khoan");
+  }
+
   const session = {
     id: user.id,
     email: user.email || "",
-    name: user.user_metadata?.name || user.email?.split("@")[0] || "Admin",
-    role: user.user_metadata?.role || "admin",
+    name: user.user_metadata?.name || user.email?.split("@")[0] || "User",
+    role: role,
   };
 
   return (

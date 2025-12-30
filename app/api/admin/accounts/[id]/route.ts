@@ -33,7 +33,7 @@ export async function PUT(
     }
 
     const { data: { user: authUser } } = await supabase.auth.getUser();
-    const currentRole = authUser?.user_metadata?.role || "admin";
+    const currentRole = authUser?.user_metadata?.role;
     if (!authUser || currentRole !== "admin") {
       return NextResponse.json({ error: "Chỉ Admin mới có quyền" }, { status: 403 });
     }
@@ -115,7 +115,7 @@ export async function DELETE(
     }
 
     const { data: { user } } = await supabase.auth.getUser();
-    const userRole = user?.user_metadata?.role || "admin";
+    const userRole = user?.user_metadata?.role;
     if (!user || userRole !== "admin") {
       return NextResponse.json({ error: "Chỉ Admin mới có quyền" }, { status: 403 });
     }

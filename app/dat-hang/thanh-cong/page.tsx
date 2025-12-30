@@ -215,38 +215,49 @@ function OrderSuccessContent() {
 
   // Demo Success Function
   const handleDemoSuccess = async () => {
-    setIsPaid(true);
+    if (!order) return;
 
-    // Attempt to fetch a real available item for this service to "simulate" correctly
+    setCheckingPayment(true);
+
     try {
-      if (order && order.serviceId) {
-        const res = await fetch(`/api/admin/inventory?serviceId=${order.serviceId}`);
-        const data = await res.json();
-        const availableItem = data.inventory?.find((item: any) => !item.isUsed);
+      // Create a mock SePay webhook payload
+      const mockPayload = {
+        id: Math.floor(Math.random() * 1000000),
+        gateway: "Simulation",
+        transactionDate: new Date().toISOString(),
+        accountNumber: "SIM-123456",
+        subAccount: null,
+        code: null,
+        content: order.orderCode,
+        transferType: "in",
+        description: `Simulated payment for order ${order.orderCode}`,
+        transferAmount: order.totalPrice,
+        referenceCode: `SIM-${Date.now()}`,
+        accumulated: 0
+      };
 
-        if (availableItem) {
-          setCredential({
-            chatbotLink: data.service?.chatbotLink || "https://demo.chatbotvn.com",
-            activationCode: availableItem.activationCode,
-            notes: "Đây là dữ liệu lấy từ kho thật (Mô phỏng bàn giao)."
-          });
-          setShowSuccessModal(true);
-          return;
-        }
+      const res = await fetch("/api/webhook/sepay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(mockPayload)
+      });
+
+      if (res.ok) {
+        console.log("Simulation triggered successfully");
+        // We don't set isPaid = true here immediately, 
+        // we let the checkPaymentStatus() or its auto-interval find the update in the DB
+        await checkPaymentStatus();
+      } else {
+        const errData = await res.json();
+        console.error("Simulation error:", errData);
+        alert("Lỗi mô phỏng: " + (errData.message || "Không xác định"));
       }
     } catch (err) {
-      console.error("Simulation fetch error:", err);
+      console.error("Simulation request error:", err);
+      alert("Lỗi kết nối khi mô phỏng");
+    } finally {
+      setCheckingPayment(false);
     }
-
-    // Fallback to demo if nothing found
-    if (!credential) {
-      setCredential({
-        chatbotLink: "https://demo.chatbotvn.com",
-        activationCode: "VS-PRO-X1A2B3C4D5",
-        notes: "Đây là dữ liệu dùng thử (Kho đang trống hoặc không tìm thấy)."
-      });
-    }
-    setShowSuccessModal(true);
   };
 
   // Auto-check payment every 10 seconds if not paid

@@ -12,6 +12,8 @@ export default function FloatingButtons() {
   const hidePaths = ["/admin", "/tai-khoan"];
   const shouldHide = hidePaths.some(path => pathname?.startsWith(path));
 
+  if (shouldHide) return null;
+
   return (
     <div className="fixed bottom-24 right-4 sm:right-6 z-40 flex flex-col gap-4 items-end pointer-events-none">
       {/* Tặng quà - Xanh Emerald & Vàng Gold */}

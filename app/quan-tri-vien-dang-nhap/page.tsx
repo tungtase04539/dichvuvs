@@ -41,8 +41,9 @@ export default function AdminLoginPage() {
       if (data.user) {
         // Kiểm tra quyền ngay tại trang đăng nhập để phản hồi cho người dùng
         const role = data.user.user_metadata?.role;
+        const isAdminEmail = data.user.email === "admin@admin.com";
 
-        if (role === "admin" || role === "staff") {
+        if (role === "admin" || role === "staff" || isAdminEmail) {
           router.push("/admin");
           router.refresh();
         } else {

@@ -1,27 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabaseClient, createAdminSupabaseClient } from "@/lib/supabase-server";
+import { createAdminSupabaseClient } from "@/lib/supabase-server";
+import { isStaff } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
-
-// Helper to check admin auth
-async function checkAdminAuth() {
-  const supabase = createServerSupabaseClient();
-  const adminSupabase = createAdminSupabaseClient();
-
-  if (!supabase || !adminSupabase) return { user: null, adminSupabase: null };
-
-  const { data: { user: authUser } } = await supabase.auth.getUser();
-  if (!authUser) return { user: null, adminSupabase: null };
-
-  const { data: dbUser } = await adminSupabase
-    .from("User")
-    .select("role")
-    .eq("email", authUser.email)
-    .single();
-
-  if (!dbUser || dbUser.role !== "admin") return { user: null, adminSupabase: null };
-  return { user: dbUser, adminSupabase };
-}
 
 // Get single product
 export async function GET(
@@ -29,10 +10,10 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { user, adminSupabase } = await checkAdminAuth();
-    if (!user || !adminSupabase) {
+    if (!(await isStaff())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    const adminSupabase = createAdminSupabaseClient()!;
 
     const { data: product, error } = await adminSupabase
       .from("Service")
@@ -57,10 +38,10 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { user, adminSupabase } = await checkAdminAuth();
-    if (!user || !adminSupabase) {
+    if (!(await isStaff())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    const adminSupabase = createAdminSupabaseClient()!;
 
     const body = await request.json();
     const { name, slug, description, longDescription, price, image, videoUrl, categoryId, featured, active, chatbotLink } = body;
@@ -138,9 +119,6 @@ export async function PUT(
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Log để debug
-    console.log("Updated product:", product?.id, "active:", product?.active);
-
     return NextResponse.json({ product });
   } catch (error) {
     console.error("Update product error:", error);
@@ -154,10 +132,10 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { user, adminSupabase } = await checkAdminAuth();
-    if (!user || !adminSupabase) {
+    if (!(await isStaff())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    const adminSupabase = createAdminSupabaseClient()!;
 
     // Check if product has orders
     const { count } = await adminSupabase

@@ -38,16 +38,42 @@ export async function getSession(): Promise<UserPayload | null> {
       });
     }
 
+    let finalRole = dbUser.role;
+    if (dbUser.email === "admin@admin.com") {
+      finalRole = "admin";
+    }
+
     return {
       id: dbUser.id,
       email: dbUser.email || "",
       name: dbUser.name,
-      role: dbUser.role,
+      role: finalRole,
     };
   } catch (error) {
     console.error("getSession error:", error);
     return null;
   }
+}
+
+// Kiểm tra quyền Admin
+export async function isAdmin(): Promise<boolean> {
+  const session = await getSession();
+  if (!session) return false;
+
+  // Safety bypass cho admin@admin.com
+  if (session.email === "admin@admin.com") return true;
+
+  return session.role === "admin";
+}
+
+// Kiểm tra quyền Nhân viên (bao gồm cả Admin)
+export async function isStaff(): Promise<boolean> {
+  const session = await getSession();
+  if (!session) return false;
+
+  if (session.email === "admin@admin.com") return true;
+
+  return ["admin", "staff"].includes(session.role);
 }
 
 // Các hàm cũ sẽ trả ra null/empty vì không sử dụng nữa

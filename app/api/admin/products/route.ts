@@ -1,34 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabaseClient, createAdminSupabaseClient } from "@/lib/supabase-server";
+import { createAdminSupabaseClient } from "@/lib/supabase-server";
+import { isStaff } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 // Get all products (admin)
 export async function GET() {
   try {
-    const supabase = createServerSupabaseClient();
-    const adminSupabase = createAdminSupabaseClient();
-
-    if (!supabase || !adminSupabase) {
-      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
-    }
-
-    // Check auth
-    const { data: { user: authUser } } = await supabase.auth.getUser();
-    if (!authUser) {
+    if (!(await isStaff())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    // Check role using admin client
-    const { data: dbUser } = await adminSupabase
-      .from("User")
-      .select("role")
-      .eq("email", authUser.email)
-      .single();
-
-    if (!dbUser || dbUser.role !== "admin") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const adminSupabase = createAdminSupabaseClient()!;
 
     // Use admin client to bypass RLS
     const { data: products, error } = await adminSupabase
@@ -51,29 +33,10 @@ export async function GET() {
 // Create new product
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createServerSupabaseClient();
-    const adminSupabase = createAdminSupabaseClient();
-
-    if (!supabase || !adminSupabase) {
-      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
-    }
-
-    // Check auth
-    const { data: { user: authUser } } = await supabase.auth.getUser();
-    if (!authUser) {
+    if (!(await isStaff())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    // Check role using admin client
-    const { data: dbUser } = await adminSupabase
-      .from("User")
-      .select("role")
-      .eq("email", authUser.email)
-      .single();
-
-    if (!dbUser || dbUser.role !== "admin") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const adminSupabase = createAdminSupabaseClient()!;
 
     const body = await request.json();
     const { name, slug, description, longDescription, price, image, videoUrl, categoryId, featured, active, chatbotLink } = body;
@@ -153,29 +116,6 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error("Create product error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    if (!product) {
-      return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
-    }
-
-    // Log để debug
-    console.log("Product created:", product.id, "name:", product.name, "active:", product.active, "categoryId:", product.categoryId);
-
-    // Đảm bảo sản phẩm mới luôn có active = true (double check)
-    if (!product.active) {
-      console.warn("Product created with active=false, fixing...");
-      const { data: updatedProduct } = await adminSupabase
-        .from("Service")
-        .update({ active: true })
-        .eq("id", product.id)
-        .select()
-        .single();
-
-      if (updatedProduct) {
-        console.log("Product active fixed:", updatedProduct.id, "active:", updatedProduct.active);
-        return NextResponse.json({ product: updatedProduct });
-      }
     }
 
     return NextResponse.json({ product });

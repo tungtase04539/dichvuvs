@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { isAdmin, getSession } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -14,10 +14,7 @@ function getSupabaseAdmin() {
   }
 
   return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
+    auth: { autoRefreshToken: false, persistSession: false },
   });
 }
 
@@ -27,24 +24,15 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createServerSupabaseClient();
-    if (!supabase) {
+    if (!(await isAdmin())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { data: { user: authUser } } = await supabase.auth.getUser();
-    const currentRole = authUser?.user_metadata?.role;
-    if (!authUser || currentRole !== "admin") {
-      return NextResponse.json({ error: "Chỉ Admin mới có quyền" }, { status: 403 });
     }
 
     const body = await request.json();
     const { name, role, phone, password, parentId } = body;
 
     const supabaseAdmin = getSupabaseAdmin();
-
-    // 1. Update Supabase Auth user
-    const updatePayload: Record<string, any> = {
+    const updatePayload: any = {
       user_metadata: {
         name,
         role,
@@ -53,9 +41,7 @@ export async function PUT(
       },
     };
 
-    if (password) {
-      updatePayload.password = password;
-    }
+    if (password) updatePayload.password = password;
 
     const { data: updatedAuth, error: authError } = await supabaseAdmin.auth.admin.updateUserById(
       params.id,
@@ -67,36 +53,22 @@ export async function PUT(
       return NextResponse.json({ error: authError.message }, { status: 500 });
     }
 
-    // 2. Sync with Prisma User table
-    // Important: We use upsert because the user might not exist in Prisma table yet
+    // Sync Prisma
     await prisma.user.upsert({
       where: { id: params.id },
-      update: {
-        name,
-        role,
-        phone,
-        parentId: parentId || null
-      },
+      update: { name, role, phone, parentId: parentId || null },
       create: {
         id: params.id,
         email: updatedAuth.user.email!,
-        password: "SUPABASE_AUTH_USER", // Password is managed by Supabase
         name,
         role,
         phone,
-        parentId: parentId || null
+        parentId: parentId || null,
+        password: "",
       }
     });
 
-    return NextResponse.json({
-      success: true,
-      user: {
-        id: updatedAuth.user.id,
-        email: updatedAuth.user.email,
-        name,
-        role,
-      },
-    });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Update account error:", error);
     return NextResponse.json({ error: "Lỗi hệ thống" }, { status: 500 });
@@ -109,20 +81,13 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createServerSupabaseClient();
-    if (!supabase) {
+    const session = await getSession();
+    if (!session || session.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
-    const userRole = user?.user_metadata?.role;
-    if (!user || userRole !== "admin") {
-      return NextResponse.json({ error: "Chỉ Admin mới có quyền" }, { status: 403 });
-    }
-
-    // Không cho xóa chính mình
-    if (params.id === user.id) {
-      return NextResponse.json({ error: "Không thể xóa tài khoản của chính mình" }, { status: 400 });
+    if (params.id === session.id) {
+      return NextResponse.json({ error: "Không thể xóa chính mình" }, { status: 400 });
     }
 
     const supabaseAdmin = getSupabaseAdmin();
@@ -139,4 +104,3 @@ export async function DELETE(
     return NextResponse.json({ error: "Lỗi hệ thống" }, { status: 500 });
   }
 }
-

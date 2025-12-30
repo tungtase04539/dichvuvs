@@ -1,19 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getSession } from "@/lib/auth";
+import { getSession, isStaff } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
-
-interface FormattedUser {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-  phone: string;
-  parentId: string | null;
-  active: boolean;
-  createdAt: string;
-}
 
 // Supabase Admin client
 function getSupabaseAdmin() {
@@ -29,11 +18,11 @@ function getSupabaseAdmin() {
   });
 }
 
-// GET - Lấy danh sách users từ Supabase Auth
+// GET - Lấy danh sách users
 export async function GET(request: NextRequest) {
   try {
     const user = await getSession();
-    if (!user) {
+    if (!user || !(await isStaff())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -48,34 +37,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Filter và format users
-    let users: FormattedUser[] = (authUsers || []).map((u: {
-      id: string;
-      email: string;
-      raw_user_meta_data: Record<string, unknown> | null;
-      created_at: string;
-      last_sign_in_at: string | null;
-    }) => ({
+    let users = (authUsers || []).map((u: any) => ({
       id: u.id,
       email: u.email,
-      name: (u.raw_user_meta_data?.name as string) || u.email?.split("@")[0],
-      role: (u.raw_user_meta_data?.role as string) || "staff",
-      phone: (u.raw_user_meta_data?.phone as string) || "",
-      parentId: (u.raw_user_meta_data?.parentId as string) || null,
-      active: true,
+      name: u.raw_user_meta_data?.name || u.email?.split("@")[0],
+      role: u.raw_user_meta_data?.role || "customer",
+      phone: u.raw_user_meta_data?.phone || "",
+      parentId: u.raw_user_meta_data?.parentId || null,
       createdAt: u.created_at,
     }));
 
-    // Filter by role if specified
     if (role) {
-      users = users.filter((u: FormattedUser) => u.role === role);
+      users = users.filter((u: any) => u.role === role);
     }
 
     // Filter based on current user's role
     if (user.role === "master_agent") {
-      users = users.filter((u: FormattedUser) => u.parentId === user.id);
+      users = users.filter((u: any) => u.parentId === user.id);
     } else if (user.role === "agent") {
-      users = users.filter((u: FormattedUser) => u.parentId === user.id && u.role === "collaborator");
+      users = users.filter((u: any) => u.parentId === user.id && u.role === "collaborator");
     } else if (user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -87,33 +67,21 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Tạo user mới trong Supabase Auth
+// POST - Tạo user mới
 export async function POST(request: NextRequest) {
   try {
     const currentUser = await getSession();
-    if (!currentUser) {
+    if (!currentUser || !(await isStaff())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
     const { name, email, password, phone, role, parentId } = body;
 
-    // Validate
     if (!name || !email || !password) {
-      return NextResponse.json(
-        { error: "Vui lòng nhập đầy đủ thông tin" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Thiếu thông tin" }, { status: 400 });
     }
 
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: "Mật khẩu phải có ít nhất 6 ký tự" },
-        { status: 400 }
-      );
-    }
-
-    // Kiểm tra quyền tạo role
     const allowedRoles: Record<string, string[]> = {
       admin: ["master_agent", "agent", "collaborator", "staff"],
       master_agent: ["agent"],
@@ -121,21 +89,9 @@ export async function POST(request: NextRequest) {
     };
 
     if (!allowedRoles[currentUser.role]?.includes(role)) {
-      return NextResponse.json(
-        { error: `Bạn không có quyền tạo tài khoản ${role}` },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Không có quyền tạo tài khoản này" }, { status: 403 });
     }
 
-    // Xác định parentId
-    let finalParentId = parentId;
-    if (currentUser.role === "master_agent" && role === "agent") {
-      finalParentId = currentUser.id;
-    } else if (currentUser.role === "agent" && role === "collaborator") {
-      finalParentId = currentUser.id;
-    }
-
-    // Tạo user trong Supabase Auth
     const supabaseAdmin = getSupabaseAdmin();
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
       email,
@@ -144,27 +100,17 @@ export async function POST(request: NextRequest) {
       user_metadata: {
         name,
         role,
-        phone: phone || "",
-        parentId: finalParentId || null,
+        phone,
+        parentId: parentId || currentUser.id,
       },
     });
 
     if (error) {
       console.error("Create user error:", error);
-      if (error.message.includes("already registered")) {
-        return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 400 });
-      }
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({
-      user: {
-        id: data.user.id,
-        name,
-        email: data.user.email,
-        role,
-      },
-    });
+    return NextResponse.json({ user: data.user });
   } catch (error) {
     console.error("Create user error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

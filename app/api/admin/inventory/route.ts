@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminSupabaseClient } from "@/lib/supabase-server";
+import { isStaff } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -8,6 +9,9 @@ export async function GET(
     request: NextRequest
 ) {
     try {
+        if (!(await isStaff())) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
         const { searchParams } = new URL(request.url);
         const serviceId = searchParams.get("serviceId");
 
@@ -70,15 +74,18 @@ export async function GET(
 // Add new inventory item
 export async function POST(request: NextRequest) {
     try {
+        if (!(await isStaff())) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+        const adminSupabase = createAdminSupabaseClient();
+        if (!adminSupabase) return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+
         const body = await request.json();
         const { serviceId, activationCode } = body;
 
         if (!serviceId || !activationCode) {
             return NextResponse.json({ error: "Thiếu thông tin bắt buộc" }, { status: 400 });
         }
-
-        const adminSupabase = createAdminSupabaseClient();
-        if (!adminSupabase) return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
 
         let { data: newItem, error } = await adminSupabase
             .from("ChatbotInventory")
@@ -127,15 +134,18 @@ export async function POST(request: NextRequest) {
 // Update service chatbot link
 export async function PUT(request: NextRequest) {
     try {
+        if (!(await isStaff())) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+        const adminSupabase = createAdminSupabaseClient();
+        if (!adminSupabase) return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+
         const body = await request.json();
         const { serviceId, chatbotLink } = body;
 
         if (!serviceId) {
             return NextResponse.json({ error: "Thiếu serviceId" }, { status: 400 });
         }
-
-        const adminSupabase = createAdminSupabaseClient();
-        if (!adminSupabase) return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
 
         const { error } = await adminSupabase
             .from("Service")
@@ -166,15 +176,18 @@ export async function PUT(request: NextRequest) {
 // Delete inventory item
 export async function DELETE(request: NextRequest) {
     try {
+        if (!(await isStaff())) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+        const adminSupabase = createAdminSupabaseClient();
+        if (!adminSupabase) return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
+
         const { searchParams } = new URL(request.url);
         const id = searchParams.get("id");
 
         if (!id) {
             return NextResponse.json({ error: "Thiếu ID" }, { status: 400 });
         }
-
-        const adminSupabase = createAdminSupabaseClient();
-        if (!adminSupabase) return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
 
         const { error } = await adminSupabase
             .from("ChatbotInventory")

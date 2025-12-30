@@ -26,7 +26,7 @@ export default function AdminLoginPage() {
 
     try {
       const supabase = createClient();
-      
+
       const { data, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -39,8 +39,18 @@ export default function AdminLoginPage() {
       }
 
       if (data.user) {
-        router.push("/admin");
-        router.refresh();
+        // Kiểm tra quyền ngay tại trang đăng nhập để phản hồi cho người dùng
+        const role = data.user.user_metadata?.role;
+
+        if (role === "admin" || role === "staff") {
+          router.push("/admin");
+          router.refresh();
+        } else {
+          // Nếu không phải admin/staff, đăng xuất ngay để tránh kẹt session
+          await supabase.auth.signOut();
+          setError("Tài khoản này không có quyền truy cập trang quản trị");
+          setIsLoading(false);
+        }
       }
     } catch {
       setError("Đã có lỗi xảy ra, vui lòng thử lại");

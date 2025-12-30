@@ -28,17 +28,11 @@ export async function GET() {
             }
         });
 
-        // Auto-sync if user doesn't exist in Prisma yet (e.g. created via Supabase Auth only)
-        if (!dbUser) {
-            dbUser = await prisma.user.create({
-                data: {
-                    id: authUser.id,
-                    email: authUser.email || "",
-                    name: authUser.user_metadata?.name || authUser.email?.split("@")[0] || "User",
-                    role: authUser.user_metadata?.role || "customer",
-                    phone: authUser.user_metadata?.phone || "",
-                    password: "",
-                },
+        // Sync role if different
+        if (dbUser && dbUser.role !== authUser.user_metadata?.role && authUser.user_metadata?.role) {
+            dbUser = await prisma.user.update({
+                where: { id: dbUser.id },
+                data: { role: authUser.user_metadata.role },
                 select: {
                     id: true,
                     email: true,

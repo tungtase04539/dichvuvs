@@ -1,33 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabaseClient, createAdminSupabaseClient } from "@/lib/supabase-server";
+import { createAdminSupabaseClient } from "@/lib/supabase-server";
+import { isStaff } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createServerSupabaseClient();
-    const adminSupabase = createAdminSupabaseClient();
-    
-    if (!supabase || !adminSupabase) {
-      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
-    }
-
-    // Check auth
-    const { data: { user: authUser } } = await supabase.auth.getUser();
-    if (!authUser) {
+    if (!(await isStaff())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    // Check role
-    const { data: dbUser } = await adminSupabase
-      .from("User")
-      .select("role")
-      .eq("email", authUser.email)
-      .single();
-
-    if (!dbUser || dbUser.role !== "admin") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const adminSupabase = createAdminSupabaseClient()!;
 
     // Get form data
     const formData = await request.formData();
@@ -76,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     // Get public URL
     const { data: urlData } = adminSupabase.storage.from("images").getPublicUrl(fileName);
-    
+
     return NextResponse.json({ url: urlData.publicUrl });
   } catch (error) {
     console.error("Upload error:", error);
@@ -87,29 +69,10 @@ export async function POST(request: NextRequest) {
 // Delete file
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = createServerSupabaseClient();
-    const adminSupabase = createAdminSupabaseClient();
-    
-    if (!supabase || !adminSupabase) {
-      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
-    }
-
-    // Check auth
-    const { data: { user: authUser } } = await supabase.auth.getUser();
-    if (!authUser) {
+    if (!(await isStaff())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    // Check role
-    const { data: dbUser } = await adminSupabase
-      .from("User")
-      .select("role")
-      .eq("email", authUser.email)
-      .single();
-
-    if (!dbUser || dbUser.role !== "admin") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const adminSupabase = createAdminSupabaseClient()!;
 
     const { searchParams } = new URL(request.url);
     const fileUrl = searchParams.get("url");
@@ -131,4 +94,3 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
-

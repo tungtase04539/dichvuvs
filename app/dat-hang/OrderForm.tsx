@@ -155,11 +155,6 @@ export default function OrderForm() {
       return;
     }
 
-    if (!email) {
-      alert("Vui lòng nhập email để nhận tài khoản quản lý ChatBot");
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
@@ -251,15 +246,14 @@ export default function OrderForm() {
 
               <div className="space-y-1.5">
                 <label className="text-sm font-semibold text-slate-700 ml-1">
-                  Địa chỉ Email <span className="text-red-500">*</span>
+                  Địa chỉ Email (Tùy chọn)
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
                   className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:bg-white outline-none transition-all"
-                  placeholder="your@email.com"
+                  placeholder="your@email.com (Để tạo tài khoản quản lý)"
                 />
                 <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 flex gap-2">
                   <Gift className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />

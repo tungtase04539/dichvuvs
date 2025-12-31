@@ -33,6 +33,7 @@ interface Order {
   status: string;
   customerName: string;
   customerPhone: string;
+  customerEmail: string | null;
   serviceId?: string; // Added for inventory simulation logic
 }
 
@@ -114,12 +115,35 @@ function CredentialDisplay({ credential }: { credential: Credential }) {
 function AccountNotice() {
   return (
     <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 mb-4">
-      <p className="text-blue-800 text-sm font-medium mb-2">
-        📧 Tài khoản sẽ tự động tạo sau khi thanh toán
-      </p>
-      <p className="text-blue-600 text-xs">
-        Đăng nhập: <strong>Email</strong> | Mật khẩu: <strong>SĐT của bạn</strong>
-      </p>
+      <div className="flex items-start gap-3">
+        <Sparkles className="w-5 h-5 text-blue-600 mt-0.5" />
+        <div>
+          <p className="text-blue-800 text-sm font-medium">
+            Tài khoản quản lý đã được tạo!
+          </p>
+          <p className="text-blue-600 text-xs mt-1">
+            Đăng nhập bằng <strong>Email</strong> và mật khẩu là <strong>Số điện thoại</strong> của bạn tại trang đăng nhập.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SaveInfoNotice() {
+  return (
+    <div className="bg-amber-50 rounded-xl p-4 border border-amber-200 mb-4">
+      <div className="flex items-start gap-3">
+        <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
+        <div>
+          <p className="text-amber-800 text-sm font-bold">
+            QUAN TRỌNG: Hãy lưu lại thông tin!
+          </p>
+          <p className="text-amber-600 text-xs mt-1 leading-relaxed">
+            Bạn không cung cấp Email nên hệ thống <strong>không tạo tài khoản</strong> quản lý. Vui lòng chụp ảnh màn hình hoặc lưu lại Mã kích hoạt/Link ChatBot bên dưới để sử dụng.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -165,6 +189,7 @@ function OrderSuccessContent() {
             status: "pending",
             customerName: "Khách hàng",
             customerPhone: "",
+            customerEmail: null,
           });
         }
       } catch (e) {
@@ -175,6 +200,7 @@ function OrderSuccessContent() {
           status: "pending",
           customerName: "Khách hàng",
           customerPhone: "",
+          customerEmail: null,
         });
       }
 
@@ -410,8 +436,8 @@ function OrderSuccessContent() {
         </div>
       </div>
 
-      {/* Account Notice */}
-      <AccountNotice />
+      {/* Account or Save Notice */}
+      {order.customerEmail ? <AccountNotice /> : <SaveInfoNotice />}
 
       {/* Payment QR */}
       <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 mb-4">

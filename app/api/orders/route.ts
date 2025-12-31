@@ -132,20 +132,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Vui lòng nhập họ tên và số điện thoại" }, { status: 400 });
     }
 
-
     if (!items || items.length === 0) {
       return NextResponse.json({ error: "Vui lòng chọn ít nhất 1 sản phẩm" }, { status: 400 });
     }
 
     // Get products from cache or DB
-    let products = getCache<{ id: string; name: string; price: number }[]>("products_map");
+    let products = getCache<any[]>("products_map");
 
     if (!products) {
-      const dbProducts = await prisma.service.findMany({
+      products = await prisma.service.findMany({
         where: { active: true },
-        select: { id: true, name: true, price: true },
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          priceGold: true,
+          pricePlatinum: true
+        },
       });
-      products = dbProducts;
       setCache("products_map", products, 300);
     }
 
@@ -161,12 +165,27 @@ export async function POST(request: NextRequest) {
       if (!product) {
         return NextResponse.json({ error: "Sản phẩm không tồn tại" }, { status: 400 });
       }
-      totalPrice += product.price * item.quantity;
+
+      // Determine price based on packageType
+      let itemPrice = product.price;
+      if (item.packageType === "gold") {
+        itemPrice = product.priceGold || product.price * 1.5;
+      } else if (item.packageType === "platinum") {
+        itemPrice = product.pricePlatinum || product.price * 2.5;
+      }
+
+      totalPrice += itemPrice * item.quantity;
       totalQuantity += item.quantity;
-      details.push(`${product.name} x${item.quantity}`);
+      details.push(`${product.name} (${item.packageType || "standard"}) x${item.quantity}`);
     }
 
-    const mainProduct = productMap.get(items[0].serviceId);
+    const mainItem = items[0];
+    const mainProduct = productMap.get(mainItem.serviceId);
+
+    let mainBasePrice = mainProduct?.price || 29000;
+    if (mainItem.packageType === "gold") mainBasePrice = mainProduct?.priceGold || mainBasePrice * 1.5;
+    else if (mainItem.packageType === "platinum") mainBasePrice = mainProduct?.pricePlatinum || mainBasePrice * 2.5;
+
     const orderCode = generateOrderCode();
 
     // Referral features are disabled in this MVP
@@ -188,9 +207,10 @@ export async function POST(request: NextRequest) {
         scheduledDate: new Date(),
         scheduledTime: "Giao ngay",
         notes: notes ? `${notes}\n---\n${details.join(", ")}` : details.join(", "),
-        basePrice: mainProduct?.price || 29000,
+        basePrice: mainBasePrice,
         totalPrice,
         status: "pending",
+        packageType: items[0].packageType || "standard",
         referralCode: finalReferralCode,
         referrerId: referrerId,
       },

@@ -200,57 +200,12 @@ export default function ProductDetailPage({
 
             {/* Sidebar */}
             <div className="space-y-6 order-1 lg:order-2">
-              {/* Price Card */}
-              <div className="bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-700">
-                {product.videoUrl && getYoutubeEmbedUrl(product.videoUrl) && (
-                  <div className="mb-4 rounded-xl overflow-hidden border border-slate-700 aspect-video bg-black">
-                    <iframe
-                      src={`${getYoutubeEmbedUrl(product.videoUrl)}?rel=0`}
-                      className="w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      title="Video demo"
-                    />
-                  </div>
-                )}
 
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-primary-400 fill-primary-400" />
-                  ))}
-                  <span className="text-sm text-slate-500 ml-2">(128 đánh giá)</span>
-                </div>
-
-                <div className="mb-6">
-                  <div className="flex items-end gap-3 mb-2">
-                    <span className="text-4xl font-bold text-primary-400">
-                      {formatCurrency(product.price)}
-                    </span>
-                    <span className="text-xl text-slate-500 line-through">
-                      {formatCurrency(product.price * 2)}
-                    </span>
-                  </div>
-                  <span className="inline-flex px-3 py-1 bg-red-900/50 text-red-400 text-sm font-bold rounded-full">
-                    Giảm 50%
-                  </span>
-                </div>
-
-                <AddToCartButton
-                  product={{
-                    ...product,
-                    price: selectedPackage === "gold" ? (product.priceGold || product.price) :
-                      selectedPackage === "platinum" ? (product.pricePlatinum || product.price) :
-                        product.price
-                  }}
-                />
-
-              </div>
-
-              {/* Package Selection Section */}
-              <div className="space-y-4">
-                <h3 className="text-white font-bold uppercase text-sm tracking-wider flex items-center gap-2">
+              {/* Package Selection Section - MOVED TO TOP */}
+              <div className="space-y-4 bg-slate-800/50 rounded-2xl p-6 border border-slate-700 shadow-sm">
+                <h3 className="text-white font-bold uppercase text-sm tracking-wider flex items-center gap-2 mb-4">
                   <Star className="w-4 h-4 text-primary-400" />
-                  Chọn gói dịch vụ
+                  Bước 1: Chọn gói dịch vụ
                 </h3>
 
                 <div className="grid grid-cols-1 gap-4">
@@ -277,7 +232,7 @@ export default function ProductDetailPage({
                     <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-slate-700 border-2 border-primary-500 rotate-y-180 flex flex-col justify-center">
                       <h4 className="text-white font-bold mb-3 text-sm">Ưu đãi Tiêu chuẩn:</h4>
                       <ul className="space-y-2">
-                        {["Full tính năng cơ bản", "Hỗ trợ cộng đồng", "Update bảo mật"].map((f, i) => (
+                        {["Full tính năng cơ bản", "Hỗ trợ cộng đồng", "Update bảo mật"].map((f: string, i: number) => (
                           <li key={i} className="flex items-center gap-2 text-xs text-slate-300">
                             <CheckCircle className="w-3 h-3 text-primary-400" />
                             {f}
@@ -359,6 +314,66 @@ export default function ProductDetailPage({
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Price & Action Card */}
+              <div className="bg-slate-800 rounded-2xl p-6 shadow-xl border border-primary-500/30 ring-1 ring-primary-500/20">
+                <h3 className="text-white font-bold uppercase text-sm tracking-wider flex items-center gap-2 mb-4">
+                  <span className="w-6 h-6 rounded-full bg-primary-500 text-slate-900 flex items-center justify-center text-[10px]">2</span>
+                  Xác nhận & Đăng ký
+                </h3>
+
+                {product.videoUrl && getYoutubeEmbedUrl(product.videoUrl) && (
+                  <div className="mb-6 rounded-xl overflow-hidden border border-slate-700 aspect-video bg-black shadow-inner">
+                    <iframe
+                      src={`${getYoutubeEmbedUrl(product.videoUrl)}?rel=0`}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title="Video demo"
+                    />
+                  </div>
+                )}
+
+                <div className="flex items-center gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 text-amber-400 fill-amber-400" />
+                  ))}
+                  <span className="text-sm text-slate-500 ml-2">(128 đánh giá)</span>
+                </div>
+
+                <div className="mb-6 p-4 bg-slate-900/50 rounded-xl border border-slate-700">
+                  <div className="text-xs text-slate-500 uppercase font-bold mb-1">Tổng cộng dự kiến:</div>
+                  <div className="flex items-end gap-3 mb-2">
+                    <span className="text-4xl font-bold text-primary-400">
+                      {formatCurrency(
+                        selectedPackage === "gold" ? (product.priceGold || product.price * 1.5) :
+                          selectedPackage === "platinum" ? (product.pricePlatinum || product.price * 2.5) :
+                            product.price
+                      )}
+                    </span>
+                    <span className="text-xl text-slate-500 line-through">
+                      {formatCurrency(
+                        (selectedPackage === "gold" ? (product.priceGold || product.price * 1.5) :
+                          selectedPackage === "platinum" ? (product.pricePlatinum || product.price * 2.5) :
+                            product.price) * 2
+                      )}
+                    </span>
+                  </div>
+                  <span className="inline-flex px-3 py-1 bg-red-900/50 text-red-400 text-[10px] font-bold rounded-full uppercase tracking-wider">
+                    Ưu đãi giới hạn - Giảm 50%
+                  </span>
+                </div>
+
+                <AddToCartButton
+                  product={{
+                    ...product,
+                    price: selectedPackage === "gold" ? (product.priceGold || product.price * 1.5) :
+                      selectedPackage === "platinum" ? (product.pricePlatinum || product.price * 2.5) :
+                        product.price,
+                    packageType: selectedPackage
+                  }}
+                />
               </div>
 
               <style jsx>{`

@@ -134,8 +134,9 @@ model Order {
   totalPrice Float
 
   // Status
-  status String  @default("pending") // pending, confirmed, in_progress, completed, cancelled
-  notes  String?
+  status      String  @default("pending") // pending, confirmed, in_progress, completed, cancelled
+  packageType String  @default("standard") // standard, gold, platinum
+  notes       String?
 
   // Assignment
   assignedToId String?

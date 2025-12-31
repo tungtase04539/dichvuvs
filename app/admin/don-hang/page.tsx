@@ -26,6 +26,7 @@ interface Order {
   address: string;
   district: string;
   status: string;
+  packageType: string;
   scheduledDate: string;
   scheduledTime: string;
   totalPrice: number;
@@ -99,7 +100,7 @@ export default function OrdersPage() {
       <div className="flex items-center justify-between flex-wrap gap-4">
         <h1 className="text-2xl font-bold text-slate-900">Quản lý đơn hàng</h1>
         <div className="flex items-center gap-3">
-          <ExportExcel 
+          <ExportExcel
             orders={filteredOrders.map(o => ({
               orderCode: o.orderCode,
               customerName: o.customerName,
@@ -111,7 +112,7 @@ export default function OrdersPage() {
               notes: o.notes || null,
               createdAt: o.createdAt,
               serviceName: o.service?.name,
-            }))} 
+            }))}
           />
           <button
             onClick={fetchOrders}
@@ -176,6 +177,7 @@ export default function OrdersPage() {
                   <th className="px-6 py-4 font-medium">Dịch vụ</th>
                   <th className="px-6 py-4 font-medium">Lịch hẹn</th>
                   <th className="px-6 py-4 font-medium">Giá trị</th>
+                  <th className="px-6 py-4 font-medium">Gói</th>
                   <th className="px-6 py-4 font-medium">Trạng thái</th>
                   <th className="px-6 py-4 font-medium">Thao tác</th>
                 </tr>
@@ -212,6 +214,15 @@ export default function OrdersPage() {
                     </td>
                     <td className="px-6 py-4 font-medium text-slate-900">
                       {formatCurrency(order.totalPrice)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={cn("badge",
+                        order.packageType === "gold" ? "bg-amber-100 text-amber-700" :
+                          order.packageType === "platinum" ? "bg-cyan-100 text-cyan-700" :
+                            "bg-slate-100 text-slate-700"
+                      )}>
+                        {order.packageType || "standard"}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
                       <span className={cn("badge", getStatusColor(order.status))}>

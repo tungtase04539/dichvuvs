@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ShoppingCart, Plus, Minus, ArrowRight } from "lucide-react";
+import { CheckCircle, Plus, Minus, ArrowRight } from "lucide-react";
 
 interface Product {
   id: string;
   name: string;
   price: number;
+  packageType?: string;
 }
 
 interface AddToCartButtonProps {
@@ -20,7 +21,11 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
 
   const handleAddToCart = () => {
     // Save to session storage
-    const cart = [{ id: product.id, quantity }];
+    const cart = [{
+      id: product.id,
+      quantity,
+      packageType: product.packageType || "standard"
+    }];
     sessionStorage.setItem("cart", JSON.stringify(cart));
     router.push("/dat-hang");
   };
@@ -48,17 +53,17 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
 
       <button
         onClick={handleAddToCart}
-        className="btn btn-primary w-full text-lg py-4"
+        className="btn btn-primary w-full text-lg py-4 font-bold uppercase tracking-wider shadow-lg shadow-primary-500/20"
       >
-        <ShoppingCart className="w-5 h-5" />
-        Mua ngay
+        <CheckCircle className="w-5 h-5" />
+        ĐĂNG KÝ SỬ DỤNG
       </button>
 
       <button
         onClick={handleAddToCart}
-        className="btn btn-secondary w-full"
+        className="btn btn-secondary w-full font-bold uppercase tracking-wider"
       >
-        Thêm vào giỏ hàng
+        THÊM VÀO DANH SÁCH CHỜ
         <ArrowRight className="w-5 h-5" />
       </button>
     </div>

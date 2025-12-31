@@ -20,8 +20,12 @@ interface Product {
 }
 
 interface CartItem {
-  product: Product;
+  product: Product & {
+    priceGold?: number | null;
+    pricePlatinum?: number | null;
+  };
   quantity: number;
+  packageType: string;
 }
 
 export default function OrderForm() {
@@ -102,10 +106,14 @@ export default function OrderForm() {
         try {
           const items = JSON.parse(cartData);
           const cartItems: CartItem[] = [];
-          items.forEach((item: { id: string; quantity: number }) => {
+          items.forEach((item: { id: string; quantity: number; packageType?: string }) => {
             const product = products.find((p) => p.id === item.id);
             if (product) {
-              cartItems.push({ product, quantity: item.quantity });
+              cartItems.push({
+                product,
+                quantity: item.quantity,
+                packageType: item.packageType || "standard"
+              });
             }
           });
           if (cartItems.length > 0) setCart(cartItems);
@@ -119,13 +127,13 @@ export default function OrderForm() {
 
   const addToCart = (product: Product) => {
     setCart((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
+      const existing = prev.find((item) => item.product.id === product.id && item.packageType === "standard");
       if (existing) {
         return prev.map((item) =>
-          item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          (item.product.id === product.id && item.packageType === "standard") ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-      return [...prev, { product, quantity: 1 }];
+      return [...prev, { product, quantity: 1, packageType: "standard" }];
     });
   };
 
@@ -146,7 +154,12 @@ export default function OrderForm() {
   };
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const totalPrice = cart.reduce((sum, item) => {
+    let price = item.product.price;
+    if (item.packageType === "gold") price = item.product.priceGold || price * 1.5;
+    else if (item.packageType === "platinum") price = item.product.pricePlatinum || price * 2.5;
+    return sum + price * item.quantity;
+  }, 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,6 +174,7 @@ export default function OrderForm() {
       const items = cart.map((item) => ({
         serviceId: item.product.id,
         quantity: item.quantity,
+        packageType: item.packageType
       }));
 
       const res = await fetch("/api/orders", {
@@ -312,9 +326,23 @@ export default function OrderForm() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-slate-900 truncate">{item.product.name}</h3>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-slate-900 truncate">{item.product.name}</h3>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${item.packageType === 'gold' ? 'bg-amber-100 text-amber-600' :
+                            item.packageType === 'platinum' ? 'bg-cyan-100 text-cyan-600' :
+                              'bg-slate-100 text-slate-500'
+                          }`}>
+                          {item.packageType || 'standard'}
+                        </span>
+                      </div>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-primary-600 font-bold">{formatCurrency(item.product.price)}</span>
+                        <span className="text-primary-600 font-bold">
+                          {formatCurrency(
+                            item.packageType === 'gold' ? (item.product.priceGold || item.product.price * 1.5) :
+                              item.packageType === 'platinum' ? (item.product.pricePlatinum || item.product.price * 2.5) :
+                                item.product.price
+                          )}
+                        </span>
                         <span className="text-slate-300">/tháng</span>
                       </div>
                     </div>

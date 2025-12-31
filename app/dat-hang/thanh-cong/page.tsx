@@ -248,9 +248,16 @@ function OrderSuccessContent() {
         // we let the checkPaymentStatus() or its auto-interval find the update in the DB
         await checkPaymentStatus();
       } else {
-        const errData = await res.json();
-        console.error("Simulation error:", errData);
-        alert("Lỗi mô phỏng: " + (errData.message || "Không xác định"));
+        let errorMessage = "Không xác định";
+        try {
+          const errData = await res.json();
+          errorMessage = errData.message || errorMessage;
+        } catch (e) {
+          // If 504, Vercel returns HTML, res.json() fails
+          errorMessage = "Máy chủ đang xử lý (Timeout). Vui lòng chờ 10-30 giây để hệ thống tự cập nhật.";
+        }
+        console.error("Simulation error:", errorMessage);
+        alert("Lỗi mô phỏng: " + errorMessage);
       }
     } catch (err) {
       console.error("Simulation request error:", err);

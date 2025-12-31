@@ -61,73 +61,56 @@ export async function POST(request: NextRequest) {
     const tolerance = 1000;
     const isAmountMatch = Math.abs(transaction.transferAmount - order.totalPrice) <= tolerance;
 
-    // Count codes for this service
+    // Consolidate inventory logic - Find available code first
+    const availableChatbot = await prisma.chatbotInventory.findFirst({
+      where: {
+        serviceId: order.serviceId,
+        isUsed: false,
+      },
+      orderBy: { createdAt: "asc" },
+    });
+
+    // Check if it's the LAST one (shared logic or single-use)
     const inventoryCount = await prisma.chatbotInventory.count({
       where: { serviceId: order.serviceId }
     });
 
-    if (inventoryCount === 1) {
-      // Reusable code logic: if only ONE code exists, use it for everyone
-      const sharedChatbot = await prisma.chatbotInventory.findFirst({
-        where: { serviceId: order.serviceId },
-      });
+    if (availableChatbot) {
+      const isShared = inventoryCount === 1;
 
-      if (sharedChatbot) {
-        await prisma.order.update({
-          where: { id: order.id },
-          data: {
-            status: "confirmed",
-            notes: order.notes
-              ? `${order.notes}\n\n✅ Đã tự động bàn giao ChatBot: ${sharedChatbot.activationCode}`
-              : `✅ Đã tự động bàn giao ChatBot: ${sharedChatbot.activationCode}`,
-          },
-        });
-        console.log(`✅ SHARED Chatbot data [${sharedChatbot.activationCode}] assigned to order ${orderCode}`);
-      }
-    } else {
-      // Single-use logic: Find available chatbot data (FIFO)
-      const availableChatbot = await prisma.chatbotInventory.findFirst({
-        where: {
-          serviceId: order.serviceId,
-          isUsed: false,
-        },
-        orderBy: { createdAt: "asc" },
-      });
-
-      // Assign chatbot data if available
-      if (availableChatbot) {
-        await prisma.$transaction([
-          prisma.chatbotInventory.update({
+      await prisma.$transaction(async (tx) => {
+        // Update Inventory if not shared
+        if (!isShared) {
+          await tx.chatbotInventory.update({
             where: { id: availableChatbot.id },
-            data: {
-              isUsed: true,
-              orderId: order.id,
-            },
-          }),
-          prisma.order.update({
-            where: { id: order.id },
-            data: {
-              status: "confirmed",
-              notes: order.notes
-                ? `${order.notes}\n\n✅ Đã tự động bàn giao ChatBot: ${availableChatbot.activationCode}`
-                : `✅ Đã tự động bàn giao ChatBot: ${availableChatbot.activationCode}`,
-            },
-          })
-        ]);
-        console.log(`✅ Chatbot data [${availableChatbot.activationCode}] assigned and order ${orderCode} confirmed`);
-      } else {
-        // Just confirm order if no chatbot data
-        await prisma.order.update({
+            data: { isUsed: true, orderId: order.id },
+          });
+        }
+
+        // Update Order
+        await tx.order.update({
           where: { id: order.id },
           data: {
             status: "confirmed",
             notes: order.notes
-              ? `${order.notes}\n\n⚠️ Không có sẵn dữ liệu ChatBot để bàn giao tự động.`
-              : `⚠️ Không có sẵn dữ liệu ChatBot để bàn giao tự động.`,
+              ? `${order.notes}\n\n✅ Đã tự động bàn giao ChatBot: ${availableChatbot.activationCode}`
+              : `✅ Đã tự động bàn giao ChatBot: ${availableChatbot.activationCode}`,
           },
         });
-        console.log(`⚠️ No chatbot data available for service ${order.service.name} - Order ${orderCode} confirmed without delivery`);
-      }
+      });
+      console.log(`✅ Chatbot data [${availableChatbot.activationCode}] assigned to order ${orderCode}`);
+    } else {
+      // Just confirm order if no chatbot data
+      await prisma.order.update({
+        where: { id: order.id },
+        data: {
+          status: "confirmed",
+          notes: order.notes
+            ? `${order.notes}\n\n⚠️ Không có sẵn dữ liệu ChatBot để bàn giao tự động.`
+            : `⚠️ Không có sẵn dữ liệu ChatBot để bàn giao tự động.`,
+        },
+      });
+      console.log(`⚠️ No chatbot data available for service ${order.service.name} - Order ${orderCode} confirmed without delivery`);
     }
 
     // --- Logic tạo tài khoản khách hàng tự động ---

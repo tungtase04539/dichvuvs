@@ -146,8 +146,8 @@ export async function POST(request: NextRequest) {
           id: true,
           name: true,
           price: true,
-          priceGold: true,
-          pricePlatinum: true
+          // priceGold: true,
+          // pricePlatinum: true 
         },
       });
       setCache("products_map", products, 300);
@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
         basePrice: mainBasePrice,
         totalPrice,
         status: "pending",
-        packageType: items[0].packageType || "standard",
+        // packageType: items[0].packageType || "standard",
         referralCode: finalReferralCode,
         referrerId: referrerId,
       },

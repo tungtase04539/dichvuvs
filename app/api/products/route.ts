@@ -37,10 +37,7 @@ export async function GET(request: NextRequest) {
     // Query đơn giản hơn - không dùng relation join trước
     let query = supabase
       .from("Service")
-      .select(`
-        id, name, slug, description, price, image, videoUrl, featured, categoryId, active,
-        priceGold, pricePlatinum, featuresGold, featuresPlatinum
-      `)
+      .select("*")
       .eq("active", true);
 
     // Filter by category if provided

@@ -368,8 +368,27 @@ export default function ProductDetailPage({
               <div className="bg-slate-800 rounded-2xl p-6 shadow-xl border border-primary-500/30 ring-1 ring-primary-500/20">
                 <h3 className="text-white font-bold uppercase text-sm tracking-wider flex items-center gap-2 mb-4">
                   <span className="w-6 h-6 rounded-full bg-primary-500 text-slate-900 flex items-center justify-center text-[10px]">2</span>
-                  Xác nhận & Đăng ký
+                  {selectedPackage === "standard" ? "Xác nhận mua ChatBot" : "Đăng ký Gói Nâng Cấp"}
                 </h3>
+
+                <div className="mb-6">
+                  {selectedPackage === "standard" ? (
+                    <div className="p-4 bg-slate-900/50 rounded-xl border border-slate-700">
+                      <p className="text-slate-300 text-sm leading-relaxed">
+                        Sở hữu ngay ChatBot với đầy đủ tính năng tiêu chuẩn. Hệ thống sẽ tự động bàn giao tài khoản ngay sau khi thanh toán thành công.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-primary-900/10 rounded-xl border border-primary-900/30">
+                      <p className="text-primary-100/90 text-sm leading-relaxed flex gap-3">
+                        <Bot className="w-5 h-5 text-primary-400 shrink-0" />
+                        <span>
+                          Gói {selectedPackage.toUpperCase()} bao gồm **Link Bot riêng biệt** và dịch vụ setup phần cứng/phần mềm chuyên sâu. Admin sẽ trực tiếp bàn giao link bot cho bạn sau khi setup hoàn tất.
+                        </span>
+                      </p>
+                    </div>
+                  )}
+                </div>
 
                 {product.videoUrl && getYoutubeEmbedUrl(product.videoUrl) && (
                   <div className="mb-6 rounded-xl overflow-hidden border border-slate-700 aspect-video bg-black shadow-inner">
@@ -391,7 +410,9 @@ export default function ProductDetailPage({
                 </div>
 
                 <div className="mb-6 p-4 bg-slate-900/50 rounded-xl border border-slate-700">
-                  <div className="text-xs text-slate-500 uppercase font-bold mb-1">Tổng cộng dự kiến:</div>
+                  <div className="text-xs text-slate-500 uppercase font-bold mb-1">
+                    {selectedPackage === "standard" ? "Giá mua sản phẩm:" : "Phí dịch vụ trọn gói:"}
+                  </div>
                   <div className="flex items-end gap-3 mb-2">
                     <span className="text-4xl font-bold text-primary-400">
                       {formatCurrency(

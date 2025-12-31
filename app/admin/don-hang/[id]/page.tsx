@@ -33,6 +33,7 @@ interface Order {
     district: string;
     status: string;
     packageType: string;
+    chatbotLink?: string | null;
     scheduledDate: string;
     scheduledTime: string;
     totalPrice: number;
@@ -58,6 +59,7 @@ interface Order {
 
 export default function OrderDetailPage({ params }: { params: { id: string } }) {
     const [order, setOrder] = useState<Order | null>(null);
+    const [chatbotLink, setChatbotLink] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [isUpdating, setIsUpdating] = useState(false);
     const router = useRouter();
@@ -74,6 +76,7 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
             }
             const data = await res.json();
             setOrder(data.order);
+            setChatbotLink(data.order.chatbotLink || "");
         } catch (error) {
             console.error("Error fetching order:", error);
         } finally {
@@ -99,6 +102,26 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
             }
         } catch (error) {
             console.error("Error updating order:", error);
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    const handleUpdateLink = async () => {
+        setIsUpdating(true);
+        try {
+            const res = await fetch(`/api/orders/${params.id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ chatbotLink: chatbotLink }),
+            });
+
+            if (res.ok) {
+                alert("Đã cập nhật link Bot thành công!");
+                fetchOrder();
+            }
+        } catch (error) {
+            console.error("Error updating chatbot link:", error);
         } finally {
             setIsUpdating(false);
         }
@@ -336,6 +359,40 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
                             </div>
                         )}
                     </div>
+
+                    {/* Provisioning Section for Premium Packages */}
+                    {order.packageType !== "standard" && (
+                        <div className="bg-white rounded-2xl p-6 shadow-sm border border-primary-100 ring-1 ring-primary-50">
+                            <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                <Bot className="w-4 h-4 text-primary-500" />
+                                Setup & Bàn giao Link Bot
+                            </h3>
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs text-slate-400 uppercase font-bold">Link Bot dành riêng cho khách:</label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={chatbotLink}
+                                            onChange={(e) => setChatbotLink(e.target.value)}
+                                            placeholder="https://t.me/your_bot_link..."
+                                            className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                                        />
+                                        <button
+                                            onClick={handleUpdateLink}
+                                            disabled={isUpdating}
+                                            className="btn btn-primary px-6"
+                                        >
+                                            {isUpdating ? "..." : "Lưu Link"}
+                                        </button>
+                                    </div>
+                                    <p className="text-[10px] text-slate-500 italic px-1">
+                                        * Link này sẽ được hiển thị trong trang chi tiết đơn hàng của khách hàng sau khi bạn lưu.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Quick Help Card */}
                     <div className="bg-primary-50 rounded-2xl p-6 border border-primary-100">

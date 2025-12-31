@@ -136,6 +136,7 @@ model Order {
   // Status
   status      String  @default("pending") // pending, confirmed, in_progress, completed, cancelled
   packageType String  @default("standard") // standard, gold, platinum
+  chatbotLink String? // Link dedicated bot for premium packages
   notes       String?
 
   // Assignment

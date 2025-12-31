@@ -55,7 +55,7 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { status, assignedToId, notes } = body;
+    const { status, assignedToId, notes, chatbotLink } = body;
 
     const updateData: Record<string, unknown> = {};
 
@@ -67,6 +67,9 @@ export async function PATCH(
     }
     if (notes !== undefined) {
       updateData.notes = notes;
+    }
+    if (chatbotLink !== undefined) {
+      updateData.chatbotLink = chatbotLink;
     }
 
     const order = await prisma.order.update({

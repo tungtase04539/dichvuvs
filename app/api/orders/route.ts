@@ -132,9 +132,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Vui lòng nhập họ tên và số điện thoại" }, { status: 400 });
     }
 
-    if (!email) {
-      return NextResponse.json({ error: "Vui lòng nhập email để nhận tài khoản quản lý ChatBot" }, { status: 400 });
-    }
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: "Vui lòng chọn ít nhất 1 sản phẩm" }, { status: 400 });

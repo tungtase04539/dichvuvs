@@ -91,6 +91,12 @@ model Service {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   chatbotLink     String? // Link chatbot mac dinh cho san pham nay
+  
+  // Custom Packages (Gold & Platinum)
+  priceGold        Float?
+  pricePlatinum    Float?
+  featuresGold     String? // JSON string of perks
+  featuresPlatinum String? // JSON string of perks
 
   // Category
   categoryId String?

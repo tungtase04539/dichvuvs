@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, Loader2, Youtube } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Youtube, Star } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
 
 interface Category {
@@ -31,6 +31,10 @@ export default function AddProductPage() {
     featured: false,
     active: true,
     chatbotLink: "",
+    priceGold: "",
+    pricePlatinum: "",
+    featuresGold: "",
+    featuresPlatinum: "",
   });
 
   // Load categories
@@ -279,6 +283,65 @@ VD:
               step="1000"
               className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
+          </div>
+
+          <div className="border-t border-slate-100 pt-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <Star className="w-5 h-5 text-amber-500" />
+              Gói Dịch Vụ Nâng Cao (Tùy chọn)
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Gold Package */}
+              <div className="space-y-4 p-4 bg-amber-50 rounded-xl border border-amber-100">
+                <h4 className="font-bold text-amber-800">Gói VÀNG (Gold)</h4>
+                <div>
+                  <label className="block text-xs font-bold text-amber-700 uppercase mb-1">Giá gói Vàng (VNĐ)</label>
+                  <input
+                    type="number"
+                    value={formData.priceGold}
+                    onChange={(e) => setFormData({ ...formData, priceGold: e.target.value })}
+                    className="w-full px-3 py-2 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
+                    placeholder="VD: 49000"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-amber-700 uppercase mb-1">Ưu đãi gói Vàng (Mỗi dòng 1 ưu đãi)</label>
+                  <textarea
+                    value={formData.featuresGold}
+                    onChange={(e) => setFormData({ ...formData, featuresGold: e.target.value })}
+                    rows={4}
+                    className="w-full px-3 py-2 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none resize-none text-sm"
+                    placeholder="Hỗ trợ ưu tiên&#10;Update 24/7&#10;Tùy chỉnh giao diện..."
+                  />
+                </div>
+              </div>
+
+              {/* Platinum Package */}
+              <div className="space-y-4 p-4 bg-cyan-50 rounded-xl border border-cyan-100">
+                <h4 className="font-bold text-cyan-800">Gói BẠCH KIM (Platinum)</h4>
+                <div>
+                  <label className="block text-xs font-bold text-cyan-700 uppercase mb-1">Giá gói Bạch Kim (VNĐ)</label>
+                  <input
+                    type="number"
+                    value={formData.pricePlatinum}
+                    onChange={(e) => setFormData({ ...formData, pricePlatinum: e.target.value })}
+                    className="w-full px-3 py-2 border border-cyan-200 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none"
+                    placeholder="VD: 99000"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-cyan-700 uppercase mb-1">Ưu đãi gói Bạch Kim (Mỗi dòng 1 ưu đãi)</label>
+                  <textarea
+                    value={formData.featuresPlatinum}
+                    onChange={(e) => setFormData({ ...formData, featuresPlatinum: e.target.value })}
+                    rows={4}
+                    className="w-full px-3 py-2 border border-cyan-200 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none resize-none text-sm"
+                    placeholder="Full tính năng Premium&#10;Bảo hành trọn đời&#10;Hỗ trợ 1-1..."
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Checkboxes */}

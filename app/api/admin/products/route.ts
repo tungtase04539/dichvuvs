@@ -39,7 +39,11 @@ export async function POST(request: NextRequest) {
     const adminSupabase = createAdminSupabaseClient()!;
 
     const body = await request.json();
-    const { name, slug, description, longDescription, price, image, videoUrl, categoryId, featured, active, chatbotLink } = body;
+    const {
+      name, slug, description, longDescription, price, image, videoUrl,
+      categoryId, featured, active, chatbotLink,
+      priceGold, pricePlatinum, featuresGold, featuresPlatinum
+    } = body;
 
     if (!name || !slug || !price) {
       return NextResponse.json(
@@ -79,6 +83,10 @@ export async function POST(request: NextRequest) {
         featured: featured === true,
         active: true, // Force active = true cho sản phẩm mới
         chatbotLink: chatbotLink || null,
+        priceGold: priceGold ? parseFloat(priceGold) : null,
+        pricePlatinum: pricePlatinum ? parseFloat(pricePlatinum) : null,
+        featuresGold: featuresGold || null,
+        featuresPlatinum: featuresPlatinum || null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       })

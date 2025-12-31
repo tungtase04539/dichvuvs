@@ -19,6 +19,10 @@ interface Product {
   image: string | null;
   videoUrl: string | null;
   featured: boolean;
+  priceGold: number | null;
+  pricePlatinum: number | null;
+  featuresGold: string | null;
+  featuresPlatinum: string | null;
 }
 
 export default function ProductDetailPage({
@@ -29,6 +33,8 @@ export default function ProductDetailPage({
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedPackage, setSelectedPackage] = useState<"standard" | "gold" | "platinum">("standard");
+  const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
   const router = useRouter();
 
   const getYoutubeEmbedUrl = (url: string | null) => {
@@ -58,14 +64,14 @@ export default function ProductDetailPage({
     const loadData = async () => {
       try {
         const res = await fetch(`/api/products/${params.slug}`);
-        
+
         if (!res.ok) {
           router.push("/san-pham");
           return;
         }
-        
+
         const data = await res.json();
-        
+
         if (!data.product) {
           router.push("/san-pham");
           return;
@@ -147,7 +153,7 @@ export default function ProductDetailPage({
                   ) : (
                     <div className="space-y-6 text-slate-300">
                       <p>
-                        <strong className="text-white">{product.name}</strong> là giải pháp ChatBot AI tiên tiến, 
+                        <strong className="text-white">{product.name}</strong> là giải pháp ChatBot AI tiên tiến,
                         được thiết kế đặc biệt để tự động hóa quy trình kinh doanh và tăng hiệu quả tương tác với khách hàng.
                       </p>
 
@@ -229,9 +235,147 @@ export default function ProductDetailPage({
                   </span>
                 </div>
 
-                <AddToCartButton product={product} />
+                <AddToCartButton
+                  product={{
+                    ...product,
+                    price: selectedPackage === "gold" ? (product.priceGold || product.price) :
+                      selectedPackage === "platinum" ? (product.pricePlatinum || product.price) :
+                        product.price
+                  }}
+                />
 
               </div>
+
+              {/* Package Selection Section */}
+              <div className="space-y-4">
+                <h3 className="text-white font-bold uppercase text-sm tracking-wider flex items-center gap-2">
+                  <Star className="w-4 h-4 text-primary-400" />
+                  Chọn gói dịch vụ
+                </h3>
+
+                <div className="grid grid-cols-1 gap-4">
+                  {/* Standard Package */}
+                  <div
+                    className={`relative group cursor-pointer transition-all preserve-3d h-48 ${flippedCards['standard'] ? 'flipped' : ''}`}
+                    onClick={() => {
+                      setSelectedPackage("standard");
+                      setFlippedCards(prev => ({ ...prev, standard: !prev.standard }));
+                    }}
+                  >
+                    <div className={`absolute inset-0 backface-hidden rounded-2xl p-5 border-2 transition-all ${selectedPackage === "standard" ? "bg-slate-800 border-primary-500 shadow-lg shadow-primary-500/20" : "bg-slate-800/50 border-slate-700 hover:border-slate-600"}`}>
+                      <div className="flex justify-between items-start mb-4">
+                        <span className="text-slate-400 text-xs font-bold uppercase">Tiêu chuẩn</span>
+                        {selectedPackage === "standard" && <CheckCircle className="w-5 h-5 text-primary-500" />}
+                      </div>
+                      <div className="text-2xl font-bold text-white mb-2">{formatCurrency(product.price)}</div>
+                      <p className="text-slate-400 text-xs">Gói cơ bản phù hợp cho cá nhân khởi đầu</p>
+                      <div className="absolute bottom-4 right-4 text-primary-400 text-[10px] font-bold uppercase flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                        Xem ưu đãi <ArrowLeft className="w-3 h-3 rotate-180" />
+                      </div>
+                    </div>
+
+                    <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-slate-700 border-2 border-primary-500 rotate-y-180 flex flex-col justify-center">
+                      <h4 className="text-white font-bold mb-3 text-sm">Ưu đãi Tiêu chuẩn:</h4>
+                      <ul className="space-y-2">
+                        {["Full tính năng cơ bản", "Hỗ trợ cộng đồng", "Update bảo mật"].map((f, i) => (
+                          <li key={i} className="flex items-center gap-2 text-xs text-slate-300">
+                            <CheckCircle className="w-3 h-3 text-primary-400" />
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Gold Package */}
+                  <div
+                    className={`relative group cursor-pointer transition-all preserve-3d h-48 ${flippedCards['gold'] ? 'flipped' : ''}`}
+                    onClick={() => {
+                      setSelectedPackage("gold");
+                      setFlippedCards(prev => ({ ...prev, gold: !prev.gold }));
+                    }}
+                  >
+                    <div className={`absolute inset-0 backface-hidden rounded-2xl p-5 border-2 transition-all ${selectedPackage === "gold" ? "bg-amber-900/20 border-amber-500 shadow-lg shadow-amber-500/20" : "bg-amber-900/10 border-amber-900/30 hover:border-amber-500/50"}`}>
+                      <div className="flex justify-between items-start mb-4">
+                        <span className="text-amber-400 text-xs font-bold uppercase flex items-center gap-1">
+                          <Star className="w-3 h-3 fill-amber-400" />
+                          Gói VÀNG
+                        </span>
+                        {selectedPackage === "gold" && <CheckCircle className="w-5 h-5 text-amber-500" />}
+                      </div>
+                      <div className="text-2xl font-bold text-amber-400 mb-2">{formatCurrency(product.priceGold || product.price * 1.5)}</div>
+                      <p className="text-amber-100/60 text-xs">Phù hợp cho doanh nghiệp đang phát triển</p>
+                      <div className="absolute bottom-4 right-4 text-amber-400 text-[10px] font-bold uppercase flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                        Xem ưu đãi <ArrowLeft className="w-3 h-3 rotate-180" />
+                      </div>
+                    </div>
+
+                    <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-amber-900 border-2 border-amber-500 rotate-y-180 flex flex-col justify-center">
+                      <h4 className="text-white font-bold mb-3 text-sm">Ưu đãi gói Vàng:</h4>
+                      <ul className="space-y-2">
+                        {(product.featuresGold?.split('\n') || ["Hỗ trợ ưu tiên", "Tùy chỉnh linh hoạt", "Theo dõi nâng cao"]).map((f: string, i: number) => (
+                          <li key={i} className="flex items-center gap-2 text-xs text-amber-100 font-medium">
+                            <CheckCircle className="w-3 h-3 text-amber-400" />
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Platinum Package */}
+                  <div
+                    className={`relative group cursor-pointer transition-all preserve-3d h-48 ${flippedCards['platinum'] ? 'flipped' : ''}`}
+                    onClick={() => {
+                      setSelectedPackage("platinum");
+                      setFlippedCards(prev => ({ ...prev, platinum: !prev.platinum }));
+                    }}
+                  >
+                    <div className={`absolute inset-0 backface-hidden rounded-2xl p-5 border-2 transition-all ${selectedPackage === "platinum" ? "bg-cyan-900/20 border-cyan-400 shadow-lg shadow-cyan-400/20" : "bg-cyan-900/10 border-cyan-900/30 hover:border-cyan-400/50"}`}>
+                      <div className="flex justify-between items-start mb-4">
+                        <span className="text-cyan-400 text-xs font-bold uppercase flex items-center gap-1">
+                          <Bot className="w-3 h-3" />
+                          BACH KIM
+                        </span>
+                        {selectedPackage === "platinum" && <CheckCircle className="w-5 h-5 text-cyan-400" />}
+                      </div>
+                      <div className="text-2xl font-bold text-cyan-400 mb-2">{formatCurrency(product.pricePlatinum || product.price * 2.5)}</div>
+                      <p className="text-cyan-100/60 text-xs">Giải pháp tối thượng cho tập đoàn lớn</p>
+                      <div className="absolute bottom-4 right-4 text-cyan-400 text-[10px] font-bold uppercase flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                        Xem ưu đãi <ArrowLeft className="w-3 h-3 rotate-180" />
+                      </div>
+                    </div>
+
+                    <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-cyan-950 border-2 border-cyan-400 rotate-y-180 flex flex-col justify-center">
+                      <h4 className="text-white font-bold mb-3 text-sm">Ưu đãi Bạch Kim:</h4>
+                      <ul className="space-y-2">
+                        {(product.featuresPlatinum?.split('\n') || ["Full giải pháp AI", "Kỹ thuật hỗ trợ 1-1", "SLA cam kết 99.9%"]).map((f: string, i: number) => (
+                          <li key={i} className="flex items-center gap-2 text-xs text-cyan-100 font-medium">
+                            <CheckCircle className="w-3 h-3 text-cyan-400" />
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <style jsx>{`
+                .preserve-3d {
+                  transform-style: preserve-3d;
+                  perspective: 1000px;
+                }
+                .backface-hidden {
+                  backface-visibility: hidden;
+                }
+                .rotate-y-180 {
+                  transform: rotateY(180deg);
+                }
+                .flipped {
+                  transform: rotateY(180deg);
+                }
+              `}</style>
 
               {/* Contact Card */}
               <div className="bg-gradient-cta rounded-2xl p-6 text-white border border-primary-400/20">
@@ -248,7 +392,7 @@ export default function ProductDetailPage({
                 </a>
               </div>
 
-            
+
             </div>
           </div>
 

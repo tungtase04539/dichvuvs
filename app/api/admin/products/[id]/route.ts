@@ -44,7 +44,11 @@ export async function PUT(
     const adminSupabase = createAdminSupabaseClient()!;
 
     const body = await request.json();
-    const { name, slug, description, longDescription, price, image, videoUrl, categoryId, featured, active, chatbotLink } = body;
+    const {
+      name, slug, description, longDescription, price, image, videoUrl,
+      categoryId, featured, active, chatbotLink,
+      priceGold, pricePlatinum, featuresGold, featuresPlatinum
+    } = body;
 
     if (!name || !slug || !price) {
       return NextResponse.json(
@@ -82,6 +86,10 @@ export async function PUT(
         featured: featured || false,
         active: active !== false,
         chatbotLink: chatbotLink || null,
+        priceGold: priceGold ? parseFloat(priceGold) : null,
+        pricePlatinum: pricePlatinum ? parseFloat(pricePlatinum) : null,
+        featuresGold: featuresGold || null,
+        featuresPlatinum: featuresPlatinum || null,
         updatedAt: new Date().toISOString(),
       })
       .eq("id", params.id)

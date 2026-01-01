@@ -210,37 +210,75 @@ export async function POST(request: NextRequest) {
       packageType: mainItem.packageType
     });
 
-    // Single insert query - Tài khoản sẽ được tạo sau khi thanh toán thành công
-    const order = await prisma.order.create({
-      data: {
-        orderCode,
-        serviceId: items[0].serviceId,
-        quantity: totalQuantity,
-        unit: "bot",
-        customerName,
-        customerPhone: finalPhone,
-        customerEmail: email,
-        address: "Online",
-        district: "Online",
-        scheduledDate: new Date(),
-        scheduledTime: "Giao ngay",
-        notes: notes ? `${notes}\n---\n${details.join(", ")}` : details.join(", "),
-        basePrice: mainBasePrice,
-        totalPrice,
-        status: "pending",
-        packageType: mainItem.packageType || "standard",
-        referralCode: finalReferralCode,
-        referrerId: referrerId,
-      },
-      select: {
-        id: true,
-        orderCode: true,
-        totalPrice: true,
-        status: true,
-        customerEmail: true,
-        service: { select: { name: true } },
-      },
-    });
+    let order;
+    try {
+      console.log("Attempting to create order with orderPackageType...");
+      order = await prisma.order.create({
+        data: {
+          orderCode,
+          serviceId: items[0].serviceId,
+          quantity: totalQuantity,
+          unit: "bot",
+          customerName,
+          customerPhone: finalPhone,
+          customerEmail: email,
+          address: "Online",
+          district: "Online",
+          scheduledDate: new Date(),
+          scheduledTime: "Giao ngay",
+          notes: notes ? `${notes}\n---\n${details.join(", ")}` : details.join(", "),
+          basePrice: mainBasePrice,
+          totalPrice,
+          status: "pending",
+          // @ts-ignore - dynamic fallback
+          orderPackageType: mainItem.packageType || "standard",
+          referralCode: finalReferralCode,
+          referrerId: referrerId,
+        },
+        select: {
+          id: true,
+          orderCode: true,
+          totalPrice: true,
+          status: true,
+          customerEmail: true,
+          service: { select: { name: true } },
+        },
+      });
+    } catch (createError: any) {
+      console.warn("Primary order creation failed, trying fallback without orderPackageType...", createError.message);
+      // Fallback: Try without the new field in case DB is not updated
+      order = await prisma.order.create({
+        data: {
+          orderCode,
+          serviceId: items[0].serviceId,
+          quantity: totalQuantity,
+          unit: "bot",
+          customerName,
+          customerPhone: finalPhone,
+          customerEmail: email,
+          address: "Online",
+          district: "Online",
+          scheduledDate: new Date(),
+          scheduledTime: "Giao ngay",
+          notes: notes
+            ? `${notes}\n---\n[Package: ${mainItem.packageType || 'standard'}]\n---\n${details.join(", ")}`
+            : `[Package: ${mainItem.packageType || 'standard'}]\n---\n${details.join(", ")}`,
+          basePrice: mainBasePrice,
+          totalPrice,
+          status: "pending",
+          referralCode: finalReferralCode,
+          referrerId: referrerId,
+        },
+        select: {
+          id: true,
+          orderCode: true,
+          totalPrice: true,
+          status: true,
+          customerEmail: true,
+          service: { select: { name: true } },
+        },
+      });
+    }
 
     console.log("Order created successfully:", order.orderCode);
 

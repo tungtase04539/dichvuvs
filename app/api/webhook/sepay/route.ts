@@ -84,14 +84,14 @@ export async function POST(request: NextRequest) {
 
     await prisma.$transaction(async (tx) => {
       // --- Special Logic for Premium Packages (Gold/Platinum) ---
-      if (order.packageType === "gold" || order.packageType === "platinum") {
-        const dedicatedLink = order.packageType === "gold"
+      if (order.orderPackageType === "gold" || order.orderPackageType === "platinum") {
+        const dedicatedLink = order.orderPackageType === "gold"
           ? linksMap.get("chatbot_link_gold") || order.service.chatbotLinkGold
           : linksMap.get("chatbot_link_platinum") || order.service.chatbotLinkPlatinum;
 
         const deliveryMessage = dedicatedLink
-          ? `✅ Đã tự động bàn giao Link ${order.packageType.toUpperCase()}: ${dedicatedLink}`
-          : `⚠️ Gói ${order.packageType.toUpperCase()} chưa có link bàn giao riêng. Vui lòng liên hệ Admin.`;
+          ? `✅ Đã tự động bàn giao Link ${order.orderPackageType.toUpperCase()}: ${dedicatedLink}`
+          : `⚠️ Gói ${order.orderPackageType.toUpperCase()} chưa có link bàn giao riêng. Vui lòng liên hệ Admin.`;
 
         await tx.order.update({
           where: { id: order.id },

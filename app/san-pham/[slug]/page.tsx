@@ -312,11 +312,12 @@ export default function ProductDetailPage({
                         className={`relative group cursor-pointer transition-all preserve-3d min-h-[220px] ${flippedCards['gold'] ? 'flipped' : ''}`}
                         onClick={() => setSelectedPackage("gold")}
                       >
-                        {/* Sparkle Border Container */}
-                        <div className={`absolute -inset-[2px] rounded-[18px] z-0 opacity-0 group-hover:opacity-100 transition-opacity bg-[length:200%_200%] bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-600 animate-border-sparkle`}></div>
+                        {/* Sparkle Border Container - ALWAYS VISIBLE for premium */}
+                        <div className={`absolute -inset-[2px] rounded-[18px] z-0 bg-[length:200%_200%] bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-600 animate-border-sparkle`}></div>
 
                         {/* Front Side */}
-                        <div className={`relative z-10 h-full backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "gold" ? "bg-amber-900/30 border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.3)] animate-premium-glow" : "bg-amber-900/10 border-amber-950 hover:bg-amber-900/20 hover:border-amber-400/50"}`}>
+                        {/* Front Side */}
+                        <div className={`relative z-10 h-full backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "gold" ? "bg-amber-900/30 border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.3)] animate-premium-glow" : "bg-slate-900/95 border-transparent"}`}>
                           <div className="flex justify-between items-start mb-3">
                             <span className="text-amber-400 text-[10px] font-bold uppercase flex items-center gap-1">
                               <Star className="w-3 h-3 fill-amber-400" />
@@ -396,11 +397,12 @@ export default function ProductDetailPage({
                         className={`relative group cursor-pointer transition-all preserve-3d min-h-[220px] ${flippedCards['platinum'] ? 'flipped' : ''}`}
                         onClick={() => setSelectedPackage("platinum")}
                       >
-                        {/* Sparkle Border Container */}
-                        <div className={`absolute -inset-[2px] rounded-[18px] z-0 opacity-0 group-hover:opacity-100 transition-opacity bg-[length:200%_200%] bg-gradient-to-r from-cyan-400 via-white to-blue-600 animate-border-sparkle`}></div>
+                        {/* Sparkle Border Container - ALWAYS VISIBLE for premium */}
+                        <div className={`absolute -inset-[2px] rounded-[18px] z-0 bg-[length:200%_200%] bg-gradient-to-r from-cyan-400 via-white to-blue-600 animate-border-sparkle`}></div>
 
                         {/* Front Side */}
-                        <div className={`relative z-10 h-full backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "platinum" ? "bg-cyan-900/30 border-cyan-400 shadow-[0_0_25px_rgba(34,211,238,0.3)] animate-premium-glow-platinum" : "bg-cyan-900/10 border-cyan-950 hover:bg-cyan-900/20 hover:border-cyan-400/50"}`}>
+                        {/* Front Side */}
+                        <div className={`relative z-10 h-full backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "platinum" ? "bg-cyan-900/40 border-cyan-400 shadow-[0_0_25px_rgba(34,211,238,0.3)] animate-premium-glow-platinum" : "bg-slate-900/95 border-transparent"}`}>
                           <div className="flex justify-between items-start mb-3">
                             <span className="text-cyan-400 text-[10px] font-bold uppercase flex items-center gap-1">
                               <Bot className="w-3 h-3" />

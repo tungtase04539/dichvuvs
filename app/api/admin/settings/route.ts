@@ -51,12 +51,16 @@ export async function POST(request: NextRequest) {
         // Validate and update each setting
         const updates = Object.entries(body).filter(([key]) => PACKAGE_SETTING_KEYS.includes(key));
 
-        for (const [key, value] of updates) {
-            await prisma.setting.upsert({
-                where: { key },
-                update: { value: String(value) },
-                create: { key, value: String(value) },
-            });
+        if (updates.length > 0) {
+            await prisma.$transaction(
+                updates.map(([key, value]) =>
+                    prisma.setting.upsert({
+                        where: { key },
+                        update: { value: String(value) },
+                        create: { key, value: String(value) },
+                    })
+                )
+            );
         }
 
         return NextResponse.json({ success: true, message: "Cập nhật cấu hình thành công" });

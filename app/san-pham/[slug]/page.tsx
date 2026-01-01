@@ -368,7 +368,7 @@ export default function ProductDetailPage({
                             </span>
                             {selectedPackage === "gold" && <CheckCircle className="w-5 h-5 text-amber-400 drop-shadow-glow" />}
                           </div>
-                          <div className={`text-2xl font-black mb-1 drop-shadow-sm ${selectedPackage === "gold" ? "text-white" : "text-amber-400"}`}>{formatCurrency(product.priceGold || product.price * 1.5)}</div>
+                          <div className={`text-2xl font-black mb-1 drop-shadow-sm ${selectedPackage === "gold" ? "text-white" : "text-amber-400"}`}>{formatCurrency(priceGold)}</div>
                           <p className={`text-[10px] mb-4 font-medium ${selectedPackage === "gold" ? "text-amber-100" : "text-amber-100/60"}`}>Combo: Trợ lý AI + Thương hiệu & Quà tặng</p>
 
                           <div className="mt-auto space-y-3">
@@ -404,7 +404,7 @@ export default function ProductDetailPage({
                         {/* Back Side */}
                         <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-amber-950 border-2 border-amber-500 rotate-y-180 flex flex-col">
                           <p className="text-white font-bold text-xs mb-2">Ưu đãi Combo Vàng:</p>
-                          <p className="text-amber-100/80 text-[10px] leading-snug mb-4">Sở hữu Standard + Đóng gói thương hiệu riêng, Quà tặng đặc biệt từ Admin.</p>
+                          <p className="text-amber-100/80 text-[10px] leading-snug mb-4">{featuresGoldStr.split("\n").join(", ")}</p>
 
                           <div className="mt-auto space-y-3">
                             <button
@@ -452,7 +452,7 @@ export default function ProductDetailPage({
                             </span>
                             {selectedPackage === "platinum" && <CheckCircle className="w-5 h-5 text-cyan-400 drop-shadow-glow" />}
                           </div>
-                          <div className={`text-2xl font-black mb-1 drop-shadow-sm ${selectedPackage === "platinum" ? "text-white" : "text-cyan-400"}`}>{formatCurrency(product.pricePlatinum || product.price * 2.5)}</div>
+                          <div className={`text-2xl font-black mb-1 drop-shadow-sm ${selectedPackage === "platinum" ? "text-white" : "text-cyan-400"}`}>{formatCurrency(pricePlatinum)}</div>
                           <p className={`text-[10px] mb-4 font-medium ${selectedPackage === "platinum" ? "text-cyan-100" : "text-cyan-100/60"}`}>Full Option: Trợ lý AI + Hệ sinh thái đặc quyền</p>
 
                           <div className="mt-auto space-y-3">
@@ -488,7 +488,7 @@ export default function ProductDetailPage({
                         {/* Back Side */}
                         <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-cyan-950 border-2 border-cyan-400 rotate-y-180 flex flex-col">
                           <p className="text-white font-bold text-xs mb-2">Đặc quyền Bạch Kim:</p>
-                          <p className="text-cyan-100/80 text-[10px] leading-snug mb-4">Full giải pháp AI, Kỹ thuật hỗ trợ 1-1, Setup link Bot riêng, SLA 99.9%.</p>
+                          <p className="text-cyan-100/80 text-[10px] leading-snug mb-4">{featuresPlatinumStr.split("\n").join(", ")}</p>
 
                           <div className="mt-auto space-y-3">
                             <button

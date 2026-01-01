@@ -76,12 +76,18 @@ export async function POST(request: NextRequest) {
 
     const isShared = inventoryCount === 1;
 
+    // Fetch global dedicated links
+    const globalLinks = await prisma.setting.findMany({
+      where: { key: { in: ["chatbot_link_gold", "chatbot_link_platinum"] } }
+    });
+    const linksMap = new Map(globalLinks.map(s => [s.key, s.value]));
+
     await prisma.$transaction(async (tx) => {
       // --- Special Logic for Premium Packages (Gold/Platinum) ---
       if (order.packageType === "gold" || order.packageType === "platinum") {
         const dedicatedLink = order.packageType === "gold"
-          ? order.service.chatbotLinkGold
-          : order.service.chatbotLinkPlatinum;
+          ? linksMap.get("chatbot_link_gold") || order.service.chatbotLinkGold
+          : linksMap.get("chatbot_link_platinum") || order.service.chatbotLinkPlatinum;
 
         const deliveryMessage = dedicatedLink
           ? `✅ Đã tự động bàn giao Link ${order.packageType.toUpperCase()}: ${dedicatedLink}`

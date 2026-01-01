@@ -34,6 +34,7 @@ export default function ProductDetailPage({
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPackage, setSelectedPackage] = useState<"standard" | "gold" | "platinum">("standard");
   const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
+  const [globalSettings, setGlobalSettings] = useState<Record<string, string>>({});
   const router = useRouter();
 
   const getYoutubeEmbedUrl = (url: string | null) => {
@@ -78,6 +79,17 @@ export default function ProductDetailPage({
 
         setProduct(data.product);
         setRelatedProducts(data.relatedProducts || []);
+
+        // Fetch global settings for packages
+        try {
+          const settingsRes = await fetch("/api/admin/settings");
+          const settingsData = await settingsRes.json();
+          if (settingsData.settings) {
+            setGlobalSettings(settingsData.settings);
+          }
+        } catch (e) {
+          console.warn("Could not load global settings, using defaults");
+        }
       } catch (error) {
         console.error("Load product error:", error);
         router.push("/san-pham");
@@ -98,6 +110,38 @@ export default function ProductDetailPage({
   }
 
   if (!product) return null;
+
+  // Global-aware pricing & features logic
+  const priceGold = globalSettings.price_gold ? parseFloat(globalSettings.price_gold) : (product.priceGold || product.price * 1.5);
+  const pricePlatinum = globalSettings.price_platinum ? parseFloat(globalSettings.price_platinum) : (product.pricePlatinum || product.price * 2.5);
+
+  const featuresGoldStr = globalSettings.features_gold || product.featuresGold || "Hỗ trợ ưu tiên\nUpdate 24/7\nTùy chỉnh chuyên sâu";
+  const featuresPlatinumStr = globalSettings.features_platinum || product.featuresPlatinum || "Toàn bộ tính năng Premium\nBảo hành trọn đời\nHỗ trợ 1-1";
+
+  const packages = [
+    {
+      id: "standard",
+      name: "TIÊU CHUẨN",
+      price: product.price,
+      features: ["Sử dụng vĩnh viễn", "Hỗ trợ cơ bản", "Update định kỳ"],
+      color: "slate",
+    },
+    {
+      id: "gold",
+      name: "VÀNG (GOLD)",
+      price: priceGold,
+      features: featuresGoldStr.split("\n").filter(f => f.trim()),
+      color: "amber",
+      popular: true,
+    },
+    {
+      id: "platinum",
+      name: "BẠCH KIM (PLATINUM)",
+      price: pricePlatinum,
+      features: featuresPlatinumStr.split("\n").filter(f => f.trim()),
+      color: "cyan",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-slate-900">

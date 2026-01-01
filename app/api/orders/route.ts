@@ -146,12 +146,19 @@ export async function POST(request: NextRequest) {
           id: true,
           name: true,
           price: true,
-          // priceGold: true,
-          // pricePlatinum: true 
         },
       });
       setCache("products_map", products, 300);
     }
+
+    // Fetch global package settings
+    const globalSettings = await prisma.setting.findMany({
+      where: { key: { in: ["price_gold", "price_platinum"] } }
+    });
+    const settingsMap = new Map(globalSettings.map(s => [s.key, s.value]));
+
+    const priceGoldGlobal = parseFloat(settingsMap.get("price_gold") || "0");
+    const pricePlatinumGlobal = parseFloat(settingsMap.get("price_platinum") || "0");
 
     const productMap = new Map(products.map((p) => [p.id, p]));
 
@@ -169,9 +176,9 @@ export async function POST(request: NextRequest) {
       // Determine price based on packageType
       let itemPrice = product.price;
       if (item.packageType === "gold") {
-        itemPrice = product.priceGold || product.price * 1.5;
+        itemPrice = priceGoldGlobal || product.price * 1.5;
       } else if (item.packageType === "platinum") {
-        itemPrice = product.pricePlatinum || product.price * 2.5;
+        itemPrice = pricePlatinumGlobal || product.price * 2.5;
       }
 
       totalPrice += itemPrice * item.quantity;
@@ -183,8 +190,8 @@ export async function POST(request: NextRequest) {
     const mainProduct = productMap.get(mainItem.serviceId);
 
     let mainBasePrice = mainProduct?.price || 29000;
-    if (mainItem.packageType === "gold") mainBasePrice = mainProduct?.priceGold || mainBasePrice * 1.5;
-    else if (mainItem.packageType === "platinum") mainBasePrice = mainProduct?.pricePlatinum || mainBasePrice * 2.5;
+    if (mainItem.packageType === "gold") mainBasePrice = priceGoldGlobal || mainBasePrice * 1.5;
+    else if (mainItem.packageType === "platinum") mainBasePrice = pricePlatinumGlobal || mainBasePrice * 2.5;
 
     const orderCode = generateOrderCode();
 

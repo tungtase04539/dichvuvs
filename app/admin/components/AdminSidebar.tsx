@@ -52,6 +52,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       { href: "/admin/don-hang", icon: Package, label: "Đơn hàng" },
       { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" },
       { href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" },
+      { href: "/admin/cau-hinh-goi", icon: Bot, label: "Cấu hình gói" },
       { href: "/admin/tai-khoan", icon: Key, label: "Tài khoản" },
     ];
 

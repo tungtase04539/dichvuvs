@@ -153,12 +153,13 @@ export async function POST(request: NextRequest) {
 
     // Fetch global package settings
     const globalSettings = await prisma.setting.findMany({
-      where: { key: { in: ["price_gold", "price_platinum"] } }
+      where: { key: { in: ["price_gold", "price_platinum", "price_standard"] } }
     });
     const settingsMap = new Map(globalSettings.map(s => [s.key, s.value]));
 
     const priceGoldGlobal = parseFloat(settingsMap.get("price_gold") || "0");
     const pricePlatinumGlobal = parseFloat(settingsMap.get("price_platinum") || "0");
+    const priceStandardGlobal = parseFloat(settingsMap.get("price_standard") || "0");
 
     const productMap = new Map(products.map((p) => [p.id, p]));
 
@@ -179,6 +180,8 @@ export async function POST(request: NextRequest) {
         itemPrice = priceGoldGlobal || product.price * 1.5;
       } else if (item.packageType === "platinum") {
         itemPrice = pricePlatinumGlobal || product.price * 2.5;
+      } else {
+        itemPrice = priceStandardGlobal || product.price;
       }
 
       totalPrice += itemPrice * item.quantity;
@@ -192,6 +195,7 @@ export async function POST(request: NextRequest) {
     let mainBasePrice = mainProduct?.price || 29000;
     if (mainItem.packageType === "gold") mainBasePrice = priceGoldGlobal || mainBasePrice * 1.5;
     else if (mainItem.packageType === "platinum") mainBasePrice = pricePlatinumGlobal || mainBasePrice * 2.5;
+    else mainBasePrice = priceStandardGlobal || mainBasePrice;
 
     const orderCode = generateOrderCode();
 

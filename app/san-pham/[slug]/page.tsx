@@ -114,19 +114,22 @@ export default function ProductDetailPage({
   // Global-aware pricing & features logic
   const priceGold = globalSettings.price_gold ? parseFloat(globalSettings.price_gold) : (product.priceGold || product.price * 1.5);
   const pricePlatinum = globalSettings.price_platinum ? parseFloat(globalSettings.price_platinum) : (product.pricePlatinum || product.price * 2.5);
+  const priceStandard = globalSettings.price_standard ? parseFloat(globalSettings.price_standard) : product.price;
 
   const featuresGoldStr = globalSettings.features_gold || product.featuresGold || "Hỗ trợ ưu tiên\nUpdate 24/7\nTùy chỉnh chuyên sâu";
   const featuresPlatinumStr = globalSettings.features_platinum || product.featuresPlatinum || "Toàn bộ tính năng Premium\nBảo hành trọn đời\nHỗ trợ 1-1";
+  const featuresStandardStr = globalSettings.features_standard || "Sử dụng vĩnh viễn\nHỗ trợ cộng đồng\nUpdate bảo mật định kỳ";
 
   const descriptionGold = globalSettings.description_gold || "Combo: Trợ lý AI + Thương hiệu & Quà tặng";
   const descriptionPlatinum = globalSettings.description_platinum || "Full Option: Trợ lý AI + Hệ sinh thái đặc quyền";
+  const descriptionStandard = globalSettings.description_standard || "Gói cơ bản phù hợp cho cá nhân khởi đầu";
 
   const packages = [
     {
       id: "standard",
       name: "TIÊU CHUẨN",
-      price: product.price,
-      features: ["Sử dụng vĩnh viễn", "Hỗ trợ cộng đồng", "Update bảo mật định kỳ"],
+      price: priceStandard,
+      features: featuresStandardStr.split("\n").filter((f: string) => f.trim()),
       color: "slate",
     },
     {
@@ -287,8 +290,8 @@ export default function ProductDetailPage({
                             <span className="text-slate-400 text-[10px] font-bold uppercase tracking-tight">MUA TRỢ LÝ AI (Tiêu chuẩn)</span>
                             {selectedPackage === "standard" && <CheckCircle className="w-4 h-4 text-primary-500" />}
                           </div>
-                          <div className="text-xl font-bold text-white mb-1">{formatCurrency(product.price)}</div>
-                          <p className="text-slate-400 text-[10px] mb-4">Gói cơ bản phù hợp cho cá nhân khởi đầu</p>
+                          <div className="text-xl font-bold text-white mb-1">{formatCurrency(priceStandard)}</div>
+                          <p className="text-slate-400 text-[10px] mb-4">{descriptionStandard}</p>
 
                           <div className="mt-auto space-y-3">
                             {selectedPackage === "standard" && (
@@ -324,7 +327,7 @@ export default function ProductDetailPage({
                         <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-slate-800 border-2 border-primary-500 rotate-y-180 flex flex-col">
                           <p className="text-white font-bold text-xs mb-2">Ưu đãi Tiêu chuẩn:</p>
                           <div className="grid grid-cols-1 gap-1.5 overflow-hidden pr-1 mb-4">
-                            {["Sử dụng vĩnh viễn", "Hỗ trợ cộng đồng", "Update bảo mật định kỳ"].map((feat, idx) => (
+                            {featuresStandardStr.split("\n").filter((f: string) => f.trim()).map((feat: string, idx: number) => (
                               <div key={idx} className="flex items-start gap-1.5 text-[10px] text-slate-300 leading-tight">
                                 <CheckCircle className="w-2.5 h-2.5 shrink-0 mt-0.5 text-emerald-400" />
                                 <span>{feat}</span>

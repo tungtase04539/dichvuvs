@@ -15,7 +15,10 @@ export default function PackageSettingsPage() {
         chatbot_link_gold: "",
         chatbot_link_platinum: "",
         description_gold: "",
-        description_platinum: ""
+        description_platinum: "",
+        price_standard: "",
+        features_standard: "",
+        description_standard: ""
     });
 
     useEffect(() => {
@@ -35,7 +38,10 @@ export default function PackageSettingsPage() {
                     chatbot_link_gold: data.settings.chatbot_link_gold || "",
                     chatbot_link_platinum: data.settings.chatbot_link_platinum || "",
                     description_gold: data.settings.description_gold || "",
-                    description_platinum: data.settings.description_platinum || ""
+                    description_platinum: data.settings.description_platinum || "",
+                    price_standard: data.settings.price_standard || "",
+                    features_standard: data.settings.features_standard || "",
+                    description_standard: data.settings.description_standard || ""
                 });
             }
         } catch (error) {
@@ -85,7 +91,57 @@ export default function PackageSettingsPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Standard Package Settings */}
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-6 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-10">
+                            <Star className="w-12 h-12 text-slate-400" />
+                        </div>
+
+                        <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <Star className="w-5 h-5 text-slate-400" />
+                            Gói TIÊU CHUẨN (Standard)
+                        </h3>
+
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Giá hiển thị (VNĐ)</label>
+                            <input
+                                type="number"
+                                value={settings.price_standard}
+                                onChange={(e) => setSettings({ ...settings, price_standard: e.target.value })}
+                                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none font-semibold text-slate-900"
+                                placeholder="VD: 29000"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Mô tả ngắn (Mặt trước)</label>
+                            <input
+                                type="text"
+                                value={settings.description_standard}
+                                onChange={(e) => setSettings({ ...settings, description_standard: e.target.value })}
+                                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none text-sm text-slate-900"
+                                placeholder="VD: Gói cơ bản phù hợp cho cá nhân"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Ưu đãi (Mỗi dòng 1 ưu đãi)</label>
+                            <textarea
+                                value={settings.features_standard}
+                                onChange={(e) => setSettings({ ...settings, features_standard: e.target.value })}
+                                rows={5}
+                                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none resize-none text-sm text-slate-900"
+                                placeholder="Sử dụng vĩnh viễn&#10;Hỗ trợ cộng đồng..."
+                            />
+                        </div>
+
+                        <div className="mt-auto pt-2">
+                            <p className="text-[10px] text-slate-500 italic">
+                                * Link và mã kích hoạt gói Tiêu chuẩn vẫn được lấy từ kho Inventory của từng sản phẩm.
+                            </p>
+                        </div>
+                    </div>
                     {/* Gold Package Settings */}
                     <div className="bg-white p-6 rounded-2xl shadow-sm border border-amber-100 flex flex-col gap-6 relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-4 opacity-10">

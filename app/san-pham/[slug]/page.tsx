@@ -118,19 +118,22 @@ export default function ProductDetailPage({
   const featuresGoldStr = globalSettings.features_gold || product.featuresGold || "Hỗ trợ ưu tiên\nUpdate 24/7\nTùy chỉnh chuyên sâu";
   const featuresPlatinumStr = globalSettings.features_platinum || product.featuresPlatinum || "Toàn bộ tính năng Premium\nBảo hành trọn đời\nHỗ trợ 1-1";
 
+  const descriptionGold = globalSettings.description_gold || "Combo: Trợ lý AI + Thương hiệu & Quà tặng";
+  const descriptionPlatinum = globalSettings.description_platinum || "Full Option: Trợ lý AI + Hệ sinh thái đặc quyền";
+
   const packages = [
     {
       id: "standard",
       name: "TIÊU CHUẨN",
       price: product.price,
-      features: ["Sử dụng vĩnh viễn", "Hỗ trợ cơ bản", "Update định kỳ"],
+      features: ["Sử dụng vĩnh viễn", "Hỗ trợ cộng đồng", "Update bảo mật định kỳ"],
       color: "slate",
     },
     {
       id: "gold",
       name: "VÀNG (GOLD)",
       price: priceGold,
-      features: featuresGoldStr.split("\n").filter(f => f.trim()),
+      features: featuresGoldStr.split("\n").filter((f: string) => f.trim()),
       color: "amber",
       popular: true,
     },
@@ -138,7 +141,7 @@ export default function ProductDetailPage({
       id: "platinum",
       name: "BẠCH KIM (PLATINUM)",
       price: pricePlatinum,
-      features: featuresPlatinumStr.split("\n").filter(f => f.trim()),
+      features: featuresPlatinumStr.split("\n").filter((f: string) => f.trim()),
       color: "cyan",
     },
   ];
@@ -320,7 +323,14 @@ export default function ProductDetailPage({
                         {/* Back Side */}
                         <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-slate-800 border-2 border-primary-500 rotate-y-180 flex flex-col">
                           <p className="text-white font-bold text-xs mb-2">Ưu đãi Tiêu chuẩn:</p>
-                          <p className="text-slate-300 text-[10px] leading-snug mb-4">Full tính năng cơ bản, Hỗ trợ cộng đồng, Update bảo mật định kỳ.</p>
+                          <div className="grid grid-cols-1 gap-1.5 overflow-hidden pr-1 mb-4">
+                            {["Sử dụng vĩnh viễn", "Hỗ trợ cộng đồng", "Update bảo mật định kỳ"].map((feat, idx) => (
+                              <div key={idx} className="flex items-start gap-1.5 text-[10px] text-slate-300 leading-tight">
+                                <CheckCircle className="w-2.5 h-2.5 shrink-0 mt-0.5 text-emerald-400" />
+                                <span>{feat}</span>
+                              </div>
+                            ))}
+                          </div>
 
                           <div className="mt-auto space-y-3">
                             <button
@@ -369,7 +379,7 @@ export default function ProductDetailPage({
                             {selectedPackage === "gold" && <CheckCircle className="w-5 h-5 text-amber-400 drop-shadow-glow" />}
                           </div>
                           <div className={`text-2xl font-black mb-1 drop-shadow-sm ${selectedPackage === "gold" ? "text-white" : "text-amber-400"}`}>{formatCurrency(priceGold)}</div>
-                          <p className={`text-[10px] mb-4 font-medium ${selectedPackage === "gold" ? "text-amber-100" : "text-amber-100/60"}`}>Combo: Trợ lý AI + Thương hiệu & Quà tặng</p>
+                          <p className={`text-[10px] mb-4 font-medium ${selectedPackage === "gold" ? "text-amber-100" : "text-amber-100/60"}`}>{descriptionGold}</p>
 
                           <div className="mt-auto space-y-3">
                             {selectedPackage === "gold" && (
@@ -404,7 +414,14 @@ export default function ProductDetailPage({
                         {/* Back Side */}
                         <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-amber-950 border-2 border-amber-500 rotate-y-180 flex flex-col">
                           <p className="text-white font-bold text-xs mb-2">Ưu đãi Combo Vàng:</p>
-                          <p className="text-amber-100/80 text-[10px] leading-snug mb-4">{featuresGoldStr.split("\n").join(", ")}</p>
+                          <div className="grid grid-cols-1 gap-1.5 overflow-hidden pr-1 mb-4">
+                            {featuresGoldStr.split("\n").filter((f: string) => f.trim()).map((feat: string, idx: number) => (
+                              <div key={idx} className="flex items-start gap-1.5 text-[10px] text-amber-100/90 leading-tight">
+                                <CheckCircle className="w-2.5 h-2.5 shrink-0 mt-0.5 text-amber-400" />
+                                <span>{feat}</span>
+                              </div>
+                            ))}
+                          </div>
 
                           <div className="mt-auto space-y-3">
                             <button
@@ -453,7 +470,7 @@ export default function ProductDetailPage({
                             {selectedPackage === "platinum" && <CheckCircle className="w-5 h-5 text-cyan-400 drop-shadow-glow" />}
                           </div>
                           <div className={`text-2xl font-black mb-1 drop-shadow-sm ${selectedPackage === "platinum" ? "text-white" : "text-cyan-400"}`}>{formatCurrency(pricePlatinum)}</div>
-                          <p className={`text-[10px] mb-4 font-medium ${selectedPackage === "platinum" ? "text-cyan-100" : "text-cyan-100/60"}`}>Full Option: Trợ lý AI + Hệ sinh thái đặc quyền</p>
+                          <p className={`text-[10px] mb-4 font-medium ${selectedPackage === "platinum" ? "text-cyan-100" : "text-cyan-100/60"}`}>{descriptionPlatinum}</p>
 
                           <div className="mt-auto space-y-3">
                             {selectedPackage === "platinum" && (
@@ -488,7 +505,14 @@ export default function ProductDetailPage({
                         {/* Back Side */}
                         <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-cyan-950 border-2 border-cyan-400 rotate-y-180 flex flex-col">
                           <p className="text-white font-bold text-xs mb-2">Đặc quyền Bạch Kim:</p>
-                          <p className="text-cyan-100/80 text-[10px] leading-snug mb-4">{featuresPlatinumStr.split("\n").join(", ")}</p>
+                          <div className="grid grid-cols-1 gap-1.5 overflow-hidden pr-1 mb-4">
+                            {featuresPlatinumStr.split("\n").filter((f: string) => f.trim()).map((feat: string, idx: number) => (
+                              <div key={idx} className="flex items-start gap-1.5 text-[10px] text-cyan-100/90 leading-tight">
+                                <CheckCircle className="w-2.5 h-2.5 shrink-0 mt-0.5 text-cyan-400" />
+                                <span>{feat}</span>
+                              </div>
+                            ))}
+                          </div>
 
                           <div className="mt-auto space-y-3">
                             <button

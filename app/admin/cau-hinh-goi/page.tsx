@@ -13,7 +13,9 @@ export default function PackageSettingsPage() {
         features_gold: "",
         features_platinum: "",
         chatbot_link_gold: "",
-        chatbot_link_platinum: ""
+        chatbot_link_platinum: "",
+        description_gold: "",
+        description_platinum: ""
     });
 
     useEffect(() => {
@@ -31,7 +33,9 @@ export default function PackageSettingsPage() {
                     features_gold: data.settings.features_gold || "",
                     features_platinum: data.settings.features_platinum || "",
                     chatbot_link_gold: data.settings.chatbot_link_gold || "",
-                    chatbot_link_platinum: data.settings.chatbot_link_platinum || ""
+                    chatbot_link_platinum: data.settings.chatbot_link_platinum || "",
+                    description_gold: data.settings.description_gold || "",
+                    description_platinum: data.settings.description_platinum || ""
                 });
             }
         } catch (error) {
@@ -105,6 +109,17 @@ export default function PackageSettingsPage() {
                         </div>
 
                         <div>
+                            <label className="block text-xs font-bold text-amber-700 uppercase mb-2">Mô tả ngắn (Hiển thị mặt trước)</label>
+                            <input
+                                type="text"
+                                value={settings.description_gold}
+                                onChange={(e) => setSettings({ ...settings, description_gold: e.target.value })}
+                                className="w-full px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none text-sm text-amber-900"
+                                placeholder="VD: Combo: Trợ lý AI + Thương hiệu & Quà tặng"
+                            />
+                        </div>
+
+                        <div>
                             <label className="block text-xs font-bold text-amber-700 uppercase mb-2">Ưu đãi (Mỗi dòng 1 ưu đãi)</label>
                             <textarea
                                 value={settings.features_gold}
@@ -149,6 +164,17 @@ export default function PackageSettingsPage() {
                                 onChange={(e) => setSettings({ ...settings, price_platinum: e.target.value })}
                                 className="w-full px-4 py-3 bg-cyan-50 border border-cyan-200 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none font-semibold text-cyan-900"
                                 placeholder="VD: 99000"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-bold text-cyan-700 uppercase mb-2">Mô tả ngắn (Hiển thị mặt trước)</label>
+                            <input
+                                type="text"
+                                value={settings.description_platinum}
+                                onChange={(e) => setSettings({ ...settings, description_platinum: e.target.value })}
+                                className="w-full px-4 py-3 bg-cyan-50 border border-cyan-200 rounded-xl focus:ring-2 focus:ring-cyan-500 outline-none text-sm text-cyan-900"
+                                placeholder="VD: Full Option: Trợ lý AI + Hệ sinh thái đặc quyền"
                             />
                         </div>
 

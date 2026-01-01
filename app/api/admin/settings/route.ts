@@ -11,7 +11,9 @@ const PACKAGE_SETTING_KEYS = [
     "features_gold",
     "features_platinum",
     "chatbot_link_gold",
-    "chatbot_link_platinum"
+    "chatbot_link_platinum",
+    "description_gold",
+    "description_platinum"
 ];
 
 // Get global settings (Public)

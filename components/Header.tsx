@@ -66,7 +66,7 @@ export default function Header({ settings }: HeaderProps) {
                 <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-slate-900" />
               </div>
               <span className="text-xl sm:text-2xl font-bold text-white">
-                ChatBot<span className="text-primary-400">VN</span>
+                Trợ lý AI<span className="text-primary-400">VN</span>
               </span>
             </Link>
 

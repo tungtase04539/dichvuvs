@@ -75,7 +75,7 @@ export default function KhuyenMaiTetPage() {
                     </h1>
 
                     <p className="text-2xl md:text-3xl text-white font-bold max-w-2xl mx-auto mb-16 drop-shadow-md">
-                        Cơ hội sở hữu ChatBot AI chuyên nghiệp với mức giá hời nhất trong năm.
+                        Cơ hội sở hữu Trợ lý AI chuyên nghiệp với mức giá hời nhất trong năm.
                         Nâng cấp kinh doanh ngay đầu năm mới!
                     </p>
 
@@ -174,7 +174,7 @@ export default function KhuyenMaiTetPage() {
                         <span className="text-yellow-300">PHÁT TÀI PHÁT LỘC</span>
                     </h2>
                     <p className="text-3xl text-white font-bold max-w-4xl mx-auto mb-20 leading-relaxed drop-shadow-md">
-                        Hàng ngàn doanh nghiệp đã ứng dụng ChatBot AI và bứt phá doanh số.
+                        Hàng ngàn doanh nghiệp đã ứng dụng Trợ lý AI và bứt phá doanh số.
                         Năm Bính Ngọ 2026 sẽ là năm rực rỡ nhất của bạn!
                     </p>
                     <div className="flex flex-col md:flex-row items-center justify-center gap-10">

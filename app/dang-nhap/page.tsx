@@ -86,7 +86,7 @@ export default function LoginPage() {
               <Bot className="w-7 h-7 text-slate-900" />
             </div>
             <span className="text-2xl font-bold text-white">
-              ChatBot<span className="text-primary-400">VN</span>
+              Trợ lý AI<span className="text-primary-400">VN</span>
             </span>
           </Link>
         </div>
@@ -168,7 +168,7 @@ export default function LoginPage() {
             <p className="text-center text-sm text-slate-400">
               Chưa có tài khoản?{" "}
               <Link href="/dat-hang" className="text-primary-400 hover:text-primary-300 font-medium">
-                Mua ChatBot để nhận tài khoản
+                Mua Trợ lý AI để nhận tài khoản
               </Link>
             </p>
             <p className="text-center text-xs text-slate-500 mt-2">

@@ -12,7 +12,7 @@ export default function DanhGiaPage() {
       role: "CEO, TechStore",
       avatar: "A",
       rating: 5,
-      content: "ChatBot giúp shop tôi tiết kiệm 80% thời gian trả lời tin nhắn. Doanh số tăng 40% sau 2 tháng sử dụng! Rất đáng tiền, mình đã giới thiệu cho nhiều bạn bè.",
+      content: "Trợ lý AI giúp shop tôi tiết kiệm 80% thời gian trả lời tin nhắn. Doanh số tăng 40% sau 2 tháng sử dụng! Rất đáng tiền, mình đã giới thiệu cho nhiều bạn bè.",
       date: "10/12/2025",
       verified: true,
     },
@@ -22,7 +22,7 @@ export default function DanhGiaPage() {
       role: "Founder, BeautyShop",
       avatar: "B",
       rating: 5,
-      content: "Rất hài lòng với dịch vụ. ChatBot thông minh, hiểu khách hàng và tư vấn chính xác. Đội ngũ support rất nhiệt tình, hỗ trợ 24/7!",
+      content: "Rất hài lòng với dịch vụ. Trợ lý AI thông minh, hiểu khách hàng và tư vấn chính xác. Đội ngũ support rất nhiệt tình, hỗ trợ 24/7!",
       date: "09/12/2025",
       verified: true,
     },
@@ -32,7 +32,7 @@ export default function DanhGiaPage() {
       role: "Marketing Manager",
       avatar: "C",
       rating: 5,
-      content: "Giá cả phải chăng, hiệu quả cao. ChatBot giúp team tôi focus vào những việc quan trọng hơn. Đầu tư 29K mà tiết kiệm được cả triệu đồng/tháng.",
+      content: "Giá cả phải chăng, hiệu quả cao. Trợ lý AI giúp team tôi focus vào những việc quan trọng hơn. Đầu tư 29K mà tiết kiệm được cả triệu đồng/tháng.",
       date: "08/12/2025",
       verified: true,
     },
@@ -42,7 +42,7 @@ export default function DanhGiaPage() {
       role: "Shop online Thời trang",
       avatar: "D",
       rating: 5,
-      content: "Ban đầu còn nghi ngờ, nhưng sau khi dùng thử 3 ngày thì quyết định mua luôn. ChatBot trả lời nhanh, chính xác, khách hàng rất hài lòng.",
+      content: "Ban đầu còn nghi ngờ, nhưng sau khi dùng thử 3 ngày thì quyết định mua luôn. Trợ lý AI trả lời nhanh, chính xác, khách hàng rất hài lòng.",
       date: "07/12/2025",
       verified: true,
     },
@@ -52,7 +52,7 @@ export default function DanhGiaPage() {
       role: "Spa & Làm đẹp",
       avatar: "E",
       rating: 5,
-      content: "Mình dùng ChatBot đặt lịch cho spa, khách hàng có thể tự đặt lịch 24/7 mà không cần gọi điện. Tiện lợi vô cùng, không còn bỏ lỡ khách nữa!",
+      content: "Mình dùng Trợ lý AI đặt lịch cho spa, khách hàng có thể tự đặt lịch 24/7 mà không cần gọi điện. Tiện lợi vô cùng, không còn bỏ lỡ khách nữa!",
       date: "06/12/2025",
       verified: true,
     },
@@ -62,7 +62,7 @@ export default function DanhGiaPage() {
       role: "Nhà hàng ABC",
       avatar: "P",
       rating: 5,
-      content: "ChatBot giúp nhận đơn đặt bàn và tư vấn menu tự động. Nhân viên giờ có thể tập trung phục vụ khách thay vì trả lời tin nhắn.",
+      content: "Trợ lý AI giúp nhận đơn đặt bàn và tư vấn menu tự động. Nhân viên giờ có thể tập trung phục vụ khách thay vì trả lời tin nhắn.",
       date: "05/12/2025",
       verified: true,
     },
@@ -89,7 +89,7 @@ export default function DanhGiaPage() {
             Ý KIẾN <span className="text-primary-400">KHÁCH HÀNG</span>
           </h1>
           <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-            Hơn 10,000 khách hàng đã tin tưởng sử dụng ChatBotVN. Xem họ nói gì về chúng tôi!
+            Hơn 10,000 khách hàng đã tin tưởng sử dụng Trợ lý AI VN. Xem họ nói gì về chúng tôi!
           </p>
         </div>
       </section>

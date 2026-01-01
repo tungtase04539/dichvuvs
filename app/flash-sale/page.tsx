@@ -56,9 +56,9 @@ export default function FlashSalePage() {
   }, []);
 
   const gifts = [
-    "🎁 Mua 2 tặng 1 ChatBot miễn phí",
-    "📚 Tặng khóa học sử dụng ChatBot",
-    "💎 Giảm thêm 20% cho đơn từ 3 bot",
+    "🎁 Mua 2 tặng 1 Trợ lý AI miễn phí",
+    "📚 Tặng khóa học sử dụng Trợ lý AI",
+    "💎 Giảm thêm 20% cho đơn từ 3 trợ lý AI",
     "🎯 Hỗ trợ cài đặt miễn phí 100%",
   ];
 
@@ -72,13 +72,13 @@ export default function FlashSalePage() {
           <div className="absolute top-20 left-10 w-72 h-72 bg-red-500/20 rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-orange-500/20 rounded-full blur-3xl animate-pulse" />
         </div>
-        
+
         <div className="container mx-auto px-4 text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 text-red-400 rounded-full text-sm font-bold uppercase tracking-wide mb-6 border border-red-500/30 animate-pulse">
             <Flame className="w-4 h-4" />
             FLASH SALE - GIẢM SỐC
           </div>
-          
+
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 uppercase">
             <span className="text-red-500">SALE</span> KHỦNG
             <span className="block text-primary-400">GIẢM ĐẾN 50%</span>

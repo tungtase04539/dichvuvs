@@ -56,11 +56,11 @@ export default function DungThuPage() {
               <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-8 leading-[1.1] uppercase">
                 TRẢI NGHIỆM <br />
                 <span className="text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.2)]">MIỄN PHÍ</span> <br />
-                CHATBOT CHUYÊN GIA
+                TRỢ LÝ AI CHUYÊN GIA
               </h1>
 
               <p className="text-xl md:text-2xl text-slate-800/80 mb-10 max-w-xl font-semibold leading-relaxed">
-                Đừng bỏ lỡ cơ hội bứt phá doanh thu. Đăng ký ngay để nhận 3 ngày dùng thử ChatBot AI đỉnh cao hoàn toàn không mất phí!
+                Đừng bỏ lỡ cơ hội bứt phá doanh thu. Đăng ký ngay để nhận 3 ngày dùng thử Trợ lý AI đỉnh cao hoàn toàn không mất phí!
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
@@ -86,7 +86,7 @@ export default function DungThuPage() {
                     </div>
                     <h3 className="text-3xl font-black text-slate-900 mb-6 uppercase">ĐĂNG KÝ THÀNH CÔNG!</h3>
                     <p className="text-slate-500 text-lg mb-8 leading-relaxed">
-                      Chuyên gia của chúng tôi sẽ liên hệ với bạn trong vòng 24h để bàn giao ChatBot.
+                      Chuyên gia của chúng tôi sẽ liên hệ với bạn trong vòng 24h để bàn giao Trợ lý AI.
                     </p>
                     <a
                       href="https://zalo.me/g/ubarcp690"

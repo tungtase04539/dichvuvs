@@ -4,9 +4,9 @@ import "./globals.css";
 import ReferralTracker from "@/components/ReferralTracker";
 
 export const metadata: Metadata = {
-  title: "ChatBotVN - Mua ChatBot AI chỉ 29K/tháng",
-  description: "Mua ChatBot AI tự động trả lời khách hàng 24/7. Tăng doanh số, tiết kiệm chi phí. Chỉ 29K/chatbot AI/tháng.",
-  keywords: ["chatbot", "AI", "tự động", "bán hàng", "chăm sóc khách hàng"],
+  title: "Trợ lý AI VN - Sở hữu Trợ lý AI chỉ 29K/tháng",
+  description: "Mua Trợ lý AI tự động trả lời khách hàng 24/7. Tăng doanh số, tiết kiệm chi phí. Chỉ 29K/trợ lý AI/tháng.",
+  keywords: ["trợ lý AI", "AI", "tự động", "bán hàng", "chăm sóc khách hàng"],
 };
 
 import FloatingButtons from "@/components/FloatingButtons";

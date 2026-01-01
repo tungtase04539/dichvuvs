@@ -86,9 +86,9 @@ export default function HomePage() {
         }
         // Thêm timestamp để tránh cache
         url += url.includes("?") ? `&_=${Date.now()}` : `?_=${Date.now()}`;
-        
+
         console.log("Loading products from:", url);
-        
+
         const res = await fetch(url, {
           cache: 'no-store',
           headers: {
@@ -97,16 +97,16 @@ export default function HomePage() {
             'Expires': '0'
           }
         });
-        
+
         if (!res.ok) {
           console.error("Fetch failed:", res.status, res.statusText);
           setAllProducts([]);
           return;
         }
-        
+
         const data = await res.json();
         console.log("Loaded products for category:", selectedCategory, "count:", data.products?.length || 0);
-        
+
         if (data.products && Array.isArray(data.products)) {
           setAllProducts(data.products);
         } else {
@@ -142,7 +142,7 @@ export default function HomePage() {
     // Listen to storage events (khi có thay đổi từ tab khác)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'products-updated') {
-    loadProducts();
+        loadProducts();
       }
     };
 
@@ -242,19 +242,19 @@ export default function HomePage() {
           <div className="absolute top-20 left-10 w-72 h-72 bg-primary-400 rounded-full blur-3xl" />
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary-600 rounded-full blur-3xl" />
         </div>
-        
+
         <div className="container mx-auto px-4 relative z-10">
           {/* Header */}
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-400/20 text-primary-400 rounded-full text-sm font-semibold mb-6 uppercase tracking-wide border border-primary-400/30">
               <Sparkles className="w-4 h-4" />
-              #1 CHATBOT AI TẠI VIỆT NAM
+              #1 TRỢ LÝ AI TẠI VIỆT NAM
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
               CHỌN <span className="text-primary-400">LĨNH VỰC</span> CỦA BẠN
             </h1>
             <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto">
-              Chọn lĩnh vực phù hợp để tìm ChatBot AI tối ưu cho ngành nghề của bạn. 
+              Chọn lĩnh vực phù hợp để tìm Trợ lý AI tối ưu cho ngành nghề của bạn.
               Chỉ từ <span className="text-primary-400 font-bold">29K/tháng</span>!
             </p>
           </div>
@@ -263,11 +263,10 @@ export default function HomePage() {
           <div className="flex flex-wrap items-center justify-center gap-2 mb-8 max-w-5xl mx-auto">
             <button
               onClick={() => setSelectedCategory("all")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                selectedCategory === "all"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${selectedCategory === "all"
                   ? "bg-primary-400 text-slate-900 shadow-lg shadow-primary-400/40"
                   : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700 hover:border-primary-400/50"
-              }`}
+                }`}
             >
               <span className="text-lg">🌟</span>
               <span>Tất cả</span>
@@ -276,11 +275,10 @@ export default function HomePage() {
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.slug)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  selectedCategory === category.slug
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${selectedCategory === category.slug
                     ? "bg-primary-400 text-slate-900 shadow-lg shadow-primary-400/40"
                     : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700 hover:border-primary-400/50"
-                }`}
+                  }`}
               >
                 <span className="text-lg">{category.icon || "📦"}</span>
                 <span>{category.name}</span>
@@ -292,21 +290,21 @@ export default function HomePage() {
           <div className="bg-slate-800/50 rounded-3xl p-6 md:p-8 border border-slate-700/50 backdrop-blur-sm">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl md:text-2xl font-bold text-white">
-                {selectedCategory === "all" ? "Tất cả ChatBot" : (
-                  <>Kết quả: <span className="text-primary-400">{allProducts.length}</span> ChatBot</>
+                {selectedCategory === "all" ? "Tất cả Trợ lý AI" : (
+                  <>Kết quả: <span className="text-primary-400">{allProducts.length}</span> Trợ lý AI</>
                 )}
               </h3>
               {allProducts.length > 6 && (
-              <Link
-                href={selectedCategory === "all" ? "/san-pham" : `/san-pham?category=${selectedCategory}`}
-                className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 font-semibold transition-colors"
-              >
-                Xem tất cả
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+                <Link
+                  href={selectedCategory === "all" ? "/san-pham" : `/san-pham?category=${selectedCategory}`}
+                  className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 font-semibold transition-colors"
+                >
+                  Xem tất cả
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               )}
             </div>
-            
+
             {allProducts.length > 0 ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {allProducts.map((product) => (
@@ -316,16 +314,16 @@ export default function HomePage() {
                   >
                     <Link href={`/san-pham/${product.slug}`} className="flex flex-col flex-1">
                       <div className="w-full aspect-video rounded-lg bg-slate-600 flex items-center justify-center mb-3 overflow-hidden relative">
-                      {product.image ? (
+                        {product.image ? (
                           <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                      ) : (
+                        ) : (
                           <span className="text-4xl">🤖</span>
-                      )}
-                    </div>
+                        )}
+                      </div>
                       <div className="flex-1 flex flex-col">
                         <h4 className="font-semibold text-white group-hover:text-primary-400 transition-colors mb-1 line-clamp-2">
-                        {product.name}
-                      </h4>
+                          {product.name}
+                        </h4>
                         <p className="text-xs text-slate-400 mb-2 line-clamp-2 flex-grow">{product.description}</p>
                         {product.category && (
                           <span className="inline-block text-xs px-2 py-1 bg-primary-400/20 text-primary-400 rounded mb-2 w-fit">
@@ -333,8 +331,8 @@ export default function HomePage() {
                           </span>
                         )}
                         <p className="text-primary-400 font-bold text-lg mt-auto">{formatCurrency(product.price)}</p>
-                    </div>
-                  </Link>
+                      </div>
+                    </Link>
                     {/* Video Demo Button */}
                     {product.videoUrl && (
                       <button
@@ -350,7 +348,7 @@ export default function HomePage() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <p className="text-slate-400">Chưa có ChatBot nào trong lĩnh vực này</p>
+                <p className="text-slate-400">Chưa có Trợ lý AI nào trong lĩnh vực này</p>
               </div>
             )}
           </div>
@@ -381,7 +379,7 @@ export default function HomePage() {
                 FLASH SALE - GIẢM SỐC
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
-                GIẢM ĐẾN <span className="text-red-500">50%</span> TẤT CẢ CHATBOT
+                GIẢM ĐẾN <span className="text-red-500">50%</span> TẤT CẢ TRỢ LÝ AI
               </h2>
               <p className="text-slate-300 text-lg">
                 Mua ngay kẻo lỡ! Ưu đãi có hạn + Quà tặng hấp dẫn
@@ -409,7 +407,7 @@ export default function HomePage() {
               TÍNH NĂNG NỔI BẬT
             </span>
             <h2 className="section-title">
-              TẠI SAO CHỌN <span className="text-primary-400">CHATBOT VN</span>?
+              TẠI SAO CHỌN <span className="text-primary-400">TRỢ LÝ AI VN</span>?
             </h2>
             <p className="section-subtitle">
               Giải pháp ChatBot AI toàn diện, giúp doanh nghiệp tự động hóa và tăng trưởng
@@ -446,7 +444,7 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-3 uppercase">NHẬN QUÀ MIỄN PHÍ</h3>
                 <p className="text-slate-300 mb-6">
-                  Tham gia nhóm Zalo ngay để nhận ChatBot AI miễn phí và nhiều quà tặng hấp dẫn!
+                  Tham gia nhóm Zalo ngay để nhận Trợ lý AI miễn phí và nhiều quà tặng hấp dẫn!
                 </p>
                 <Link
                   href="/qua-tang"
@@ -468,7 +466,7 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-3 uppercase">DÙNG THỬ 3 NGÀY</h3>
                 <p className="text-slate-300 mb-6">
-                  Trải nghiệm ChatBot AI hoàn toàn miễn phí trong 3 ngày. Không cần thẻ tín dụng!
+                  Trải nghiệm Trợ lý AI hoàn toàn miễn phí trong 3 ngày. Không cần thẻ tín dụng!
                 </p>
                 <Link
                   href="/dung-thu"
@@ -537,11 +535,11 @@ export default function HomePage() {
               Sẵn sàng tự động hóa kinh doanh?
             </h2>
             <p className="text-xl text-slate-300 mb-8">
-              Bắt đầu ngay hôm nay với ChatBot AI. Chỉ từ <span className="text-primary-400 font-bold">29K/tháng</span>!
+              Bắt đầu ngay hôm nay với Trợ lý AI. Chỉ từ <span className="text-primary-400 font-bold">29K/tháng</span>!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/dat-hang" className="btn bg-primary-400 text-slate-900 hover:bg-primary-300 text-lg font-bold uppercase shadow-lg shadow-primary-400/30">
-                MUA CHATBOT NGAY
+                MUA TRỢ LÝ AI NGAY
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <a href="tel:0363189699" className="btn bg-transparent text-primary-400 border-2 border-primary-400/50 hover:bg-primary-400/10 text-lg font-bold uppercase">

@@ -9,8 +9,8 @@ export default function TinTucPage() {
   const news = [
     {
       id: 1,
-      title: "🎁 TẶNG CHATBOT MIỄN PHÍ - Chỉ cần tham gia nhóm Zalo",
-      excerpt: "Cơ hội nhận ChatBot AI hoàn toàn miễn phí khi tham gia cộng đồng ChatBotVN trên Zalo. Số lượng có hạn!",
+      title: "🎁 TẶNG TRỢ LÝ AI MIỄN PHÍ - Chỉ cần tham gia nhóm Zalo",
+      excerpt: "Cơ hội nhận Trợ lý AI hoàn toàn miễn phí khi tham gia cộng đồng Trợ lý AI VN trên Zalo. Số lượng có hạn!",
       date: "11/12/2025",
       category: "Khuyến mãi",
       image: "🎁",
@@ -19,8 +19,8 @@ export default function TinTucPage() {
     },
     {
       id: 2,
-      title: "⚡ FLASH SALE - Giảm đến 50% tất cả ChatBot",
-      excerpt: "Đợt sale lớn nhất năm! Mua ChatBot với giá chỉ 29K, kèm theo hàng loạt quà tặng hấp dẫn.",
+      title: "⚡ FLASH SALE - Giảm đến 50% tất cả Trợ lý AI",
+      excerpt: "Đợt sale lớn nhất năm! Mua Trợ lý AI với giá chỉ 29K, kèm theo hàng loạt quà tặng hấp dẫn.",
       date: "11/12/2025",
       category: "Flash Sale",
       image: "⚡",
@@ -29,7 +29,7 @@ export default function TinTucPage() {
     },
     {
       id: 3,
-      title: "🚀 Ra mắt ChatBot Bán Hàng Pro phiên bản mới",
+      title: "🚀 Ra mắt Trợ lý AI Bán Hàng Pro phiên bản mới",
       excerpt: "Phiên bản mới với AI thông minh hơn, tự động chốt đơn hiệu quả hơn, tăng tỷ lệ chuyển đổi lên 300%.",
       date: "10/12/2025",
       category: "Sản phẩm mới",
@@ -48,7 +48,7 @@ export default function TinTucPage() {
     {
       id: 5,
       title: "📊 Khách hàng ABC tăng doanh số 500% sau 1 tháng",
-      excerpt: "Câu chuyện thành công của shop online ABC khi sử dụng ChatBot AI tự động chăm sóc khách hàng.",
+      excerpt: "Câu chuyện thành công của shop online ABC khi sử dụng Trợ lý AI tự động chăm sóc khách hàng.",
       date: "08/12/2025",
       category: "Câu chuyện thành công",
       image: "📊",
@@ -56,8 +56,8 @@ export default function TinTucPage() {
     },
     {
       id: 6,
-      title: "🎓 Hướng dẫn cài đặt ChatBot trong 5 phút",
-      excerpt: "Video hướng dẫn chi tiết cách cài đặt và cấu hình ChatBot AI cho người mới bắt đầu.",
+      title: "🎓 Hướng dẫn cài đặt Trợ lý AI trong 5 phút",
+      excerpt: "Video hướng dẫn chi tiết cách cài đặt và cấu hình Trợ lý AI cho người mới bắt đầu.",
       date: "07/12/2025",
       category: "Hướng dẫn",
       image: "🎓",
@@ -79,7 +79,7 @@ export default function TinTucPage() {
             TIN TỨC <span className="text-primary-400">HOT</span>
           </h1>
           <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-            Cập nhật những tin tức mới nhất, khuyến mãi hấp dẫn và cơ hội kiếm tiền từ ChatBotVN
+            Cập nhật những tin tức mới nhất, khuyến mãi hấp dẫn và cơ hội kiếm tiền từ Trợ lý AI VN
           </p>
         </div>
       </section>

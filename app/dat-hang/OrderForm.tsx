@@ -164,7 +164,7 @@ export default function OrderForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (cart.length === 0) {
-      alert("Vui lòng chọn ít nhất 1 ChatBot");
+      alert("Vui lòng chọn ít nhất 1 Trợ lý AI");
       return;
     }
 
@@ -272,7 +272,7 @@ export default function OrderForm() {
                 <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 flex gap-2">
                   <Gift className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                   <p className="text-xs text-blue-800 leading-relaxed">
-                    Tài khoản ChatBot sẽ được tạo qua <strong>Email</strong> này. Mật khẩu mặc định là <strong>Số điện thoại</strong> của bạn.
+                    Tài khoản Trợ lý AI sẽ được tạo qua <strong>Email</strong> này. Mật khẩu mặc định là <strong>Số điện thoại</strong> của bạn.
                   </p>
                 </div>
               </div>
@@ -301,7 +301,7 @@ export default function OrderForm() {
                 <div className="w-10 h-10 rounded-2xl bg-primary-100 flex items-center justify-center">
                   <ShoppingCart className="w-5 h-5 text-primary-600" />
                 </div>
-                ChatBot đã chọn
+                Trợ lý AI đã chọn
               </div>
               {totalItems > 0 && (
                 <span className="text-sm font-medium text-slate-400">{totalItems} bot</span>
@@ -311,7 +311,7 @@ export default function OrderForm() {
             {cart.length === 0 ? (
               <div className="text-center py-10 border-2 border-dashed border-slate-100 rounded-3xl">
                 <Bot className="w-12 h-12 text-slate-200 mx-auto mb-3" />
-                <p className="text-slate-400 font-medium">Bạn chưa chọn ChatBot nào</p>
+                <p className="text-slate-400 font-medium">Bạn chưa chọn Trợ lý AI nào</p>
                 <p className="text-xs text-slate-300 mt-1">Hãy xem các gợi ý bên cạnh 👉</p>
               </div>
             ) : (
@@ -329,8 +329,8 @@ export default function OrderForm() {
                       <div className="flex items-center gap-2">
                         <h3 className="font-bold text-slate-900 truncate">{item.product.name}</h3>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${item.packageType === 'gold' ? 'bg-amber-100 text-amber-600' :
-                            item.packageType === 'platinum' ? 'bg-cyan-100 text-cyan-600' :
-                              'bg-slate-100 text-slate-500'
+                          item.packageType === 'platinum' ? 'bg-cyan-100 text-cyan-600' :
+                            'bg-slate-100 text-slate-500'
                           }`}>
                           {item.packageType || 'standard'}
                         </span>
@@ -388,7 +388,7 @@ export default function OrderForm() {
 
             <div className="space-y-4 mb-8">
               <div className="flex justify-between text-slate-400">
-                <span>Số lượng Bot</span>
+                <span>Số lượng Trợ lý AI</span>
                 <span className="font-bold text-white">{totalItems}</span>
               </div>
               <div className="flex justify-between text-slate-400">
@@ -427,7 +427,7 @@ export default function OrderForm() {
           <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
             <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
               <Plus className="w-4 h-4 text-primary-500" />
-              Gợi ý Bot khác
+              Gợi ý Trợ lý AI khác
             </h3>
 
             <div className="space-y-3">
@@ -457,7 +457,7 @@ export default function OrderForm() {
                   type="button"
                   className="w-full py-2 text-xs font-bold text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all"
                 >
-                  Xem thêm tất cả ChatBot
+                  Xem thêm tất cả Trợ lý AI
                 </button>
               )}
             </div>

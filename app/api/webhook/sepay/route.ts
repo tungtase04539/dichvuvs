@@ -93,8 +93,8 @@ export async function POST(request: NextRequest) {
           data: {
             status: "confirmed",
             notes: order.notes
-              ? `${order.notes}\n\n✅ Đã tự động bàn giao ChatBot: ${availableChatbot.activationCode}`
-              : `✅ Đã tự động bàn giao ChatBot: ${availableChatbot.activationCode}`,
+              ? `${order.notes}\n\n✅ Đã tự động bàn giao Trợ lý AI: ${availableChatbot.activationCode}`
+              : `✅ Đã tự động bàn giao Trợ lý AI: ${availableChatbot.activationCode}`,
           },
         });
       });
@@ -106,8 +106,8 @@ export async function POST(request: NextRequest) {
         data: {
           status: "confirmed",
           notes: order.notes
-            ? `${order.notes}\n\n⚠️ Không có sẵn dữ liệu ChatBot để bàn giao tự động.`
-            : `⚠️ Không có sẵn dữ liệu ChatBot để bàn giao tự động.`,
+            ? `${order.notes}\n\n⚠️ Không có sẵn dữ liệu Trợ lý AI để bàn giao tự động.`
+            : `⚠️ Không có sẵn dữ liệu Trợ lý AI để bàn giao tự động.`,
         },
       });
       console.log(`⚠️ No chatbot data available for service ${order.service.name} - Order ${orderCode} confirmed without delivery`);

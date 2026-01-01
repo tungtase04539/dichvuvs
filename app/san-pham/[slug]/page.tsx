@@ -150,7 +150,7 @@ export default function ProductDetailPage({
                   ) : (
                     <div className="space-y-6 text-slate-300">
                       <p>
-                        <strong className="text-white">{product.name}</strong> là giải pháp ChatBot AI tiên tiến,
+                        <strong className="text-white">{product.name}</strong> là giải pháp Trợ lý AI tiên tiến,
                         được thiết kế đặc biệt để tự động hóa quy trình kinh doanh và tăng hiệu quả tương tác với khách hàng.
                       </p>
 
@@ -176,7 +176,7 @@ export default function ProductDetailPage({
                         <h3 className="text-lg font-bold text-white mb-3">📦 Bạn sẽ nhận được:</h3>
                         <ul className="space-y-2">
                           {[
-                            "1 ChatBot AI đã được cấu hình sẵn",
+                            "1 Trợ lý AI đã được cấu hình sẵn",
                             "Hướng dẫn cài đặt chi tiết",
                             "Hỗ trợ kỹ thuật 24/7",
                             "Update tính năng mới miễn phí trọn đời",
@@ -241,7 +241,7 @@ export default function ProductDetailPage({
                       >
                         <div className={`absolute inset-0 backface-hidden rounded-2xl p-5 border-2 transition-all ${selectedPackage === "standard" ? "bg-slate-700 border-primary-500 shadow-lg shadow-primary-500/20" : "bg-slate-700/30 border-slate-700 hover:border-slate-600"}`}>
                           <div className="flex justify-between items-start mb-3">
-                            <span className="text-slate-400 text-[10px] font-bold uppercase tracking-tight">MUA CHATBOT (Tiêu chuẩn)</span>
+                            <span className="text-slate-400 text-[10px] font-bold uppercase tracking-tight">MUA TRỢ LÝ AI (Tiêu chuẩn)</span>
                             {selectedPackage === "standard" && <CheckCircle className="w-4 h-4 text-primary-500" />}
                           </div>
                           <div className="text-xl font-bold text-white mb-1">{formatCurrency(product.price)}</div>
@@ -271,7 +271,7 @@ export default function ProductDetailPage({
                             {selectedPackage === "gold" && <CheckCircle className="w-4 h-4 text-amber-500" />}
                           </div>
                           <div className="text-xl font-bold text-amber-400 mb-1">{formatCurrency(product.priceGold || product.price * 1.5)}</div>
-                          <p className="text-amber-100/60 text-[10px]">Combo: ChatBot + Thương hiệu & Quà tặng</p>
+                          <p className="text-amber-100/60 text-[10px]">Combo: Trợ lý AI + Thương hiệu & Quà tặng</p>
                         </div>
                         <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-amber-900 border-2 border-amber-500 rotate-y-180 flex flex-col justify-center text-center">
                           <p className="text-white font-bold text-xs mb-2">Ưu đãi Combo Vàng:</p>
@@ -347,7 +347,7 @@ export default function ProductDetailPage({
                         </span>
                         {selectedPackage !== 'standard' && (
                           <p className="text-[10px] text-primary-300 italic">
-                            * Gói {selectedPackage.toUpperCase()} đã bao gồm bản quyền ChatBot tiêu chuẩn.
+                            * Gói {selectedPackage.toUpperCase()} đã bao gồm bản quyền Trợ lý AI tiêu chuẩn.
                           </p>
                         )}
                       </div>
@@ -390,7 +390,7 @@ export default function ProductDetailPage({
           {/* Related Products */}
           {relatedProducts.length > 0 && (
             <div className="mt-16">
-              <h2 className="text-2xl font-bold text-white mb-8 uppercase">ChatBot liên quan</h2>
+              <h2 className="text-2xl font-bold text-white mb-8 uppercase">Trợ lý AI liên quan</h2>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {relatedProducts.map((item) => (
                   <Link

@@ -137,7 +137,7 @@ model Order {
 
   // Status
   status      String  @default("pending")
-  orderPackageType String @default("standard")
+  orderPackageType String?
   chatbotLink String?
   notes       String?
 

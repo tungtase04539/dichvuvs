@@ -32,7 +32,7 @@ interface Order {
     address: string;
     district: string;
     status: string;
-    orderPackageType: string;
+    orderPackageType?: string | null;
     chatbotLink?: string | null;
     scheduledDate: string;
     scheduledTime: string;
@@ -189,13 +189,13 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
                                 <p className="text-[10px] text-slate-400 uppercase font-bold">Hình thức gói</p>
                                 <div className="flex items-center gap-2">
                                     <Star className={cn("w-4 h-4",
-                                        order.orderPackageType === "gold" ? "text-amber-500 fill-amber-500" :
-                                            order.orderPackageType === "platinum" ? "text-cyan-500 fill-cyan-500" :
+                                        (order.orderPackageType || "standard") === "gold" ? "text-amber-500 fill-amber-500" :
+                                            (order.orderPackageType || "standard") === "platinum" ? "text-cyan-500 fill-cyan-500" :
                                                 "text-slate-400"
                                     )} />
                                     <span className={cn("font-bold text-sm uppercase",
-                                        order.orderPackageType === "gold" ? "text-amber-600" :
-                                            order.orderPackageType === "platinum" ? "text-cyan-600" :
+                                        (order.orderPackageType || "standard") === "gold" ? "text-amber-600" :
+                                            (order.orderPackageType || "standard") === "platinum" ? "text-cyan-600" :
                                                 "text-slate-600"
                                     )}>
                                         {order.orderPackageType || "Standard"}

@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServerSupabaseClient();
     if (!supabase) {
+      console.error("[Orders GET] Supabase client initialization failed");
       return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
     }
 
@@ -56,8 +57,10 @@ export async function GET(request: NextRequest) {
     const { data: { user: authUser } } = await supabase.auth.getUser();
 
     if (!authUser) {
+      console.warn("[Orders GET] No auth user found");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    console.log("[Orders GET] Auth user:", authUser.email);
 
     // Get user role from database
     const { data: dbUser } = await supabase
@@ -67,8 +70,10 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (!dbUser) {
+      console.error("[Orders GET] DB User not found for email:", authUser.email);
       return NextResponse.json({ error: "User not found" }, { status: 401 });
     }
+    console.log("[Orders GET] DB User role:", dbUser.role);
 
     const status = searchParams.get("status");
 
@@ -96,7 +101,7 @@ export async function GET(request: NextRequest) {
     const { data: orders, error } = await query;
 
     if (error) {
-      console.error("Get orders error:", error);
+      console.error("[Orders GET] Supabase query error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -212,7 +217,7 @@ export async function POST(request: NextRequest) {
 
     let order;
     try {
-      console.log("Attempting to create order with orderPackageType...");
+      console.log("[Orders POST] Attempting primary creation with orderPackageType...");
       order = await prisma.order.create({
         data: {
           orderCode,
@@ -230,7 +235,6 @@ export async function POST(request: NextRequest) {
           basePrice: mainBasePrice,
           totalPrice,
           status: "pending",
-          // @ts-ignore - dynamic fallback
           orderPackageType: mainItem.packageType || "standard",
           referralCode: finalReferralCode,
           referrerId: referrerId,
@@ -244,40 +248,52 @@ export async function POST(request: NextRequest) {
           service: { select: { name: true } },
         },
       });
+      console.log("[Orders POST] Primary order creation successful:", order.orderCode);
     } catch (createError: any) {
-      console.warn("Primary order creation failed, trying fallback without orderPackageType...", createError.message);
+      console.warn("[Orders POST] Primary order creation failed:", createError.message);
+      if (createError.code === 'P2021') {
+        console.warn("[Orders POST] Table 'Order' does not exist according to Prisma");
+      }
+
+      console.log("[Orders POST] Trying fallback without orderPackageType...");
       // Fallback: Try without the new field in case DB is not updated
-      order = await prisma.order.create({
-        data: {
-          orderCode,
-          serviceId: items[0].serviceId,
-          quantity: totalQuantity,
-          unit: "bot",
-          customerName,
-          customerPhone: finalPhone,
-          customerEmail: email,
-          address: "Online",
-          district: "Online",
-          scheduledDate: new Date(),
-          scheduledTime: "Giao ngay",
-          notes: notes
-            ? `${notes}\n---\n[Package: ${mainItem.packageType || 'standard'}]\n---\n${details.join(", ")}`
-            : `[Package: ${mainItem.packageType || 'standard'}]\n---\n${details.join(", ")}`,
-          basePrice: mainBasePrice,
-          totalPrice,
-          status: "pending",
-          referralCode: finalReferralCode,
-          referrerId: referrerId,
-        },
-        select: {
-          id: true,
-          orderCode: true,
-          totalPrice: true,
-          status: true,
-          customerEmail: true,
-          service: { select: { name: true } },
-        },
-      });
+      try {
+        order = await prisma.order.create({
+          data: {
+            orderCode,
+            serviceId: items[0].serviceId,
+            quantity: totalQuantity,
+            unit: "bot",
+            customerName,
+            customerPhone: finalPhone,
+            customerEmail: email,
+            address: "Online",
+            district: "Online",
+            scheduledDate: new Date(),
+            scheduledTime: "Giao ngay",
+            notes: notes
+              ? `${notes}\n---\n[Package: ${mainItem.packageType || 'standard'}]\n---\n${details.join(", ")}`
+              : `[Package: ${mainItem.packageType || 'standard'}]\n---\n${details.join(", ")}`,
+            basePrice: mainBasePrice,
+            totalPrice,
+            status: "pending",
+            referralCode: finalReferralCode,
+            referrerId: referrerId,
+          },
+          select: {
+            id: true,
+            orderCode: true,
+            totalPrice: true,
+            status: true,
+            customerEmail: true,
+            service: { select: { name: true } },
+          },
+        });
+        console.log("[Orders POST] Fallback order creation successful:", order.orderCode);
+      } catch (fallbackError: any) {
+        console.error("[Orders POST] Fallback order creation ALSO failed:", fallbackError.message);
+        throw fallbackError; // Re-throw to be caught by final catch
+      }
     }
 
     console.log("Order created successfully:", order.orderCode);

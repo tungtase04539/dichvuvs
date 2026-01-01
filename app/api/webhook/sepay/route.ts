@@ -43,7 +43,25 @@ export async function POST(request: NextRequest) {
     // Find order with service info
     const order = await prisma.order.findUnique({
       where: { orderCode },
-      include: { service: true },
+      select: {
+        id: true,
+        orderCode: true,
+        status: true,
+        totalPrice: true,
+        notes: true,
+        serviceId: true,
+        customerName: true,
+        customerPhone: true,
+        customerEmail: true,
+        service: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+            chatbotLink: true,
+          }
+        },
+      },
     });
 
     if (!order) {

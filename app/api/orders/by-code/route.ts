@@ -27,7 +27,15 @@ export async function GET(request: NextRequest) {
         createdAt: true,
         notes: true,
         serviceId: true,
-        service: true,
+        service: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+            description: true,
+            chatbotLink: true,
+          }
+        },
         credential: true,
         chatbotData: true,
       },

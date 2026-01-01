@@ -30,8 +30,15 @@ export async function GET(
         scheduledDate: true,
         scheduledTime: true,
         createdAt: true,
-        serviceId: true,
-        service: true,
+        service: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+            description: true,
+            chatbotLink: true,
+          }
+        },
         assignedTo: {
           select: { id: true, name: true, phone: true, email: true },
         },
@@ -97,7 +104,15 @@ export async function PATCH(
         status: true,
         totalPrice: true,
         notes: true,
-        service: true,
+        service: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+            description: true,
+            chatbotLink: true,
+          }
+        },
         assignedTo: {
           select: { id: true, name: true },
         },

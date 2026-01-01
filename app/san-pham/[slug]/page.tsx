@@ -34,7 +34,6 @@ export default function ProductDetailPage({
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPackage, setSelectedPackage] = useState<"standard" | "gold" | "platinum">("standard");
   const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
-  const [quantity, setQuantity] = useState(1);
   const router = useRouter();
 
   const getYoutubeEmbedUrl = (url: string | null) => {
@@ -225,34 +224,8 @@ export default function ProductDetailPage({
 
                   {/* 2. Package Selection */}
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-primary-400 font-bold uppercase text-xs tracking-wider mb-2">
-                      Chọn gói & Số lượng
-                    </div>
-
-                    {/* Quantity Selector */}
-                    <div className="flex items-center justify-between bg-slate-900/50 p-4 rounded-2xl border border-slate-700/50 mb-6">
-                      <span className="text-sm font-bold text-slate-300 uppercase tracking-wider">Số lượng Trợ lý AI:</span>
-                      <div className="flex items-center gap-4 bg-slate-800 rounded-xl p-1 border border-slate-700">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setQuantity(Math.max(1, quantity - 1));
-                          }}
-                          className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center hover:bg-slate-600 text-white transition-colors"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
-                        <span className="w-8 text-center font-bold text-white">{quantity}</span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setQuantity(quantity + 1);
-                          }}
-                          className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center hover:bg-slate-600 text-white transition-colors"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
-                      </div>
+                    <div className="flex items-center gap-2 text-primary-400 font-bold uppercase text-xs tracking-wider mb-4">
+                      Chọn gói phù hợp
                     </div>
 
                     <div className="grid grid-cols-1 gap-6">
@@ -275,7 +248,7 @@ export default function ProductDetailPage({
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  const cart = [{ id: product.id, quantity, packageType: "standard" }];
+                                  const cart = [{ id: product.id, quantity: 1, packageType: "standard" }];
                                   sessionStorage.setItem("cart", JSON.stringify(cart));
                                   router.push("/dat-hang");
                                 }}
@@ -309,7 +282,7 @@ export default function ProductDetailPage({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                const cart = [{ id: product.id, quantity, packageType: "standard" }];
+                                const cart = [{ id: product.id, quantity: 1, packageType: "standard" }];
                                 sessionStorage.setItem("cart", JSON.stringify(cart));
                                 router.push("/dat-hang");
                               }}
@@ -356,7 +329,7 @@ export default function ProductDetailPage({
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  const cart = [{ id: product.id, quantity, packageType: "gold" }];
+                                  const cart = [{ id: product.id, quantity: 1, packageType: "gold" }];
                                   sessionStorage.setItem("cart", JSON.stringify(cart));
                                   router.push("/dat-hang");
                                 }}
@@ -390,7 +363,7 @@ export default function ProductDetailPage({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                const cart = [{ id: product.id, quantity, packageType: "gold" }];
+                                const cart = [{ id: product.id, quantity: 1, packageType: "gold" }];
                                 sessionStorage.setItem("cart", JSON.stringify(cart));
                                 router.push("/dat-hang");
                               }}
@@ -437,7 +410,7 @@ export default function ProductDetailPage({
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  const cart = [{ id: product.id, quantity, packageType: "platinum" }];
+                                  const cart = [{ id: product.id, quantity: 1, packageType: "platinum" }];
                                   sessionStorage.setItem("cart", JSON.stringify(cart));
                                   router.push("/dat-hang");
                                 }}
@@ -471,7 +444,7 @@ export default function ProductDetailPage({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                const cart = [{ id: product.id, quantity, packageType: "platinum" }];
+                                const cart = [{ id: product.id, quantity: 1, packageType: "platinum" }];
                                 sessionStorage.setItem("cart", JSON.stringify(cart));
                                 router.push("/dat-hang");
                               }}

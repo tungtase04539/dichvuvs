@@ -213,7 +213,20 @@ export default function ProductDetailPage({
                 </div>
 
                 <div className="p-6 space-y-8">
-                  {/* 1. Package Selection */}
+                  {/* 1. Video Demo (NOW AT TOP) */}
+                  {product.videoUrl && getYoutubeEmbedUrl(product.videoUrl) && (
+                    <div className="rounded-xl overflow-hidden border border-slate-700 aspect-video bg-black shadow-inner">
+                      <iframe
+                        src={`${getYoutubeEmbedUrl(product.videoUrl)}?rel=0`}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title="Video demo"
+                      />
+                    </div>
+                  )}
+
+                  {/* 2. Package Selection */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-primary-400 font-bold uppercase text-xs tracking-wider mb-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-primary-400"></span>
@@ -297,24 +310,6 @@ export default function ProductDetailPage({
                     </div>
                   </div>
 
-                  {/* 2. Video & Additional Info */}
-                  {product.videoUrl && getYoutubeEmbedUrl(product.videoUrl) && (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-primary-400 font-bold uppercase text-xs tracking-wider">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary-400"></span>
-                        Video hướng dẫn sử dụng
-                      </div>
-                      <div className="rounded-xl overflow-hidden border border-slate-700 aspect-video bg-black shadow-inner">
-                        <iframe
-                          src={`${getYoutubeEmbedUrl(product.videoUrl)}?rel=0`}
-                          className="w-full h-full"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          title="Video demo"
-                        />
-                      </div>
-                    </div>
-                  )}
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">

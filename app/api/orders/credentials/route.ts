@@ -23,7 +23,12 @@ export async function GET(request: NextRequest) {
         orderCode,
         customerPhone: phone,
       },
-      include: {
+      select: {
+        id: true,
+        orderCode: true,
+        status: true,
+        totalPrice: true,
+        notes: true,
         service: true,
         credential: true,
         chatbotData: true,

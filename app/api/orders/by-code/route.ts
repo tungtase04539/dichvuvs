@@ -15,7 +15,18 @@ export async function GET(request: NextRequest) {
     console.log(`[by-code] Searching for order code: "${orderCode}"`);
     const order = await prisma.order.findUnique({
       where: { orderCode },
-      include: {
+      select: {
+        id: true,
+        orderCode: true,
+        customerName: true,
+        customerPhone: true,
+        customerEmail: true,
+        status: true,
+        totalPrice: true,
+        quantity: true,
+        createdAt: true,
+        notes: true,
+        serviceId: true,
         service: true,
         credential: true,
         chatbotData: true,

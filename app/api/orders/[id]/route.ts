@@ -14,7 +14,23 @@ export async function GET(
 
     const order = await prisma.order.findUnique({
       where: { id: params.id },
-      include: {
+      select: {
+        id: true,
+        orderCode: true,
+        customerName: true,
+        customerPhone: true,
+        customerEmail: true,
+        status: true,
+        totalPrice: true,
+        quantity: true,
+        basePrice: true,
+        notes: true,
+        referralCode: true,
+        referrerId: true,
+        scheduledDate: true,
+        scheduledTime: true,
+        createdAt: true,
+        serviceId: true,
         service: true,
         assignedTo: {
           select: { id: true, name: true, phone: true, email: true },
@@ -75,7 +91,12 @@ export async function PATCH(
     const order = await prisma.order.update({
       where: { id: params.id },
       data: updateData,
-      include: {
+      select: {
+        id: true,
+        orderCode: true,
+        status: true,
+        totalPrice: true,
+        notes: true,
         service: true,
         assignedTo: {
           select: { id: true, name: true },

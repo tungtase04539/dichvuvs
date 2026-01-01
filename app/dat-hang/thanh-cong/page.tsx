@@ -161,7 +161,7 @@ function OrderSuccessContent() {
 
   // Fetch order
   useEffect(() => {
-    const fetchOrder = async () => {
+    const fetchOrder = async (retryCount = 0) => {
       if (!orderCode) {
         setError("Không có mã đơn hàng");
         setIsLoading(false);
@@ -169,11 +169,14 @@ function OrderSuccessContent() {
       }
 
       try {
+        console.log(`[SuccessPage] Fetching order ${orderCode} (Attempt ${retryCount + 1})...`);
         const res = await fetch(`/api/orders/by-code?code=${encodeURIComponent(orderCode)}`);
         const data = await res.json();
 
         if (data.order) {
+          console.log("[SuccessPage] Order found:", data.order.orderCode, "Price:", data.order.totalPrice);
           setOrder(data.order);
+          setError(""); // Clear any previous error
           if (data.order.status === "confirmed" || data.order.status === "completed") {
             setIsPaid(true);
             const deliveryData = data.order.deliveryData || data.order.chatbotData || data.order.credential;
@@ -182,29 +185,26 @@ function OrderSuccessContent() {
               setShowSuccessModal(true);
             }
           }
+          setIsLoading(false);
+        } else if (retryCount < 3) {
+          console.warn(`[SuccessPage] Order not found, retrying in 1.5s... (${retryCount + 1}/3)`);
+          setTimeout(() => fetchOrder(retryCount + 1), 1500);
         } else {
-          setOrder({
-            orderCode,
-            totalPrice: 29000,
-            status: "pending",
-            customerName: "Khách hàng",
-            customerPhone: "",
-            customerEmail: null,
-          });
+          console.error("[SuccessPage] Order not found after max retries.");
+          setOrder(null);
+          setError("Không tìm thấy đơn hàng trong hệ thống. Vui lòng kiểm tra lại mã đơn hàng.");
+          setIsLoading(false);
         }
-      } catch (e) {
-        console.error("Fetch order error:", e);
-        setOrder({
-          orderCode,
-          totalPrice: 29000,
-          status: "pending",
-          customerName: "Khách hàng",
-          customerPhone: "",
-          customerEmail: null,
-        });
+      } catch (e: any) {
+        console.error("[SuccessPage] Fetch order error:", e);
+        if (retryCount < 3) {
+          setTimeout(() => fetchOrder(retryCount + 1), 1500);
+        } else {
+          setError(`Lỗi kết nối: ${e.message}`);
+          setOrder(null);
+          setIsLoading(false);
+        }
       }
-
-      setIsLoading(false);
     };
 
     fetchOrder();

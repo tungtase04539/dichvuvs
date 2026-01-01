@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Missing order code" }, { status: 400 });
     }
 
+    console.log(`[by-code] Searching for order code: "${orderCode}"`);
     const order = await prisma.order.findUnique({
       where: { orderCode },
       include: {
@@ -22,17 +23,10 @@ export async function GET(request: NextRequest) {
     });
 
     if (!order) {
-      // Return default order data if not found (for demo/fallback)
-      return NextResponse.json({
-        order: {
-          orderCode,
-          totalPrice: 29000,
-          status: "pending",
-          customerName: "Khách hàng",
-          customerPhone: "",
-        }
-      });
+      console.warn(`[by-code] Order not found for code: "${orderCode}"`);
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
+    console.log(`[by-code] Order found: ${order.orderCode}, status: ${order.status}, total: ${order.totalPrice}`);
 
     // Unify delivery data for the frontend
     const deliveryData = order.chatbotData ? {

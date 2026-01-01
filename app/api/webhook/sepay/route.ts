@@ -57,9 +57,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, message: "Order already processed" });
     }
 
-    // Check if payment amount matches (allow 1000đ tolerance)
+    // Verify order total price matches transaction amount
     const tolerance = 1000;
     const isAmountMatch = Math.abs(transaction.transferAmount - order.totalPrice) <= tolerance;
+
+    if (!isAmountMatch) {
+      console.error(`[SePay Webhook] Price mismatch for order ${orderCode}. Expected: ${order.totalPrice}, Received: ${transaction.transferAmount}`);
+      return NextResponse.json({ success: false, message: "Price mismatch" }, { status: 400 });
+    }
+
+    // Determine package type (handling fallback to notes if field is missing/null)
+    let packageType = (order as any).orderPackageType;
+    if (!packageType && order.notes) {
+      if (order.notes.includes("[Package: gold]")) packageType = "gold";
+      else if (order.notes.includes("[Package: platinum]")) packageType = "platinum";
+    }
+
+    console.log(`[SePay Webhook] Processing order ${orderCode} with package: ${packageType || 'standard'}`);
 
     // Consolidate inventory logic - Find available code first
     const availableChatbot = await prisma.chatbotInventory.findFirst({
@@ -84,14 +98,14 @@ export async function POST(request: NextRequest) {
 
     await prisma.$transaction(async (tx) => {
       // --- Special Logic for Premium Packages (Gold/Platinum) ---
-      if (order.orderPackageType === "gold" || order.orderPackageType === "platinum") {
-        const dedicatedLink = order.orderPackageType === "gold"
-          ? linksMap.get("chatbot_link_gold") || order.service.chatbotLinkGold
-          : linksMap.get("chatbot_link_platinum") || order.service.chatbotLinkPlatinum;
+      if (packageType === "gold" || packageType === "platinum") {
+        const dedicatedLink = packageType === "gold"
+          ? linksMap.get("chatbot_link_gold") || (order.service as any).chatbotLinkGold
+          : linksMap.get("chatbot_link_platinum") || (order.service as any).chatbotLinkPlatinum;
 
         const deliveryMessage = dedicatedLink
-          ? `✅ Đã tự động bàn giao Link ${order.orderPackageType.toUpperCase()}: ${dedicatedLink}`
-          : `⚠️ Gói ${order.orderPackageType.toUpperCase()} chưa có link bàn giao riêng. Vui lòng liên hệ Admin.`;
+          ? `✅ Đã tự động bàn giao Link ${packageType.toUpperCase()}: ${dedicatedLink}`
+          : `⚠️ Gói ${packageType.toUpperCase()} chưa có link bàn giao riêng. Vui lòng liên hệ Admin.`;
 
         await tx.order.update({
           where: { id: order.id },
@@ -102,7 +116,7 @@ export async function POST(request: NextRequest) {
               : deliveryMessage,
           },
         });
-        console.log(`✅ Dedicated link for ${order.orderPackageType} assigned to order ${orderCode}`);
+        console.log(`✅ Dedicated link for ${packageType} assigned to order ${orderCode}`);
         return; // Skip standard inventory logic
       }
 

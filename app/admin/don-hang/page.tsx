@@ -217,11 +217,11 @@ export default function OrdersPage() {
                     </td>
                     <td className="px-6 py-4">
                       <span className={cn("badge",
-                        order.packageType === "gold" ? "bg-amber-100 text-amber-700" :
-                          order.packageType === "platinum" ? "bg-cyan-100 text-cyan-700" :
+                        order.orderPackageType === "gold" ? "bg-amber-100 text-amber-700" :
+                          order.orderPackageType === "platinum" ? "bg-cyan-100 text-cyan-700" :
                             "bg-slate-100 text-slate-700"
                       )}>
-                        {order.packageType || "standard"}
+                        {order.orderPackageType || "standard"}
                       </span>
                     </td>
                     <td className="px-6 py-4">

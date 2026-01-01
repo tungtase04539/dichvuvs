@@ -32,7 +32,7 @@ interface Order {
     address: string;
     district: string;
     status: string;
-    packageType: string;
+    orderPackageType: string;
     chatbotLink?: string | null;
     scheduledDate: string;
     scheduledTime: string;
@@ -189,16 +189,16 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
                                 <p className="text-[10px] text-slate-400 uppercase font-bold">Hình thức gói</p>
                                 <div className="flex items-center gap-2">
                                     <Star className={cn("w-4 h-4",
-                                        order.packageType === "gold" ? "text-amber-500 fill-amber-500" :
-                                            order.packageType === "platinum" ? "text-cyan-500 fill-cyan-500" :
+                                        order.orderPackageType === "gold" ? "text-amber-500 fill-amber-500" :
+                                            order.orderPackageType === "platinum" ? "text-cyan-500 fill-cyan-500" :
                                                 "text-slate-400"
                                     )} />
                                     <span className={cn("font-bold text-sm uppercase",
-                                        order.packageType === "gold" ? "text-amber-600" :
-                                            order.packageType === "platinum" ? "text-cyan-600" :
+                                        order.orderPackageType === "gold" ? "text-amber-600" :
+                                            order.orderPackageType === "platinum" ? "text-cyan-600" :
                                                 "text-slate-600"
                                     )}>
-                                        {order.packageType || "Standard"}
+                                        {order.orderPackageType || "Standard"}
                                     </span>
                                 </div>
                             </div>
@@ -361,7 +361,7 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
                     </div>
 
                     {/* Provisioning Section for Premium Packages */}
-                    {order.packageType !== "standard" && (
+                    {order.orderPackageType !== "standard" && (
                         <div className="bg-white rounded-2xl p-6 shadow-sm border border-primary-100 ring-1 ring-primary-50">
                             <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
                                 <Bot className="w-4 h-4 text-primary-500" />
@@ -401,7 +401,7 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
                             Hỗ trợ Admin
                         </h3>
                         <p className="text-primary-800 text-sm leading-relaxed">
-                            Đơn hàng gói <strong>{order.packageType?.toUpperCase() || "STANDARD"}</strong> cần được setup bộ link và mã kích hoạt cho khách hàng trong 24h.
+                            Đơn hàng gói <strong>{order.orderPackageType?.toUpperCase() || "STANDARD"}</strong> cần được setup bộ link và mã kích hoạt cho khách hàng trong 24h.
                             Kiểm tra phần ghi chú để biết yêu cầu riêng của khách.
                         </p>
                     </div>

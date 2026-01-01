@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
               : deliveryMessage,
           },
         });
-        console.log(`✅ Dedicated link for ${order.packageType} assigned to order ${orderCode}`);
+        console.log(`✅ Dedicated link for ${order.orderPackageType} assigned to order ${orderCode}`);
         return; // Skip standard inventory logic
       }
 

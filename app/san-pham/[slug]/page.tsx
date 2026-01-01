@@ -312,8 +312,11 @@ export default function ProductDetailPage({
                         className={`relative group cursor-pointer transition-all preserve-3d min-h-[220px] ${flippedCards['gold'] ? 'flipped' : ''}`}
                         onClick={() => setSelectedPackage("gold")}
                       >
+                        {/* Sparkle Border Container */}
+                        <div className={`absolute -inset-[2px] rounded-[18px] z-0 opacity-0 group-hover:opacity-100 transition-opacity bg-[length:200%_200%] bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-600 animate-border-sparkle`}></div>
+
                         {/* Front Side */}
-                        <div className={`absolute inset-0 backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "gold" ? "bg-amber-900/20 border-amber-500 shadow-lg shadow-amber-500/20" : "bg-amber-900/10 border-amber-900/30 hover:border-amber-500/50"}`}>
+                        <div className={`relative z-10 h-full backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "gold" ? "bg-amber-900/30 border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.3)] animate-premium-glow" : "bg-amber-900/10 border-amber-950 hover:bg-amber-900/20 hover:border-amber-400/50"}`}>
                           <div className="flex justify-between items-start mb-3">
                             <span className="text-amber-400 text-[10px] font-bold uppercase flex items-center gap-1">
                               <Star className="w-3 h-3 fill-amber-400" />
@@ -393,8 +396,11 @@ export default function ProductDetailPage({
                         className={`relative group cursor-pointer transition-all preserve-3d min-h-[220px] ${flippedCards['platinum'] ? 'flipped' : ''}`}
                         onClick={() => setSelectedPackage("platinum")}
                       >
+                        {/* Sparkle Border Container */}
+                        <div className={`absolute -inset-[2px] rounded-[18px] z-0 opacity-0 group-hover:opacity-100 transition-opacity bg-[length:200%_200%] bg-gradient-to-r from-cyan-400 via-white to-blue-600 animate-border-sparkle`}></div>
+
                         {/* Front Side */}
-                        <div className={`absolute inset-0 backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "platinum" ? "bg-cyan-900/20 border-cyan-400 shadow-lg shadow-cyan-400/20" : "bg-cyan-900/10 border-cyan-900/30 hover:border-cyan-400/50"}`}>
+                        <div className={`relative z-10 h-full backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "platinum" ? "bg-cyan-900/30 border-cyan-400 shadow-[0_0_25px_rgba(34,211,238,0.3)] animate-premium-glow-platinum" : "bg-cyan-900/10 border-cyan-950 hover:bg-cyan-900/20 hover:border-cyan-400/50"}`}>
                           <div className="flex justify-between items-start mb-3">
                             <span className="text-cyan-400 text-[10px] font-bold uppercase flex items-center gap-1">
                               <Bot className="w-3 h-3" />
@@ -509,6 +515,28 @@ export default function ProductDetailPage({
                 }
                 .animate-shimmer {
                   animation: shimmer 1.5s infinite;
+                }
+                @keyframes border-sparkle {
+                  0% { background-position: 0% 50%; }
+                  50% { background-position: 100% 50%; }
+                  100% { background-position: 0% 50%; }
+                }
+                .animate-border-sparkle {
+                  animation: border-sparkle 3s linear infinite;
+                }
+                @keyframes premium-glow {
+                  0%, 100% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
+                  50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.5); }
+                }
+                .animate-premium-glow {
+                  animation: premium-glow 2s ease-in-out infinite;
+                }
+                @keyframes premium-glow-platinum {
+                  0%, 100% { box-shadow: 0 0 15px rgba(34, 211, 238, 0.2); }
+                  50% { box-shadow: 0 0 35px rgba(34, 211, 238, 0.6); }
+                }
+                .animate-premium-glow-platinum {
+                  animation: premium-glow-platinum 2s ease-in-out infinite;
                 }
               `}</style>
 

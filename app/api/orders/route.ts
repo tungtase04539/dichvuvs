@@ -203,6 +203,13 @@ export async function POST(request: NextRequest) {
     const referrerId = null;
     const finalReferralCode = null;
 
+    console.log("Creating order with data:", {
+      customerName,
+      customerPhone: finalPhone,
+      totalPrice,
+      packageType: mainItem.packageType
+    });
+
     // Single insert query - Tài khoản sẽ được tạo sau khi thanh toán thành công
     const order = await prisma.order.create({
       data: {
@@ -235,12 +242,15 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Note: Referral stats (orderCount, revenue) sẽ được cập nhật 
-    // khi đơn hàng được xác nhận thanh toán, không phải khi tạo đơn
+    console.log("Order created successfully:", order.orderCode);
 
     return NextResponse.json({ order });
-  } catch (error) {
-    console.error("Create order error:", error);
-    return NextResponse.json({ error: "Lỗi tạo đơn hàng" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Create order error full:", error);
+    return NextResponse.json({
+      error: "Lỗi tạo đơn hàng",
+      details: error.message,
+      stack: process.env.NODE_ENV === "development" ? error.stack : undefined
+    }, { status: 500 });
   }
 }

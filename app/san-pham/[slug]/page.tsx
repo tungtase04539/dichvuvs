@@ -201,254 +201,177 @@ export default function ProductDetailPage({
             {/* Sidebar */}
             <div className="space-y-6 order-1 lg:order-2">
 
-              {/* Package Selection Section - MOVED TO TOP */}
-              <div className="space-y-4 bg-slate-800/50 rounded-2xl p-6 border border-slate-700 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 opacity-5">
-                  <Star className="w-24 h-24 text-primary-400" />
+              {/* Unified Purchase Card */}
+              <div className="bg-slate-800 rounded-2xl shadow-xl border border-primary-500/20 ring-1 ring-white/5 overflow-hidden">
+                {/* Header */}
+                <div className="bg-primary-500 p-4">
+                  <h3 className="text-slate-900 font-black uppercase text-center tracking-widest text-lg flex items-center justify-center gap-2">
+                    <Star className="w-5 h-5 fill-slate-900" />
+                    ĐĂNG KÝ DỊCH VỤ
+                    <Star className="w-5 h-5 fill-slate-900" />
+                  </h3>
                 </div>
-                <h3 className="text-white font-bold uppercase text-sm tracking-wider flex items-center gap-2 mb-4 relative z-10">
-                  <Star className="w-4 h-4 text-primary-400" />
-                  Chọn Gói Dịch Vụ
-                </h3>
 
-                <div className="grid grid-cols-1 gap-4">
-                  {/* Standard Package */}
-                  <div
-                    className={`relative group cursor-pointer transition-all preserve-3d h-48 ${flippedCards['standard'] ? 'flipped' : ''}`}
-                    onClick={(e) => {
-                      // Only select and/or flip if not clicking a button
-                      if ((e.target as HTMLElement).closest('button')) return;
-                      setSelectedPackage("standard");
-                      setFlippedCards(prev => ({ ...prev, standard: !prev.standard }));
-                    }}
-                  >
-                    <div className={`absolute inset-0 backface-hidden rounded-2xl p-5 border-2 transition-all ${selectedPackage === "standard" ? "bg-slate-800 border-primary-500 shadow-lg shadow-primary-500/20" : "bg-slate-800/50 border-slate-700 hover:border-slate-600"}`}>
-                      <div className="flex justify-between items-start mb-4">
-                        <span className="text-slate-400 text-xs font-bold uppercase tracking-tight">MUA CHATBOT (Tiêu chuẩn)</span>
-                        {selectedPackage === "standard" && <CheckCircle className="w-5 h-5 text-primary-500" />}
-                      </div>
-                      <div className="text-2xl font-bold text-white mb-2">{formatCurrency(product.price)}</div>
-                      <p className="text-slate-400 text-xs">Gói cơ bản phù hợp cho cá nhân khởi đầu</p>
-                      <div className="absolute bottom-4 right-4 text-primary-400 text-[10px] font-bold uppercase flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                        Xem chi tiết <ArrowLeft className="w-3 h-3 rotate-180" />
-                      </div>
+                <div className="p-6 space-y-8">
+                  {/* 1. Package Selection */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-primary-400 font-bold uppercase text-xs tracking-wider mb-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary-400"></span>
+                      Chọn gói phù hợp với bạn
                     </div>
-
-                    <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-slate-700 border-2 border-primary-500 rotate-y-180 flex flex-col justify-between">
-                      <div>
-                        <h4 className="text-white font-bold mb-3 text-sm">Ưu đãi Tiêu chuẩn:</h4>
-                        <ul className="space-y-1.5">
-                          {["Full tính năng cơ bản", "Hỗ trợ cộng đồng", "Update bảo mật"].map((f: string, i: number) => (
-                            <li key={i} className="flex items-center gap-2 text-[11px] text-slate-300">
-                              <CheckCircle className="w-3 h-3 text-primary-400" />
-                              {f}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <button
-                        onClick={() => {
+                    <div className="grid grid-cols-1 gap-4">
+                      {/* Standard Package */}
+                      <div
+                        className={`relative group cursor-pointer transition-all preserve-3d h-44 ${flippedCards['standard'] ? 'flipped' : ''}`}
+                        onClick={(e) => {
+                          if ((e.target as HTMLElement).closest('button')) return;
                           setSelectedPackage("standard");
-                          // Immediate order logic usually handled by AddToCartButton, 
-                          // but here we can trigger a scroll or immediate redirect
-                          const cart = [{ id: product.id, quantity: 1, packageType: "standard" }];
-                          sessionStorage.setItem("cart", JSON.stringify(cart));
-                          router.push("/dat-hang");
+                          setFlippedCards(prev => ({ ...prev, standard: !prev.standard }));
                         }}
-                        className="w-full py-2 bg-primary-500 text-slate-900 text-xs font-bold rounded-xl hover:bg-primary-400 transition-colors flex items-center justify-center gap-1"
                       >
-                        ĐĂNG KÝ GÓI NÀY <ArrowLeft className="w-3 h-3 rotate-180" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Gold Package */}
-                  <div
-                    className={`relative group cursor-pointer transition-all preserve-3d h-48 ${flippedCards['gold'] ? 'flipped' : ''}`}
-                    onClick={(e) => {
-                      if ((e.target as HTMLElement).closest('button')) return;
-                      setSelectedPackage("gold");
-                      setFlippedCards(prev => ({ ...prev, gold: !prev.gold }));
-                    }}
-                  >
-                    <div className={`absolute inset-0 backface-hidden rounded-2xl p-5 border-2 transition-all ${selectedPackage === "gold" ? "bg-amber-900/20 border-amber-500 shadow-lg shadow-amber-500/20" : "bg-amber-900/10 border-amber-900/30 hover:border-amber-500/50"}`}>
-                      <div className="flex justify-between items-start mb-4">
-                        <span className="text-amber-400 text-xs font-bold uppercase flex items-center gap-1">
-                          <Star className="w-3 h-3 fill-amber-400" />
-                          Gói VÀNG
-                        </span>
-                        {selectedPackage === "gold" && <CheckCircle className="w-5 h-5 text-amber-500" />}
-                      </div>
-                      <div className="text-2xl font-bold text-amber-400 mb-2">{formatCurrency(product.priceGold || product.price * 1.5)}</div>
-                      <p className="text-amber-100/60 text-xs">Bao gồm ChatBot + Đóng gói thương hiệu & Quà tặng</p>
-                      <div className="absolute bottom-4 right-4 text-amber-400 text-[10px] font-bold uppercase flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                        Xem chi tiết <ArrowLeft className="w-3 h-3 rotate-180" />
-                      </div>
-                    </div>
-
-                    <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-amber-900 border-2 border-amber-500 rotate-y-180 flex flex-col justify-between">
-                      <div>
-                        <h4 className="text-white font-bold mb-3 text-sm italic underline decoration-amber-500/50 underline-offset-4">Ưu đãi Combo Vàng:</h4>
-                        <ul className="space-y-1.5">
-                          {(product.featuresGold?.split('\n') || ["Hỗ trợ ưu tiên", "Tùy chỉnh linh hoạt", "Theo dõi nâng cao"]).map((f: string, i: number) => (
-                            <li key={i} className="flex items-center gap-2 text-[11px] text-amber-100 font-medium">
-                              <CheckCircle className="w-3 h-3 text-amber-400" />
-                              {f}
-                            </li>
-                          ))}
-                        </ul>
+                        <div className={`absolute inset-0 backface-hidden rounded-2xl p-5 border-2 transition-all ${selectedPackage === "standard" ? "bg-slate-700 border-primary-500 shadow-lg shadow-primary-500/20" : "bg-slate-700/30 border-slate-700 hover:border-slate-600"}`}>
+                          <div className="flex justify-between items-start mb-3">
+                            <span className="text-slate-400 text-[10px] font-bold uppercase tracking-tight">MUA CHATBOT (Tiêu chuẩn)</span>
+                            {selectedPackage === "standard" && <CheckCircle className="w-4 h-4 text-primary-500" />}
+                          </div>
+                          <div className="text-xl font-bold text-white mb-1">{formatCurrency(product.price)}</div>
+                          <p className="text-slate-400 text-[10px]">Gói cơ bản phù hợp cho cá nhân khởi đầu</p>
+                        </div>
+                        <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-slate-700 border-2 border-primary-500 rotate-y-180 flex flex-col justify-center text-center">
+                          <p className="text-white font-bold text-xs mb-2">Ưu đãi Tiêu chuẩn:</p>
+                          <p className="text-slate-300 text-[10px] leading-snug">Full tính năng cơ bản, Hỗ trợ cộng đồng, Update bảo mật định kỳ.</p>
+                        </div>
                       </div>
 
-                      <button
-                        onClick={() => {
+                      {/* Gold Package */}
+                      <div
+                        className={`relative group cursor-pointer transition-all preserve-3d h-44 ${flippedCards['gold'] ? 'flipped' : ''}`}
+                        onClick={(e) => {
+                          if ((e.target as HTMLElement).closest('button')) return;
                           setSelectedPackage("gold");
-                          const cart = [{ id: product.id, quantity: 1, packageType: "gold" }];
-                          sessionStorage.setItem("cart", JSON.stringify(cart));
-                          router.push("/dat-hang");
+                          setFlippedCards(prev => ({ ...prev, gold: !prev.gold }));
                         }}
-                        className="w-full py-2 bg-amber-500 text-amber-950 text-xs font-bold rounded-xl hover:bg-amber-400 transition-colors flex items-center justify-center gap-1"
                       >
-                        ĐĂNG KÝ GÓI NÀY <ArrowLeft className="w-3 h-3 rotate-180" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Platinum Package */}
-                  <div
-                    className={`relative group cursor-pointer transition-all preserve-3d h-48 ${flippedCards['platinum'] ? 'flipped' : ''}`}
-                    onClick={(e) => {
-                      if ((e.target as HTMLElement).closest('button')) return;
-                      setSelectedPackage("platinum");
-                      setFlippedCards(prev => ({ ...prev, platinum: !prev.platinum }));
-                    }}
-                  >
-                    <div className={`absolute inset-0 backface-hidden rounded-2xl p-5 border-2 transition-all ${selectedPackage === "platinum" ? "bg-cyan-900/20 border-cyan-400 shadow-lg shadow-cyan-400/20" : "bg-cyan-900/10 border-cyan-900/30 hover:border-cyan-400/50"}`}>
-                      <div className="flex justify-between items-start mb-4">
-                        <span className="text-cyan-400 text-xs font-bold uppercase flex items-center gap-1">
-                          <Bot className="w-3 h-3" />
-                          BACH KIM
-                        </span>
-                        {selectedPackage === "platinum" && <CheckCircle className="w-5 h-5 text-cyan-400" />}
-                      </div>
-                      <div className="text-2xl font-bold text-cyan-400 mb-2">{formatCurrency(product.pricePlatinum || product.price * 2.5)}</div>
-                      <p className="text-cyan-100/60 text-xs">Full Option: ChatBot + Hệ sinh thái & Ưu đãi đặc quyền</p>
-                      <div className="absolute bottom-4 right-4 text-cyan-400 text-[10px] font-bold uppercase flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                        Xem chi tiết <ArrowLeft className="w-3 h-3 rotate-180" />
-                      </div>
-                    </div>
-
-                    <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-cyan-950 border-2 border-cyan-400 rotate-y-180 flex flex-col justify-between">
-                      <div>
-                        <h4 className="text-white font-bold mb-3 text-sm italic underline decoration-cyan-500/50 underline-offset-4">Đặc quyền Bạch Kim:</h4>
-                        <ul className="space-y-1.5">
-                          {(product.featuresPlatinum?.split('\n') || ["Full giải pháp AI", "Kỹ thuật hỗ trợ 1-1", "SLA cam kết 99.9%"]).map((f: string, i: number) => (
-                            <li key={i} className="flex items-center gap-2 text-[11px] text-cyan-100 font-medium">
-                              <CheckCircle className="w-3 h-3 text-cyan-400" />
-                              {f}
-                            </li>
-                          ))}
-                        </ul>
+                        <div className={`absolute inset-0 backface-hidden rounded-2xl p-5 border-2 transition-all ${selectedPackage === "gold" ? "bg-amber-900/20 border-amber-500 shadow-lg shadow-amber-500/20" : "bg-amber-900/10 border-amber-900/30 hover:border-amber-500/50"}`}>
+                          <div className="flex justify-between items-start mb-3">
+                            <span className="text-amber-400 text-[10px] font-bold uppercase flex items-center gap-1">
+                              <Star className="w-3 h-3 fill-amber-400" />
+                              Gói VÀNG
+                            </span>
+                            {selectedPackage === "gold" && <CheckCircle className="w-4 h-4 text-amber-500" />}
+                          </div>
+                          <div className="text-xl font-bold text-amber-400 mb-1">{formatCurrency(product.priceGold || product.price * 1.5)}</div>
+                          <p className="text-amber-100/60 text-[10px]">Combo: ChatBot + Thương hiệu & Quà tặng</p>
+                        </div>
+                        <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-amber-900 border-2 border-amber-500 rotate-y-180 flex flex-col justify-center text-center">
+                          <p className="text-white font-bold text-xs mb-2">Ưu đãi Combo Vàng:</p>
+                          <p className="text-amber-100/80 text-[10px] leading-snug">Sở hữu Standard + Đóng gói thương hiệu riêng, Quà tặng đặc biệt từ Admin.</p>
+                        </div>
                       </div>
 
-                      <button
-                        onClick={() => {
+                      {/* Platinum Package */}
+                      <div
+                        className={`relative group cursor-pointer transition-all preserve-3d h-44 ${flippedCards['platinum'] ? 'flipped' : ''}`}
+                        onClick={(e) => {
+                          if ((e.target as HTMLElement).closest('button')) return;
                           setSelectedPackage("platinum");
-                          const cart = [{ id: product.id, quantity: 1, packageType: "platinum" }];
-                          sessionStorage.setItem("cart", JSON.stringify(cart));
-                          router.push("/dat-hang");
+                          setFlippedCards(prev => ({ ...prev, platinum: !prev.platinum }));
                         }}
-                        className="w-full py-2 bg-cyan-500 text-cyan-950 text-xs font-bold rounded-xl hover:bg-cyan-400 transition-colors flex items-center justify-center gap-1"
                       >
-                        ĐĂNG KÝ GÓI NÀY <ArrowLeft className="w-3 h-3 rotate-180" />
-                      </button>
+                        <div className={`absolute inset-0 backface-hidden rounded-2xl p-5 border-2 transition-all ${selectedPackage === "platinum" ? "bg-cyan-900/20 border-cyan-400 shadow-lg shadow-cyan-400/20" : "bg-cyan-900/10 border-cyan-900/30 hover:border-cyan-400/50"}`}>
+                          <div className="flex justify-between items-start mb-3">
+                            <span className="text-cyan-400 text-[10px] font-bold uppercase flex items-center gap-1">
+                              <Bot className="w-3 h-3" />
+                              BACH KIM
+                            </span>
+                            {selectedPackage === "platinum" && <CheckCircle className="w-4 h-4 text-cyan-400" />}
+                          </div>
+                          <div className="text-xl font-bold text-cyan-400 mb-1">{formatCurrency(product.pricePlatinum || product.price * 2.5)}</div>
+                          <p className="text-cyan-100/60 text-[10px]">Full Option: ChatBot + Hệ sinh thái đặc quyền</p>
+                        </div>
+                        <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-cyan-950 border-2 border-cyan-400 rotate-y-180 flex flex-col justify-center text-center">
+                          <p className="text-white font-bold text-xs mb-2">Đặc quyền Bạch Kim:</p>
+                          <p className="text-cyan-100/80 text-[10px] leading-snug">Full giải pháp AI, Kỹ thuật hỗ trợ 1-1, Setup link Bot riêng, SLA 99.9%.</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Price & Action Card */}
-              <div className="bg-slate-800 rounded-2xl p-6 shadow-xl border border-primary-500/30 ring-1 ring-primary-500/20 relative overflow-hidden">
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary-500/10 blur-3xl rounded-full"></div>
-                <h3 className="text-white font-bold uppercase text-sm tracking-wider flex items-center gap-2 mb-4 relative z-10">
-                  <span className="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center border border-primary-500/20">
-                    <CheckCircle className="w-4 h-4" />
-                  </span>
-                  Thông Tin Đăng Ký
-                </h3>
-
-                <div className="mb-6">
-                  {selectedPackage === "standard" ? (
-                    <div className="p-4 bg-slate-900/50 rounded-xl border border-slate-700">
-                      <p className="text-slate-300 text-sm leading-relaxed">
-                        Sở hữu ngay ChatBot với đầy đủ tính năng tiêu chuẩn. Hệ thống sẽ tự động bàn giao tài khoản ngay sau khi thanh toán thành công.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="p-4 bg-primary-900/10 rounded-xl border border-primary-900/30">
-                      <p className="text-primary-100/90 text-sm leading-relaxed flex gap-3">
-                        <Bot className="w-5 h-5 text-primary-400 shrink-0" />
-                        <span>
-                          Gói {selectedPackage.toUpperCase()} bao gồm **Link Bot riêng biệt** và dịch vụ setup phần cứng/phần mềm chuyên sâu. Admin sẽ trực tiếp bàn giao link bot cho bạn sau khi setup hoàn tất.
-                        </span>
-                      </p>
+                  {/* 2. Video & Additional Info */}
+                  {product.videoUrl && getYoutubeEmbedUrl(product.videoUrl) && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-primary-400 font-bold uppercase text-xs tracking-wider">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary-400"></span>
+                        Video hướng dẫn sử dụng
+                      </div>
+                      <div className="rounded-xl overflow-hidden border border-slate-700 aspect-video bg-black shadow-inner">
+                        <iframe
+                          src={`${getYoutubeEmbedUrl(product.videoUrl)}?rel=0`}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          title="Video demo"
+                        />
+                      </div>
                     </div>
                   )}
-                </div>
 
-                {product.videoUrl && getYoutubeEmbedUrl(product.videoUrl) && (
-                  <div className="mb-6 rounded-xl overflow-hidden border border-slate-700 aspect-video bg-black shadow-inner">
-                    <iframe
-                      src={`${getYoutubeEmbedUrl(product.videoUrl)}?rel=0`}
-                      className="w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      title="Video demo"
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                      ))}
+                    </div>
+                    <span className="text-xs text-slate-500 ml-2">128 khách hàng đã tin dùng</span>
+                  </div>
+
+                  {/* 3. Pricing & Call to Action */}
+                  <div className="pt-6 border-t border-slate-700">
+                    <div className="mb-6 p-5 bg-slate-900/80 rounded-2xl border border-primary-500/20">
+                      <div className="text-[10px] text-slate-500 uppercase font-black mb-2 tracking-widest">
+                        {selectedPackage === "standard" ? "Giá mua sản phẩm:" : "Phí dịch vụ trọn gói:"}
+                      </div>
+                      <div className="flex items-end gap-3 mb-3">
+                        <span className="text-3xl font-black text-primary-400">
+                          {formatCurrency(
+                            selectedPackage === "gold" ? (product.priceGold || product.price * 1.5) :
+                              selectedPackage === "platinum" ? (product.pricePlatinum || product.price * 2.5) :
+                                product.price
+                          )}
+                        </span>
+                        <span className="text-lg text-slate-500 line-through mb-1">
+                          {formatCurrency(
+                            (selectedPackage === "gold" ? (product.priceGold || product.price * 1.5) :
+                              selectedPackage === "platinum" ? (product.pricePlatinum || product.price * 2.5) :
+                                product.price) * 2
+                          )}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+                        <span className="inline-flex items-center gap-1.5 text-[9px] font-bold text-red-500 uppercase tracking-tighter">
+                          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                          Ưu đãi giới hạn - Giảm 50% chỉ hôm nay
+                        </span>
+                        {selectedPackage !== 'standard' && (
+                          <p className="text-[10px] text-primary-300 italic">
+                            * Gói {selectedPackage.toUpperCase()} đã bao gồm bản quyền ChatBot tiêu chuẩn.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <AddToCartButton
+                      product={{
+                        ...product,
+                        price: selectedPackage === "gold" ? (product.priceGold || product.price * 1.5) :
+                          selectedPackage === "platinum" ? (product.pricePlatinum || product.price * 2.5) :
+                            product.price,
+                        packageType: selectedPackage
+                      }}
                     />
                   </div>
-                )}
-
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-amber-400 fill-amber-400" />
-                  ))}
-                  <span className="text-sm text-slate-500 ml-2">(128 đánh giá)</span>
                 </div>
-
-                <div className="mb-6 p-4 bg-slate-900/50 rounded-xl border border-slate-700">
-                  <div className="text-xs text-slate-500 uppercase font-bold mb-1">
-                    {selectedPackage === "standard" ? "Giá mua sản phẩm:" : "Phí dịch vụ trọn gói:"}
-                  </div>
-                  <div className="flex items-end gap-3 mb-2">
-                    <span className="text-4xl font-bold text-primary-400">
-                      {formatCurrency(
-                        selectedPackage === "gold" ? (product.priceGold || product.price * 1.5) :
-                          selectedPackage === "platinum" ? (product.pricePlatinum || product.price * 2.5) :
-                            product.price
-                      )}
-                    </span>
-                    <span className="text-xl text-slate-500 line-through">
-                      {formatCurrency(
-                        (selectedPackage === "gold" ? (product.priceGold || product.price * 1.5) :
-                          selectedPackage === "platinum" ? (product.pricePlatinum || product.price * 2.5) :
-                            product.price) * 2
-                      )}
-                    </span>
-                  </div>
-                  <span className="inline-flex px-3 py-1 bg-red-900/50 text-red-400 text-[10px] font-bold rounded-full uppercase tracking-wider">
-                    Ưu đãi giới hạn - Giảm 50%
-                  </span>
-                </div>
-
-                <AddToCartButton
-                  product={{
-                    ...product,
-                    price: selectedPackage === "gold" ? (product.priceGold || product.price * 1.5) :
-                      selectedPackage === "platinum" ? (product.pricePlatinum || product.price * 2.5) :
-                        product.price,
-                    packageType: selectedPackage
-                  }}
-                />
               </div>
 
               <style jsx>{`

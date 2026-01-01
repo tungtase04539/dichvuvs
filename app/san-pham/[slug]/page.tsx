@@ -312,21 +312,20 @@ export default function ProductDetailPage({
                         className={`relative group cursor-pointer transition-all preserve-3d min-h-[220px] ${flippedCards['gold'] ? 'flipped' : ''}`}
                         onClick={() => setSelectedPackage("gold")}
                       >
-                        {/* Sparkle Border Container - ALWAYS VISIBLE for premium */}
-                        <div className={`absolute -inset-[2px] rounded-[18px] z-0 bg-[length:200%_200%] bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-600 animate-border-sparkle`}></div>
+                        {/* Sparkle Border Container - VIBRANT & PERSISTENT */}
+                        <div className={`absolute -inset-[2.5px] rounded-[19px] z-0 bg-[length:300%_300%] bg-gradient-to-r from-amber-600 via-yellow-200 to-amber-400 via-orange-400 to-amber-600 animate-border-sparkle`}></div>
 
                         {/* Front Side */}
-                        {/* Front Side */}
-                        <div className={`relative z-10 h-full backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "gold" ? "bg-amber-900/30 border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.3)] animate-premium-glow" : "bg-slate-900/95 border-transparent"}`}>
+                        <div className={`relative z-10 h-full backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "gold" ? "bg-slate-900/40 border-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.4)] animate-premium-glow" : "bg-slate-900/95 border-transparent"}`}>
                           <div className="flex justify-between items-start mb-3">
-                            <span className="text-amber-400 text-[10px] font-bold uppercase flex items-center gap-1">
-                              <Star className="w-3 h-3 fill-amber-400" />
+                            <span className={`text-[10px] font-black uppercase flex items-center gap-1 tracking-wider ${selectedPackage === "gold" ? "text-white" : "text-amber-400"}`}>
+                              <Star className={`w-3 h-3 ${selectedPackage === "gold" ? "fill-white" : "fill-amber-400"}`} />
                               Gói VÀNG
                             </span>
-                            {selectedPackage === "gold" && <CheckCircle className="w-4 h-4 text-amber-500" />}
+                            {selectedPackage === "gold" && <CheckCircle className="w-5 h-5 text-amber-400 drop-shadow-glow" />}
                           </div>
-                          <div className="text-xl font-bold text-amber-400 mb-1">{formatCurrency(product.priceGold || product.price * 1.5)}</div>
-                          <p className="text-amber-100/60 text-[10px] mb-4">Combo: Trợ lý AI + Thương hiệu & Quà tặng</p>
+                          <div className={`text-2xl font-black mb-1 drop-shadow-sm ${selectedPackage === "gold" ? "text-white" : "text-amber-400"}`}>{formatCurrency(product.priceGold || product.price * 1.5)}</div>
+                          <p className={`text-[10px] mb-4 font-medium ${selectedPackage === "gold" ? "text-amber-100" : "text-amber-100/60"}`}>Combo: Trợ lý AI + Thương hiệu & Quà tặng</p>
 
                           <div className="mt-auto space-y-3">
                             {selectedPackage === "gold" && (
@@ -397,21 +396,20 @@ export default function ProductDetailPage({
                         className={`relative group cursor-pointer transition-all preserve-3d min-h-[220px] ${flippedCards['platinum'] ? 'flipped' : ''}`}
                         onClick={() => setSelectedPackage("platinum")}
                       >
-                        {/* Sparkle Border Container - ALWAYS VISIBLE for premium */}
-                        <div className={`absolute -inset-[2px] rounded-[18px] z-0 bg-[length:200%_200%] bg-gradient-to-r from-cyan-400 via-white to-blue-600 animate-border-sparkle`}></div>
+                        {/* Sparkle Border Container - VIBRANT & PERSISTENT */}
+                        <div className={`absolute -inset-[2.5px] rounded-[19px] z-0 bg-[length:300%_300%] bg-gradient-to-r from-cyan-600 via-white to-blue-400 via-cyan-200 to-cyan-600 animate-border-sparkle`}></div>
 
                         {/* Front Side */}
-                        {/* Front Side */}
-                        <div className={`relative z-10 h-full backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "platinum" ? "bg-cyan-900/40 border-cyan-400 shadow-[0_0_25px_rgba(34,211,238,0.3)] animate-premium-glow-platinum" : "bg-slate-900/95 border-transparent"}`}>
+                        <div className={`relative z-10 h-full backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "platinum" ? "bg-slate-900/40 border-cyan-300 shadow-[0_0_35px_rgba(34,211,238,0.4)] animate-premium-glow-platinum" : "bg-slate-900/95 border-transparent"}`}>
                           <div className="flex justify-between items-start mb-3">
-                            <span className="text-cyan-400 text-[10px] font-bold uppercase flex items-center gap-1">
+                            <span className={`text-[10px] font-black uppercase flex items-center gap-1 tracking-wider ${selectedPackage === "platinum" ? "text-white" : "text-cyan-400"}`}>
                               <Bot className="w-3 h-3" />
                               BACH KIM
                             </span>
-                            {selectedPackage === "platinum" && <CheckCircle className="w-4 h-4 text-cyan-400" />}
+                            {selectedPackage === "platinum" && <CheckCircle className="w-5 h-5 text-cyan-400 drop-shadow-glow" />}
                           </div>
-                          <div className="text-xl font-bold text-cyan-400 mb-1">{formatCurrency(product.pricePlatinum || product.price * 2.5)}</div>
-                          <p className="text-cyan-100/60 text-[10px] mb-4">Full Option: Trợ lý AI + Hệ sinh thái đặc quyền</p>
+                          <div className={`text-2xl font-black mb-1 drop-shadow-sm ${selectedPackage === "platinum" ? "text-white" : "text-cyan-400"}`}>{formatCurrency(product.pricePlatinum || product.price * 2.5)}</div>
+                          <p className={`text-[10px] mb-4 font-medium ${selectedPackage === "platinum" ? "text-cyan-100" : "text-cyan-100/60"}`}>Full Option: Trợ lý AI + Hệ sinh thái đặc quyền</p>
 
                           <div className="mt-auto space-y-3">
                             {selectedPackage === "platinum" && (
@@ -520,22 +518,25 @@ export default function ProductDetailPage({
                 }
                 @keyframes border-sparkle {
                   0% { background-position: 0% 50%; }
-                  50% { background-position: 100% 50%; }
+                  50% { background-position: 100% 100%; }
                   100% { background-position: 0% 50%; }
                 }
                 .animate-border-sparkle {
-                  animation: border-sparkle 3s linear infinite;
+                  animation: border-sparkle 4s ease infinite;
+                }
+                .drop-shadow-glow {
+                  filter: drop-shadow(0 0 8px currentColor);
                 }
                 @keyframes premium-glow {
-                  0%, 100% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
-                  50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.5); }
+                  0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
+                  50% { box-shadow: 0 0 40px rgba(245, 158, 11, 0.6); }
                 }
                 .animate-premium-glow {
                   animation: premium-glow 2s ease-in-out infinite;
                 }
                 @keyframes premium-glow-platinum {
-                  0%, 100% { box-shadow: 0 0 15px rgba(34, 211, 238, 0.2); }
-                  50% { box-shadow: 0 0 35px rgba(34, 211, 238, 0.6); }
+                  0%, 100% { box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); }
+                  50% { box-shadow: 0 0 45px rgba(34, 211, 238, 0.7); }
                 }
                 .animate-premium-glow-platinum {
                   animation: premium-glow-platinum 2s ease-in-out infinite;

@@ -26,7 +26,7 @@ interface Order {
   address: string;
   district: string;
   status: string;
-  packageType: string;
+  orderPackageType: string;
   scheduledDate: string;
   scheduledTime: string;
   totalPrice: number;

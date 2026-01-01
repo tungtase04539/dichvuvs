@@ -123,9 +123,12 @@ export default function ProductDetailPage({
                   BÁN CHẠY NHẤT
                 </span>
               )}
-              <h1 className="text-3xl md:text-4xl font-bold text-white">
+              <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
                 {product.name}
               </h1>
+              <p className="text-slate-300 text-lg max-w-2xl leading-relaxed">
+                {product.description}
+              </p>
             </div>
           </div>
         </div>
@@ -137,12 +140,6 @@ export default function ProductDetailPage({
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8 order-2 lg:order-1">
               {/* Description */}
-              <div className="bg-slate-800 rounded-2xl p-8 shadow-sm border border-slate-700">
-                <h2 className="text-xl font-bold text-white mb-4 uppercase">Mô tả sản phẩm</h2>
-                <p className="text-slate-300 leading-relaxed text-lg">
-                  {product.description}
-                </p>
-              </div>
 
               {/* Long Description */}
               <div className="bg-slate-800 rounded-2xl p-8 shadow-sm border border-slate-700">
@@ -385,20 +382,6 @@ export default function ProductDetailPage({
                 }
               `}</style>
 
-              {/* Contact Card */}
-              <div className="bg-gradient-cta rounded-2xl p-6 text-white border border-primary-400/20">
-                <h3 className="font-bold text-lg mb-2 text-primary-400 uppercase">CẦN TƯ VẤN?</h3>
-                <p className="text-slate-300 text-sm mb-4">
-                  Liên hệ ngay để được hỗ trợ chọn ChatBot phù hợp
-                </p>
-                <a
-                  href="tel:0363189699"
-                  className="btn bg-primary-400 text-slate-900 hover:bg-primary-300 w-full font-bold uppercase shadow-lg shadow-primary-400/30"
-                >
-                  <Bot className="w-5 h-5" />
-                  0363 189 699
-                </a>
-              </div>
 
 
             </div>
@@ -427,6 +410,26 @@ export default function ProductDetailPage({
               </div>
             </div>
           )}
+
+          {/* Contact Card - NOW AT BOTTOM */}
+          <div className="mt-20">
+            <div className="bg-gradient-cta rounded-3xl p-10 text-white border border-primary-400/20 text-center max-w-4xl mx-auto shadow-2xl">
+              <h3 className="text-3xl font-black mb-4 text-primary-400 uppercase tracking-tighter">CẦN TƯ VẤN CHUYÊN SÂU?</h3>
+              <p className="text-slate-300 text-lg mb-8 max-w-2xl mx-auto">
+                Bạn chưa biết chọn gói nào? Liên hệ ngay với đội ngũ chuyên gia của chúng tôi để được tư vấn giải pháp AI tối ưu nhất cho doanh nghiệp của bạn.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                <a
+                  href="tel:0363189699"
+                  className="btn bg-primary-400 text-slate-900 hover:bg-primary-300 px-10 py-4 text-xl font-black uppercase shadow-xl shadow-primary-400/40 flex items-center gap-3 transition-all hover:scale-105"
+                >
+                  <Bot className="w-6 h-6" />
+                  0363 189 699
+                </a>
+                <span className="text-slate-500 font-bold uppercase tracking-widest text-sm">Hoặc Chat qua Zalo</span>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
 

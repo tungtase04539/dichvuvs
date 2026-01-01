@@ -37,6 +37,7 @@ export default function OrderForm() {
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [globalSettings, setGlobalSettings] = useState<any>({});
   const [videoModal, setVideoModal] = useState({ isOpen: false, url: "", title: "" });
   const [searchQuery, setSearchQuery] = useState("");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -82,21 +83,26 @@ export default function OrderForm() {
   };
 
   useEffect(() => {
-    const loadProducts = async () => {
+    const loadData = async () => {
       try {
-        const res = await fetch("/api/products");
-        const data = await res.json();
-        if (data.products) {
-          setProducts(data.products);
-        }
+        const [prodRes, settingsRes] = await Promise.all([
+          fetch("/api/products"),
+          fetch("/api/admin/settings", { cache: "no-store" })
+        ]);
+
+        const prodData = await prodRes.json();
+        const settingsData = await settingsRes.json();
+
+        if (prodData.products) setProducts(prodData.products);
+        if (settingsData.settings) setGlobalSettings(settingsData.settings);
       } catch (error) {
-        console.error("Load products error:", error);
+        console.error("Load data error:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadProducts();
+    loadData();
   }, []);
 
   useEffect(() => {
@@ -156,8 +162,13 @@ export default function OrderForm() {
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cart.reduce((sum, item) => {
     let price = item.product.price;
-    if (item.packageType === "gold") price = item.product.priceGold || price * 1.5;
-    else if (item.packageType === "platinum") price = item.product.pricePlatinum || price * 2.5;
+    if (item.packageType === "gold") {
+      price = globalSettings.price_gold ? parseFloat(globalSettings.price_gold) : (item.product.priceGold || price * 1.5);
+    } else if (item.packageType === "platinum") {
+      price = globalSettings.price_platinum ? parseFloat(globalSettings.price_platinum) : (item.product.pricePlatinum || price * 2.5);
+    } else if (item.packageType === "standard") {
+      price = globalSettings.price_standard ? parseFloat(globalSettings.price_standard) : price;
+    }
     return sum + price * item.quantity;
   }, 0);
 
@@ -328,19 +339,21 @@ export default function OrderForm() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <h3 className="font-bold text-slate-900 truncate">{item.product.name}</h3>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${item.packageType === 'gold' ? 'bg-amber-100 text-amber-600' :
-                          item.packageType === 'platinum' ? 'bg-cyan-100 text-cyan-600' :
-                            'bg-slate-100 text-slate-500'
+                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase border ${item.packageType === 'gold' ? 'bg-amber-500/10 text-amber-600 border-amber-200' :
+                          item.packageType === 'platinum' ? 'bg-cyan-500/10 text-cyan-600 border-cyan-200' :
+                            'bg-slate-100 text-slate-500 border-slate-200'
                           }`}>
-                          {item.packageType || 'standard'}
+                          GÓI {item.packageType === 'gold' ? 'VÀNG (GOLD)' :
+                            item.packageType === 'platinum' ? 'BẠCH KIM (PLATINUM)' :
+                              'TIÊU CHUẨN'}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-primary-600 font-bold">
                           {formatCurrency(
-                            item.packageType === 'gold' ? (item.product.priceGold || item.product.price * 1.5) :
-                              item.packageType === 'platinum' ? (item.product.pricePlatinum || item.product.price * 2.5) :
-                                item.product.price
+                            item.packageType === 'gold' ? (globalSettings.price_gold ? parseFloat(globalSettings.price_gold) : (item.product.priceGold || item.product.price * 1.5)) :
+                              item.packageType === 'platinum' ? (globalSettings.price_platinum ? parseFloat(globalSettings.price_platinum) : (item.product.pricePlatinum || item.product.price * 2.5)) :
+                                (globalSettings.price_standard ? parseFloat(globalSettings.price_standard) : item.product.price)
                           )}
                         </span>
                         <span className="text-slate-300">/tháng</span>

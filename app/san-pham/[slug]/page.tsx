@@ -202,10 +202,13 @@ export default function ProductDetailPage({
             <div className="space-y-6 order-1 lg:order-2">
 
               {/* Package Selection Section - MOVED TO TOP */}
-              <div className="space-y-4 bg-slate-800/50 rounded-2xl p-6 border border-slate-700 shadow-sm">
-                <h3 className="text-white font-bold uppercase text-sm tracking-wider flex items-center gap-2 mb-4">
+              <div className="space-y-4 bg-slate-800/50 rounded-2xl p-6 border border-slate-700 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-5">
+                  <Star className="w-24 h-24 text-primary-400" />
+                </div>
+                <h3 className="text-white font-bold uppercase text-sm tracking-wider flex items-center gap-2 mb-4 relative z-10">
                   <Star className="w-4 h-4 text-primary-400" />
-                  Bước 1: Chọn gói dịch vụ
+                  Chọn Gói Dịch Vụ
                 </h3>
 
                 <div className="grid grid-cols-1 gap-4">
@@ -278,7 +281,7 @@ export default function ProductDetailPage({
                         {selectedPackage === "gold" && <CheckCircle className="w-5 h-5 text-amber-500" />}
                       </div>
                       <div className="text-2xl font-bold text-amber-400 mb-2">{formatCurrency(product.priceGold || product.price * 1.5)}</div>
-                      <p className="text-amber-100/60 text-xs">Phù hợp cho doanh nghiệp đang phát triển</p>
+                      <p className="text-amber-100/60 text-xs">Bao gồm ChatBot + Đóng gói thương hiệu & Quà tặng</p>
                       <div className="absolute bottom-4 right-4 text-amber-400 text-[10px] font-bold uppercase flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                         Xem chi tiết <ArrowLeft className="w-3 h-3 rotate-180" />
                       </div>
@@ -286,7 +289,7 @@ export default function ProductDetailPage({
 
                     <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-amber-900 border-2 border-amber-500 rotate-y-180 flex flex-col justify-between">
                       <div>
-                        <h4 className="text-white font-bold mb-3 text-sm">Ưu đãi gói Vàng:</h4>
+                        <h4 className="text-white font-bold mb-3 text-sm italic underline decoration-amber-500/50 underline-offset-4">Ưu đãi Combo Vàng:</h4>
                         <ul className="space-y-1.5">
                           {(product.featuresGold?.split('\n') || ["Hỗ trợ ưu tiên", "Tùy chỉnh linh hoạt", "Theo dõi nâng cao"]).map((f: string, i: number) => (
                             <li key={i} className="flex items-center gap-2 text-[11px] text-amber-100 font-medium">
@@ -329,7 +332,7 @@ export default function ProductDetailPage({
                         {selectedPackage === "platinum" && <CheckCircle className="w-5 h-5 text-cyan-400" />}
                       </div>
                       <div className="text-2xl font-bold text-cyan-400 mb-2">{formatCurrency(product.pricePlatinum || product.price * 2.5)}</div>
-                      <p className="text-cyan-100/60 text-xs">Giải pháp tối thượng cho tập đoàn lớn</p>
+                      <p className="text-cyan-100/60 text-xs">Full Option: ChatBot + Hệ sinh thái & Ưu đãi đặc quyền</p>
                       <div className="absolute bottom-4 right-4 text-cyan-400 text-[10px] font-bold uppercase flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                         Xem chi tiết <ArrowLeft className="w-3 h-3 rotate-180" />
                       </div>
@@ -337,7 +340,7 @@ export default function ProductDetailPage({
 
                     <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-cyan-950 border-2 border-cyan-400 rotate-y-180 flex flex-col justify-between">
                       <div>
-                        <h4 className="text-white font-bold mb-3 text-sm">Ưu đãi Bạch Kim:</h4>
+                        <h4 className="text-white font-bold mb-3 text-sm italic underline decoration-cyan-500/50 underline-offset-4">Đặc quyền Bạch Kim:</h4>
                         <ul className="space-y-1.5">
                           {(product.featuresPlatinum?.split('\n') || ["Full giải pháp AI", "Kỹ thuật hỗ trợ 1-1", "SLA cam kết 99.9%"]).map((f: string, i: number) => (
                             <li key={i} className="flex items-center gap-2 text-[11px] text-cyan-100 font-medium">
@@ -365,10 +368,13 @@ export default function ProductDetailPage({
               </div>
 
               {/* Price & Action Card */}
-              <div className="bg-slate-800 rounded-2xl p-6 shadow-xl border border-primary-500/30 ring-1 ring-primary-500/20">
-                <h3 className="text-white font-bold uppercase text-sm tracking-wider flex items-center gap-2 mb-4">
-                  <span className="w-6 h-6 rounded-full bg-primary-500 text-slate-900 flex items-center justify-center text-[10px]">2</span>
-                  {selectedPackage === "standard" ? "Xác nhận mua ChatBot" : "Đăng ký Gói Nâng Cấp"}
+              <div className="bg-slate-800 rounded-2xl p-6 shadow-xl border border-primary-500/30 ring-1 ring-primary-500/20 relative overflow-hidden">
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary-500/10 blur-3xl rounded-full"></div>
+                <h3 className="text-white font-bold uppercase text-sm tracking-wider flex items-center gap-2 mb-4 relative z-10">
+                  <span className="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center border border-primary-500/20">
+                    <CheckCircle className="w-4 h-4" />
+                  </span>
+                  Thông Tin Đăng Ký
                 </h3>
 
                 <div className="mb-6">

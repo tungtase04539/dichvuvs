@@ -82,7 +82,7 @@ export default function ProductDetailPage({
 
         // Fetch global settings for packages
         try {
-          const settingsRes = await fetch("/api/admin/settings");
+          const settingsRes = await fetch("/api/admin/settings", { cache: "no-store" });
           const settingsData = await settingsRes.json();
           if (settingsData.settings) {
             setGlobalSettings(settingsData.settings);

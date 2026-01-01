@@ -14,12 +14,9 @@ const PACKAGE_SETTING_KEYS = [
     "chatbot_link_platinum"
 ];
 
-// Get global settings
+// Get global settings (Public)
 export async function GET() {
     try {
-        if (!(await isStaff())) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
 
         const settings = await prisma.setting.findMany({
             where: {

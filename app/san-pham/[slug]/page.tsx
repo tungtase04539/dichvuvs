@@ -6,8 +6,7 @@ import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import AddToCartButton from "./AddToCartButton";
-import { ArrowLeft, Star, Bot, Loader2, CheckCircle } from "lucide-react";
+import { ArrowLeft, Star, Bot, Loader2, CheckCircle, Minus, Plus } from "lucide-react";
 
 interface Product {
   id: string;
@@ -35,6 +34,7 @@ export default function ProductDetailPage({
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPackage, setSelectedPackage] = useState<"standard" | "gold" | "platinum">("standard");
   const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
+  const [quantity, setQuantity] = useState(1);
   const router = useRouter();
 
   const getYoutubeEmbedUrl = (url: string | null) => {
@@ -226,9 +226,35 @@ export default function ProductDetailPage({
                   {/* 2. Package Selection */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-primary-400 font-bold uppercase text-xs tracking-wider mb-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary-400"></span>
-                      Chọn gói phù hợp với bạn
+                      Chọn gói & Số lượng
                     </div>
+
+                    {/* Quantity Selector */}
+                    <div className="flex items-center justify-between bg-slate-900/50 p-4 rounded-2xl border border-slate-700/50 mb-6">
+                      <span className="text-sm font-bold text-slate-300 uppercase tracking-wider">Số lượng Trợ lý AI:</span>
+                      <div className="flex items-center gap-4 bg-slate-800 rounded-xl p-1 border border-slate-700">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setQuantity(Math.max(1, quantity - 1));
+                          }}
+                          className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center hover:bg-slate-600 text-white transition-colors"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </button>
+                        <span className="w-8 text-center font-bold text-white">{quantity}</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setQuantity(quantity + 1);
+                          }}
+                          className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center hover:bg-slate-600 text-white transition-colors"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
                     <div className="grid grid-cols-1 gap-6">
                       {/* Standard Package */}
                       <div
@@ -249,13 +275,17 @@ export default function ProductDetailPage({
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  const cart = [{ id: product.id, quantity: 1, packageType: "standard" }];
+                                  const cart = [{ id: product.id, quantity, packageType: "standard" }];
                                   sessionStorage.setItem("cart", JSON.stringify(cart));
                                   router.push("/dat-hang");
                                 }}
-                                className="w-full py-2 bg-primary-500 text-slate-900 text-xs font-bold rounded-lg hover:bg-primary-400 transition-colors uppercase"
+                                className="relative overflow-hidden w-full py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-slate-900 text-xs font-black rounded-lg hover:from-emerald-400 hover:to-emerald-500 transition-all uppercase shadow-[0_0_15px_rgba(16,185,129,0.4)] hover:shadow-[0_0_25px_rgba(16,185,129,0.6)] group/btn"
                               >
-                                Đăng ký sử dụng
+                                <span className="relative z-10 flex items-center justify-center gap-2">
+                                  Đăng ký sử dụng
+                                  <CheckCircle className="w-3.5 h-3.5" />
+                                </span>
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
                               </button>
                             )}
                             <button
@@ -279,13 +309,17 @@ export default function ProductDetailPage({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                const cart = [{ id: product.id, quantity: 1, packageType: "standard" }];
+                                const cart = [{ id: product.id, quantity, packageType: "standard" }];
                                 sessionStorage.setItem("cart", JSON.stringify(cart));
                                 router.push("/dat-hang");
                               }}
-                              className="w-full py-2 bg-primary-500 text-slate-900 text-xs font-bold rounded-lg hover:bg-primary-400 transition-colors uppercase"
+                              className="relative overflow-hidden w-full py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-slate-900 text-xs font-black rounded-lg hover:from-emerald-400 hover:to-emerald-500 transition-all uppercase shadow-[0_0_15px_rgba(16,185,129,0.4)] hover:shadow-[0_0_25px_rgba(16,185,129,0.6)] group/btn"
                             >
-                              Đăng ký sử dụng
+                              <span className="relative z-10 flex items-center justify-center gap-2">
+                                Đăng ký sử dụng
+                                <CheckCircle className="w-3.5 h-3.5" />
+                              </span>
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
                             </button>
                             <button
                               onClick={(e) => {
@@ -322,13 +356,17 @@ export default function ProductDetailPage({
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  const cart = [{ id: product.id, quantity: 1, packageType: "gold" }];
+                                  const cart = [{ id: product.id, quantity, packageType: "gold" }];
                                   sessionStorage.setItem("cart", JSON.stringify(cart));
                                   router.push("/dat-hang");
                                 }}
-                                className="w-full py-2 bg-amber-500 text-slate-900 text-xs font-bold rounded-lg hover:bg-amber-400 transition-colors uppercase"
+                                className="relative overflow-hidden w-full py-2.5 bg-gradient-to-r from-amber-400 to-amber-600 text-slate-900 text-xs font-black rounded-lg hover:from-amber-300 hover:to-amber-500 transition-all uppercase shadow-[0_0_15px_rgba(245,158,11,0.4)] hover:shadow-[0_0_25px_rgba(245,158,11,0.6)] group/btn"
                               >
-                                Đăng ký sử dụng
+                                <span className="relative z-10 flex items-center justify-center gap-2">
+                                  Đăng ký sử dụng
+                                  <Star className="w-3.5 h-3.5 fill-slate-900" />
+                                </span>
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
                               </button>
                             )}
                             <button
@@ -352,13 +390,17 @@ export default function ProductDetailPage({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                const cart = [{ id: product.id, quantity: 1, packageType: "gold" }];
+                                const cart = [{ id: product.id, quantity, packageType: "gold" }];
                                 sessionStorage.setItem("cart", JSON.stringify(cart));
                                 router.push("/dat-hang");
                               }}
-                              className="w-full py-2 bg-amber-500 text-slate-900 text-xs font-bold rounded-lg hover:bg-amber-400 transition-colors uppercase"
+                              className="relative overflow-hidden w-full py-2.5 bg-gradient-to-r from-amber-400 to-amber-600 text-slate-900 text-xs font-black rounded-lg hover:from-amber-300 hover:to-amber-500 transition-all uppercase shadow-[0_0_15px_rgba(245,158,11,0.4)] hover:shadow-[0_0_25px_rgba(245,158,11,0.6)] group/btn"
                             >
-                              Đăng ký sử dụng
+                              <span className="relative z-10 flex items-center justify-center gap-2">
+                                Đăng ký sử dụng
+                                <Star className="w-3.5 h-3.5 fill-slate-900" />
+                              </span>
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
                             </button>
                             <button
                               onClick={(e) => {
@@ -395,13 +437,17 @@ export default function ProductDetailPage({
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  const cart = [{ id: product.id, quantity: 1, packageType: "platinum" }];
+                                  const cart = [{ id: product.id, quantity, packageType: "platinum" }];
                                   sessionStorage.setItem("cart", JSON.stringify(cart));
                                   router.push("/dat-hang");
                                 }}
-                                className="w-full py-2 bg-cyan-400 text-slate-900 text-xs font-bold rounded-lg hover:bg-cyan-300 transition-colors uppercase"
+                                className="relative overflow-hidden w-full py-2.5 bg-gradient-to-r from-cyan-400 to-cyan-600 text-slate-900 text-xs font-black rounded-lg hover:from-cyan-300 hover:to-cyan-500 transition-all uppercase shadow-[0_0_15px_rgba(34,211,238,0.4)] hover:shadow-[0_0_25px_rgba(34,211,238,0.6)] group/btn"
                               >
-                                Đăng ký sử dụng
+                                <span className="relative z-10 flex items-center justify-center gap-2">
+                                  Đăng ký sử dụng
+                                  <Bot className="w-3.5 h-3.5" />
+                                </span>
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
                               </button>
                             )}
                             <button
@@ -425,13 +471,17 @@ export default function ProductDetailPage({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                const cart = [{ id: product.id, quantity: 1, packageType: "platinum" }];
+                                const cart = [{ id: product.id, quantity, packageType: "platinum" }];
                                 sessionStorage.setItem("cart", JSON.stringify(cart));
                                 router.push("/dat-hang");
                               }}
-                              className="w-full py-2 bg-cyan-400 text-slate-900 text-xs font-bold rounded-lg hover:bg-cyan-300 transition-colors uppercase"
+                              className="relative overflow-hidden w-full py-2.5 bg-gradient-to-r from-cyan-400 to-cyan-600 text-slate-900 text-xs font-black rounded-lg hover:from-cyan-300 hover:to-cyan-500 transition-all uppercase shadow-[0_0_15px_rgba(34,211,238,0.4)] hover:shadow-[0_0_25px_rgba(34,211,238,0.6)] group/btn"
                             >
-                              Đăng ký sử dụng
+                              <span className="relative z-10 flex items-center justify-center gap-2">
+                                Đăng ký sử dụng
+                                <Bot className="w-3.5 h-3.5" />
+                              </span>
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
                             </button>
                             <button
                               onClick={(e) => {
@@ -458,51 +508,10 @@ export default function ProductDetailPage({
                     <span className="text-xs text-slate-500 ml-2">128 khách hàng đã tin dùng</span>
                   </div>
 
-                  {/* 3. Pricing & Call to Action */}
-                  <div className="pt-6 border-t border-slate-700">
-                    <div className="mb-6 p-5 bg-slate-900/80 rounded-2xl border border-primary-500/20">
-                      <div className="text-[10px] text-slate-500 uppercase font-black mb-2 tracking-widest">
-                        {selectedPackage === "standard" ? "Giá mua sản phẩm:" : "Phí dịch vụ trọn gói:"}
-                      </div>
-                      <div className="flex items-end gap-3 mb-3">
-                        <span className="text-3xl font-black text-primary-400">
-                          {formatCurrency(
-                            selectedPackage === "gold" ? (product.priceGold || product.price * 1.5) :
-                              selectedPackage === "platinum" ? (product.pricePlatinum || product.price * 2.5) :
-                                product.price
-                          )}
-                        </span>
-                        <span className="text-lg text-slate-500 line-through mb-1">
-                          {formatCurrency(
-                            (selectedPackage === "gold" ? (product.priceGold || product.price * 1.5) :
-                              selectedPackage === "platinum" ? (product.pricePlatinum || product.price * 2.5) :
-                                product.price) * 2
-                          )}
-                        </span>
-                      </div>
-
-                      <div className="flex flex-col gap-2">
-                        <span className="inline-flex items-center gap-1.5 text-[9px] font-bold text-red-500 uppercase tracking-tighter">
-                          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                          Ưu đãi giới hạn - Giảm 50% chỉ hôm nay
-                        </span>
-                        {selectedPackage !== 'standard' && (
-                          <p className="text-[10px] text-primary-300 italic">
-                            * Gói {selectedPackage.toUpperCase()} đã bao gồm bản quyền Trợ lý AI tiêu chuẩn.
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <AddToCartButton
-                      product={{
-                        ...product,
-                        price: selectedPackage === "gold" ? (product.priceGold || product.price * 1.5) :
-                          selectedPackage === "platinum" ? (product.pricePlatinum || product.price * 2.5) :
-                            product.price,
-                        packageType: selectedPackage
-                      }}
-                    />
+                  <div className="pt-6 border-t border-slate-700 mt-6">
+                    <p className="text-[10px] text-slate-500 italic text-center uppercase tracking-widest font-bold">
+                      Giao dịch được bảo mật bởi hệ thống thanh toán tự động
+                    </p>
                   </div>
                 </div>
               </div>
@@ -520,6 +529,13 @@ export default function ProductDetailPage({
                 }
                 .flipped {
                   transform: rotateY(180deg);
+                }
+                @keyframes shimmer {
+                  from { transform: translateX(-100%); }
+                  to { transform: translateX(200%); }
+                }
+                .animate-shimmer {
+                  animation: shimmer 1.5s infinite;
                 }
               `}</style>
 

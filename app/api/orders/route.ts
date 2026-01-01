@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
         basePrice: mainBasePrice,
         totalPrice,
         status: "pending",
-        // packageType: items[0].packageType || "standard",
+        packageType: mainItem.packageType || "standard",
         referralCode: finalReferralCode,
         referrerId: referrerId,
       },

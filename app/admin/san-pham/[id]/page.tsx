@@ -35,6 +35,8 @@ export default function EditProductPage() {
     featured: false,
     active: true,
     chatbotLink: "",
+    chatbotLinkGold: "",
+    chatbotLinkPlatinum: "",
     priceGold: "",
     pricePlatinum: "",
     featuresGold: "",
@@ -77,6 +79,8 @@ export default function EditProductPage() {
             featured: data.product.featured || false,
             active: data.product.active !== false,
             chatbotLink: data.product.chatbotLink || "",
+            chatbotLinkGold: data.product.chatbotLinkGold || "",
+            chatbotLinkPlatinum: data.product.chatbotLinkPlatinum || "",
             priceGold: data.product.priceGold ? String(data.product.priceGold) : "",
             pricePlatinum: data.product.pricePlatinum ? String(data.product.pricePlatinum) : "",
             featuresGold: data.product.featuresGold || "",
@@ -303,9 +307,19 @@ export default function EditProductPage() {
                   <textarea
                     value={formData.featuresGold}
                     onChange={(e) => setFormData({ ...formData, featuresGold: e.target.value })}
-                    rows={4}
+                    rows={3}
                     className="w-full px-3 py-2 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none resize-none text-sm"
                     placeholder="Hỗ trợ ưu tiên&#10;Update 24/7..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-amber-700 uppercase mb-1">Link bàn giao riêng (Link Dedicated Bot)</label>
+                  <input
+                    type="url"
+                    value={formData.chatbotLinkGold}
+                    onChange={(e) => setFormData({ ...formData, chatbotLinkGold: e.target.value })}
+                    className="w-full px-3 py-2 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none text-sm font-medium text-amber-900"
+                    placeholder="https://t.me/gold_bot..."
                   />
                 </div>
               </div>
@@ -328,9 +342,19 @@ export default function EditProductPage() {
                   <textarea
                     value={formData.featuresPlatinum}
                     onChange={(e) => setFormData({ ...formData, featuresPlatinum: e.target.value })}
-                    rows={4}
+                    rows={3}
                     className="w-full px-3 py-2 border border-cyan-200 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none resize-none text-sm"
                     placeholder="Full tính năng Premium..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-cyan-700 uppercase mb-1">Link bàn giao riêng (Link Dedicated Bot)</label>
+                  <input
+                    type="url"
+                    value={formData.chatbotLinkPlatinum}
+                    onChange={(e) => setFormData({ ...formData, chatbotLinkPlatinum: e.target.value })}
+                    className="w-full px-3 py-2 border border-cyan-200 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none text-sm font-medium text-cyan-900"
+                    placeholder="https://t.me/platinum_bot..."
                   />
                 </div>
               </div>

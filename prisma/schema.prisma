@@ -97,6 +97,8 @@ model Service {
   pricePlatinum    Float?
   featuresGold     String? // JSON string of perks
   featuresPlatinum String? // JSON string of perks
+  chatbotLinkGold  String? // Dedicated link for Gold package
+  chatbotLinkPlatinum String? // Dedicated link for Platinum package
 
   // Category
   categoryId String?

@@ -42,7 +42,8 @@ export async function POST(request: NextRequest) {
     const {
       name, slug, description, longDescription, price, image, videoUrl,
       categoryId, featured, active, chatbotLink,
-      priceGold, pricePlatinum, featuresGold, featuresPlatinum
+      priceGold, pricePlatinum, featuresGold, featuresPlatinum,
+      chatbotLinkGold, chatbotLinkPlatinum
     } = body;
 
     if (!name || !slug || !price) {
@@ -87,6 +88,8 @@ export async function POST(request: NextRequest) {
         pricePlatinum: pricePlatinum ? parseFloat(pricePlatinum) : null,
         featuresGold: featuresGold || null,
         featuresPlatinum: featuresPlatinum || null,
+        chatbotLinkGold: chatbotLinkGold || null,
+        chatbotLinkPlatinum: chatbotLinkPlatinum || null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       })

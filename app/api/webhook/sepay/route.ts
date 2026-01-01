@@ -70,15 +70,38 @@ export async function POST(request: NextRequest) {
       orderBy: { createdAt: "asc" },
     });
 
-    // Check if it's the LAST one (shared logic or single-use)
     const inventoryCount = await prisma.chatbotInventory.count({
       where: { serviceId: order.serviceId }
     });
 
-    if (availableChatbot) {
-      const isShared = inventoryCount === 1;
+    const isShared = inventoryCount === 1;
 
-      await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
+      // --- Special Logic for Premium Packages (Gold/Platinum) ---
+      if (order.packageType === "gold" || order.packageType === "platinum") {
+        const dedicatedLink = order.packageType === "gold"
+          ? order.service.chatbotLinkGold
+          : order.service.chatbotLinkPlatinum;
+
+        const deliveryMessage = dedicatedLink
+          ? `✅ Đã tự động bàn giao Link ${order.packageType.toUpperCase()}: ${dedicatedLink}`
+          : `⚠️ Gói ${order.packageType.toUpperCase()} chưa có link bàn giao riêng. Vui lòng liên hệ Admin.`;
+
+        await tx.order.update({
+          where: { id: order.id },
+          data: {
+            status: "confirmed",
+            notes: order.notes
+              ? `${order.notes}\n\n${deliveryMessage}`
+              : deliveryMessage,
+          },
+        });
+        console.log(`✅ Dedicated link for ${order.packageType} assigned to order ${orderCode}`);
+        return; // Skip standard inventory logic
+      }
+
+      // --- Standard Logic (activation codes) ---
+      if (availableChatbot) {
         // Update Inventory if not shared
         if (!isShared) {
           await tx.chatbotInventory.update({
@@ -97,21 +120,21 @@ export async function POST(request: NextRequest) {
               : `✅ Đã tự động bàn giao Trợ lý AI: ${availableChatbot.activationCode}`,
           },
         });
-      });
-      console.log(`✅ Chatbot data [${availableChatbot.activationCode}] assigned to order ${orderCode}`);
-    } else {
-      // Just confirm order if no chatbot data
-      await prisma.order.update({
-        where: { id: order.id },
-        data: {
-          status: "confirmed",
-          notes: order.notes
-            ? `${order.notes}\n\n⚠️ Không có sẵn dữ liệu Trợ lý AI để bàn giao tự động.`
-            : `⚠️ Không có sẵn dữ liệu Trợ lý AI để bàn giao tự động.`,
-        },
-      });
-      console.log(`⚠️ No chatbot data available for service ${order.service.name} - Order ${orderCode} confirmed without delivery`);
-    }
+        console.log(`✅ Chatbot data [${availableChatbot.activationCode}] assigned to order ${orderCode}`);
+      } else {
+        // Just confirm order if no chatbot data
+        await tx.order.update({
+          where: { id: order.id },
+          data: {
+            status: "confirmed",
+            notes: order.notes
+              ? `${order.notes}\n\n⚠️ Không có sẵn dữ liệu Trợ lý AI để bàn giao tự động.`
+              : `⚠️ Không có sẵn dữ liệu Trợ lý AI để bàn giao tự động.`,
+          },
+        });
+        console.log(`⚠️ No chatbot data available for service ${order.service.name} - Order ${orderCode} confirmed without delivery`);
+      }
+    });
 
     // --- Logic tạo tài khoản khách hàng tự động ---
     try {

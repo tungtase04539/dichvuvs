@@ -62,7 +62,7 @@ export default function Header({ settings }: HeaderProps) {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl overflow-hidden bg-white flex items-center justify-center shadow-lg shadow-black/20">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 overflow-hidden flex items-center justify-center">
                 <img src="/logo.png" alt="Sàn trợ lý AI Logo" className="w-full h-full object-contain" />
               </div>
               <span className="text-xl sm:text-2xl font-bold text-white tracking-tight">

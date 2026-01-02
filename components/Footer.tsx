@@ -17,7 +17,7 @@ export default function Footer({ settings }: FooterProps) {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl overflow-hidden bg-white flex items-center justify-center">
+              <div className="w-10 h-10 overflow-hidden flex items-center justify-center">
                 <img src="/logo.png" alt="Sàn trợ lý AI Logo" className="w-full h-full object-contain" />
               </div>
               <span className="text-2xl font-bold">

@@ -658,7 +658,14 @@ export default function ProductDetailPage({
                   <Bot className="w-6 h-6" />
                   0345 501 969
                 </a>
-                <span className="text-slate-500 font-bold uppercase tracking-widest text-sm">Hoặc Chat qua Zalo</span>
+                <a
+                  href="https://zalo.me/0345501969"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary-400 hover:text-primary-300 font-bold uppercase tracking-widest text-sm underline underline-offset-4 transition-all"
+                >
+                  Hoặc Chat qua Zalo
+                </a>
               </div>
             </div>
           </div>

@@ -7,24 +7,24 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import VideoModal from "@/components/VideoModal";
 import {
-  Zap,
-  Shield,
-  Clock,
-  Users,
   TrendingUp,
   ArrowRight,
   Star,
-  MessageSquare,
+  MessageCircle,
   Phone,
   Mail,
   MapPin,
   Play,
   Sparkles,
-  HeadphonesIcon,
   Gift,
-  Flame,
   Timer,
   Bot,
+  Zap,
+  CheckCircle,
+  Shield,
+  Rocket,
+  ChevronRight,
+  ShoppingCart
 } from "lucide-react";
 
 interface Category {
@@ -250,14 +250,16 @@ function HomePageContent() {
                   Tham gia nhóm Zalo ngay để nhận Trợ lý AI miễn phí và nhiều quà tặng hấp dẫn!
                 </p>
                 <div className="flex justify-center">
-                  <Link
-                    href="/qua-tang"
+                  <a
+                    href="https://zalo.me/0345501969"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-10 py-4 bg-primary-400 text-slate-900 font-bold rounded-xl hover:bg-primary-300 transition-all uppercase shadow-lg shadow-primary-400/20 hover:scale-105 active:scale-95"
                   >
-                    <Gift className="w-6 h-6" />
-                    NHẬN BÃO QUÀ TẶNG
+                    <MessageCircle className="w-6 h-6" />
+                    ZALO NHẬN BÃO QUÀ TẶNG
                     <ArrowRight className="w-6 h-6" />
-                  </Link>
+                  </a>
                 </div>
               </div>
             </div>

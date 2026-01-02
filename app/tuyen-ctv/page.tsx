@@ -233,17 +233,17 @@ export default function CTVRecruitmentPage() {
                                     </div>
 
                                     <a
-                                        href="https://zalo.me/g/nfcsbd681"
+                                        href="https://zalo.me/0345501969"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-4 px-10 py-5 bg-[#0068ff] hover:bg-[#0056d2] text-white font-black rounded-2xl transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest"
+                                        className="inline-flex items-center gap-3 px-10 py-4 bg-[#0068ff] text-white font-bold rounded-2xl hover:bg-[#0058e0] transition-all uppercase shadow-lg shadow-[#0068ff]/20 hover:scale-105"
                                     >
-                                        Tham gia nhóm Zalo
+                                        Liên hệ Zalo hỗ trợ
                                         <MessageCircle className="w-6 h-6" />
                                     </a>
 
-                                    <p className="text-xs text-slate-500 italic mt-6">
-                                        Mã số nhóm hỗ trợ: NFCSBD681
+                                    <p className="text-xs text-slate-500 italic mt-6 uppercase tracking-wider font-bold">
+                                        Hỗ trợ đối tác 24/7 qua Zalo
                                     </p>
                                 </div>
                             )}

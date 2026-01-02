@@ -98,14 +98,18 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    // Return fallback for confirmed orders without formal records (e.g. Premium packages where link is in notes)
     return NextResponse.json({
       order: {
         orderCode: order.orderCode,
         status: order.status,
         service: order.service.name,
       },
-      message: "Tài khoản đang được chuẩn bị, vui lòng liên hệ hỗ trợ hoặc chờ trong giây lát",
-      credential: null,
+      credential: {
+        accountInfo: order.service.chatbotLink || "Xem hướng dẫn bên dưới",
+        password: "Đã bàn giao",
+        notes: order.notes || "Cảm ơn bạn đã đặt hàng. Đơn hàng của bạn đã được xác nhận.",
+      },
     });
   } catch (error) {
     console.error("Get credentials error:", error);

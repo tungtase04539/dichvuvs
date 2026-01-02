@@ -123,7 +123,8 @@ export async function POST(request: NextRequest) {
           data: {
             status: "confirmed",
             notes: order.notes ? `${order.notes}\n\n${msg}` : msg
-          }
+          },
+          select: { id: true } // CRITICAL: Only return ID to avoid missing columns
         });
         console.log("[Webhook] Premium order updated");
         return;
@@ -147,7 +148,8 @@ export async function POST(request: NextRequest) {
         if (!isShared) {
           await tx.chatbotInventory.update({
             where: { id: available.id },
-            data: { isUsed: true, orderId: order.id }
+            data: { isUsed: true, orderId: order.id },
+            select: { id: true } // CRITICAL: Only return ID
           });
         }
         await tx.order.update({
@@ -157,7 +159,8 @@ export async function POST(request: NextRequest) {
             notes: order.notes
               ? `${order.notes}\n\n✅ Đã bàn giao: ${available.activationCode}`
               : `✅ Đã bàn giao: ${available.activationCode}`
-          }
+          },
+          select: { id: true } // CRITICAL: Only return ID
         });
         console.log("[Webhook] Standard order updated with code");
       } else {
@@ -168,7 +171,8 @@ export async function POST(request: NextRequest) {
             notes: order.notes
               ? `${order.notes}\n\n⚠️ Không có sẵn mã để bàn giao.`
               : `⚠️ Không có sẵn mã để bàn giao.`
-          }
+          },
+          select: { id: true } // CRITICAL: Only return ID
         });
         console.log("[Webhook] Standard order confirmed without code");
       }
@@ -205,13 +209,15 @@ export async function POST(request: NextRequest) {
                   phone: order.customerPhone,
                   role: "customer",
                   password: ""
-                }
+                },
+                select: { id: true } // CRITICAL: Only return ID
               });
               await prisma.order.update({
                 where: { id: order.id },
                 data: {
                   notes: `${order.notes || ""}\n\n🔑 Đã tạo tài khoản: ${order.customerEmail} / ${order.customerPhone || "Aa123456"}`
-                }
+                },
+                select: { id: true } // CRITICAL: Only return ID
               });
               console.log("[Webhook] Auto-account created");
             }

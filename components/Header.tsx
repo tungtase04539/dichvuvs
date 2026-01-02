@@ -55,8 +55,8 @@ export default function Header({ settings }: HeaderProps) {
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-300 overflow-hidden",
           isScrolled || isMobileMenuOpen
-            ? "bg-gradient-to-r from-[#5a0505] via-[#4a0404] to-[#6b0000] shadow-xl shadow-black/60 py-2 sm:py-3 border-b border-yellow-400/20"
-            : "bg-[#4a0404]/90 backdrop-blur-xl py-3 sm:py-5 border-b border-yellow-400/30"
+            ? "bg-gradient-to-r from-[#800000] via-[#5a0505] to-[#800000] shadow-[0_4px_30px_rgba(0,0,0,0.5)] py-2 sm:py-3 border-b-2 border-yellow-400/40"
+            : "bg-[#5a0505]/80 backdrop-blur-2xl py-3 sm:py-5 border-b border-yellow-400/30"
         )}
       >
         {/* Tet Decorations */}
@@ -88,7 +88,7 @@ export default function Header({ settings }: HeaderProps) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="font-bold text-yellow-200 hover:text-white transition-colors tracking-wide"
+                  className="font-bold text-yellow-400 hover:text-white transition-colors tracking-wide"
                 >
                   {link.label}
                 </Link>
@@ -186,7 +186,7 @@ export default function Header({ settings }: HeaderProps) {
       {/* Mobile menu panel */}
       <div
         className={cn(
-          "fixed top-0 right-0 h-full w-72 max-w-[85vw] bg-red-800 z-50 transform transition-transform duration-300 lg:hidden shadow-2xl border-l border-yellow-400/20",
+          "fixed top-0 right-0 h-full w-72 max-w-[85vw] bg-[#5a0505] z-50 transform transition-transform duration-300 lg:hidden shadow-2xl border-l border-yellow-400/30",
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
@@ -219,7 +219,7 @@ export default function Header({ settings }: HeaderProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-4 py-4 rounded-xl font-bold text-yellow-200 hover:bg-white/10 text-lg"
+                className="px-4 py-4 rounded-xl font-bold text-yellow-400 hover:bg-white/10 text-lg"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.label}

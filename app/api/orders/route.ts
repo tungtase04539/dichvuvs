@@ -231,7 +231,9 @@ export async function POST(request: NextRequest) {
           district: "Online",
           scheduledDate: new Date(),
           scheduledTime: "Giao ngay",
-          notes: notes ? `${notes}\n---\n${details.join(", ")}` : details.join(", "),
+          notes: notes
+            ? `${notes}\n---\n[Package: ${mainItem.packageType || 'standard'}]\n---\n${details.join(", ")}`
+            : `[Package: ${mainItem.packageType || 'standard'}]\n---\n${details.join(", ")}`,
           basePrice: mainBasePrice,
           totalPrice,
           status: "pending",

@@ -91,10 +91,14 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // 5. Detect Package Type
+    // 5. Detect Package Type (Resilient detection from notes)
     let packageType = "standard";
-    if (order.notes?.includes("[Package: gold]")) packageType = "gold";
-    else if (order.notes?.includes("[Package: platinum]")) packageType = "platinum";
+    const notesLower = (order.notes || "").toLowerCase();
+    if (notesLower.includes("gold") || notesLower.includes("(gold)") || notesLower.includes("[package: gold]")) {
+      packageType = "gold";
+    } else if (notesLower.includes("platinum") || notesLower.includes("(platinum)") || notesLower.includes("[package: platinum]")) {
+      packageType = "platinum";
+    }
     console.log(`[Webhook] Package detected: ${packageType}`);
 
     // 6. Transactional Update

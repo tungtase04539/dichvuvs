@@ -99,6 +99,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Return fallback for confirmed orders without formal records (e.g. Premium packages where link is in notes)
+    // Try to extract dedicated link from notes if it's a premium package
+    let displayLink = order.service.chatbotLink || "Xem hướng dẫn bên dưới";
+    const dedicatedLinkMatch = (order.notes || "").match(/✅ Đã bàn giao Link (?:GOLD|PLATINUM): (https?:\/\/\S+)/i);
+    if (dedicatedLinkMatch && dedicatedLinkMatch[1]) {
+      displayLink = dedicatedLinkMatch[1];
+    }
+
     return NextResponse.json({
       order: {
         orderCode: order.orderCode,
@@ -106,7 +113,7 @@ export async function GET(request: NextRequest) {
         service: order.service.name,
       },
       credential: {
-        accountInfo: order.service.chatbotLink || "Xem hướng dẫn bên dưới",
+        accountInfo: displayLink,
         password: "Đã bàn giao",
         notes: order.notes || "Cảm ơn bạn đã đặt hàng. Đơn hàng của bạn đã được xác nhận.",
       },

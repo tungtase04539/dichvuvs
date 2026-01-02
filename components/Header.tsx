@@ -45,6 +45,7 @@ export default function Header({ settings }: HeaderProps) {
   const navLinks = [
     { href: "/", label: "TRANG CHỦ" },
     { href: "/san-pham", label: "SẢN PHẨM" },
+    { href: "/tuyen-ctv", label: "TUYỂN CTV" },
   ];
 
   return (

@@ -64,6 +64,11 @@ export default function Footer({ settings }: FooterProps) {
                   Tra cứu đơn hàng
                 </Link>
               </li>
+              <li>
+                <Link href="/tuyen-ctv" className="text-slate-400 hover:text-primary-400 transition-colors font-semibold">
+                  Tuyển Cộng tác viên
+                </Link>
+              </li>
             </ul>
           </div>
 

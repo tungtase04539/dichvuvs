@@ -36,6 +36,7 @@ async function getDashboardStats() {
     totalCTVs,
     totalCommissions,
     ctvApplications,
+    recentApplications,
     recentOrders,
     recentChats,
   ] = await Promise.all([
@@ -53,6 +54,10 @@ async function getDashboardStats() {
       _sum: { amount: true },
     }),
     prisma.cTVApplication.count({ where: { status: "pending" } }),
+    prisma.cTVApplication.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    }),
     prisma.order.findMany({
       select: {
         id: true,
@@ -92,6 +97,7 @@ async function getDashboardStats() {
     totalCTVs,
     totalCommissions: totalCommissions._sum.amount || 0,
     ctvApplications,
+    recentApplications,
     recentOrders,
     recentChats,
   };
@@ -150,6 +156,16 @@ export default async function AdminDashboard() {
           </div>
           <p className="text-2xl font-bold text-slate-900">{stats.activeChats}</p>
           <p className="text-sm text-slate-500">Chat đang hoạt động</p>
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-orange-100">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center">
+              <Users className="w-6 h-6 text-orange-600" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold text-slate-900">{stats.totalCTVs}</p>
+          <p className="text-sm text-slate-500">Tổng CTV ({stats.ctvApplications} chờ duyệt)</p>
         </div>
       </div>
 
@@ -231,6 +247,51 @@ export default async function AdminDashboard() {
                   </div>
                   <div className="w-2 h-2 bg-green-500 rounded-full" />
                 </Link>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* CTV applications */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm lg:col-span-3">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-slate-900">Đăng ký CTV mới</h2>
+            <Link
+              href="/admin/tai-khoan?role=collaborator"
+              className="text-sm text-primary-600 hover:underline"
+            >
+              Xem tất cả
+            </Link>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {stats.recentApplications.length === 0 ? (
+              <div className="md:col-span-2 lg:col-span-3 text-center py-8">
+                <Users className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                <p className="text-slate-500">Chưa có đơn đăng ký CTV</p>
+              </div>
+            ) : (
+              stats.recentApplications.map((app: any) => (
+                <div
+                  key={app.id}
+                  className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="font-bold text-slate-900">{app.fullName}</p>
+                    <StatusBadge status={app.status} />
+                  </div>
+                  <div className="text-sm text-slate-500 space-y-1">
+                    <p className="flex items-center gap-2">📞 {app.phone}</p>
+                    <p className="flex items-center gap-2 truncate">📧 {app.email}</p>
+                  </div>
+                  <div className="pt-2">
+                    <Link
+                      href="/admin/tai-khoan"
+                      className="text-xs font-bold text-primary-600 hover:text-primary-700 uppercase tracking-wider"
+                    >
+                      Chi tiết & Duyệt
+                    </Link>
+                  </div>
+                </div>
               ))
             )}
           </div>

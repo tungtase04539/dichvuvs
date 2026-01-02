@@ -63,6 +63,9 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    const isPremium = (order.notes || "").toLowerCase().includes("gold") ||
+      (order.notes || "").toLowerCase().includes("platinum");
+
     // Return chatbot data (new system)
     if (order.chatbotData) {
       return NextResponse.json({
@@ -77,6 +80,7 @@ export async function GET(request: NextRequest) {
           accountInfo: order.service.chatbotLink,
           password: order.chatbotData.activationCode,
           notes: order.notes,
+          isPremium,
         },
       });
     }
@@ -94,6 +98,7 @@ export async function GET(request: NextRequest) {
           password: order.credential.password,
           apiKey: order.credential.apiKey,
           notes: order.credential.notes,
+          isPremium,
         },
       });
     }
@@ -116,6 +121,7 @@ export async function GET(request: NextRequest) {
         accountInfo: displayLink,
         password: "Đã bàn giao",
         notes: order.notes || "Cảm ơn bạn đã đặt hàng. Đơn hàng của bạn đã được xác nhận.",
+        isPremium,
       },
     });
   } catch (error) {

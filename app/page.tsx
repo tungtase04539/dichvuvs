@@ -239,20 +239,22 @@ function HomePageContent() {
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto">
             {/* Quà tặng */}
-            <div className="bg-gradient-to-br from-primary-400/20 to-primary-600/10 rounded-3xl p-8 border border-primary-400/30 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary-400/10 rounded-full blur-2xl" />
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 border border-red-500/20 relative overflow-hidden group hover:border-red-500/40 transition-all duration-500 shadow-2xl">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-full blur-3xl group-hover:bg-red-500/10 transition-colors" />
+              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-rose-500/5 rounded-full blur-3xl group-hover:bg-rose-500/10 transition-colors" />
+
               <div className="relative z-10">
-                <div className="w-16 h-16 rounded-2xl bg-primary-400/20 flex items-center justify-center mb-6">
-                  <Gift className="w-8 h-8 text-primary-400" />
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-red-500/20 to-rose-600/10 flex items-center justify-center mb-6 border border-red-500/20 shadow-inner group-hover:scale-110 transition-transform duration-500">
+                  <Gift className="w-8 h-8 text-red-500" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3 uppercase text-center">NHẬN QUÀ MIỄN PHÍ</h3>
-                <p className="text-slate-300 mb-6 text-center">
-                  Tham gia nhóm Zalo ngay để nhận Trợ lý AI miễn phí và nhiều quà tặng hấp dẫn!
+                <h3 className="text-3xl font-black text-white mb-3 uppercase text-center tracking-tight">NHẬN QUÀ <span className="text-red-500">MIỄN PHÍ</span></h3>
+                <p className="text-slate-400 mb-8 text-center text-lg leading-relaxed max-w-lg mx-auto">
+                  Tham gia cộng đồng ngay để nhận Trợ lý AI miễn phí và nhận gói quà tặng đặc biệt trị giá <span className="text-red-400 font-bold">2.000.000đ</span>!
                 </p>
                 <div className="flex justify-center">
                   <Link
                     href="/qua-tang"
-                    className="inline-flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-red-600 to-rose-500 text-white font-bold rounded-xl hover:from-red-500 hover:to-rose-400 transition-all uppercase shadow-lg shadow-red-600/30 hover:shadow-red-600/50 hover:scale-105 active:scale-95"
+                    className="inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-red-600 to-rose-500 text-white font-black rounded-2xl hover:from-red-500 hover:to-rose-400 transition-all uppercase shadow-[0_15px_35px_-10px_rgba(220,38,38,0.5)] hover:shadow-[0_20px_45px_-10px_rgba(220,38,38,0.6)] hover:scale-105 active:scale-95 text-lg"
                   >
                     <Gift className="w-6 h-6" />
                     NHẬN BÃO QUÀ TẶNG

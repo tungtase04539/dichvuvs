@@ -237,7 +237,7 @@ function HomePageContent() {
       {/* Gift & Free Trial Section */}
       <section className="py-16 bg-slate-800">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="max-w-2xl mx-auto">
             {/* Quà tặng */}
             <div className="bg-gradient-to-br from-primary-400/20 to-primary-600/10 rounded-3xl p-8 border border-primary-400/30 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary-400/10 rounded-full blur-2xl" />
@@ -245,40 +245,20 @@ function HomePageContent() {
                 <div className="w-16 h-16 rounded-2xl bg-primary-400/20 flex items-center justify-center mb-6">
                   <Gift className="w-8 h-8 text-primary-400" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3 uppercase">NHẬN QUÀ MIỄN PHÍ</h3>
-                <p className="text-slate-300 mb-6">
+                <h3 className="text-2xl font-bold text-white mb-3 uppercase text-center">NHẬN QUÀ MIỄN PHÍ</h3>
+                <p className="text-slate-300 mb-6 text-center">
                   Tham gia nhóm Zalo ngay để nhận Trợ lý AI miễn phí và nhiều quà tặng hấp dẫn!
                 </p>
-                <Link
-                  href="/qua-tang"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-primary-400 text-slate-900 font-bold rounded-xl hover:bg-primary-300 transition-all uppercase"
-                >
-                  <Gift className="w-5 h-5" />
-                  NHẬN BÃO QUÀ TẶNG CỰC XỊN
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Dùng thử */}
-            <div className="bg-gradient-to-br from-green-900/30 to-emerald-900/20 rounded-3xl p-8 border border-green-500/30 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-2xl" />
-              <div className="relative z-10">
-                <div className="w-16 h-16 rounded-2xl bg-green-500/20 flex items-center justify-center mb-6">
-                  <Timer className="w-8 h-8 text-green-400" />
+                <div className="flex justify-center">
+                  <Link
+                    href="/qua-tang"
+                    className="inline-flex items-center gap-2 px-10 py-4 bg-primary-400 text-slate-900 font-bold rounded-xl hover:bg-primary-300 transition-all uppercase shadow-lg shadow-primary-400/20 hover:scale-105 active:scale-95"
+                  >
+                    <Gift className="w-6 h-6" />
+                    NHẬN BÃO QUÀ TẶNG
+                    <ArrowRight className="w-6 h-6" />
+                  </Link>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3 uppercase">DÙNG THỬ 3 NGÀY</h3>
-                <p className="text-slate-300 mb-6">
-                  Trải nghiệm Trợ lý AI hoàn toàn miễn phí trong 3 ngày. Không cần thẻ tín dụng!
-                </p>
-                <Link
-                  href="/dung-thu"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 text-white font-bold rounded-xl hover:bg-green-400 transition-all uppercase"
-                >
-                  <Zap className="w-5 h-5" />
-                  ĐĂNG KÝ DÙNG THỬ
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
               </div>
             </div>
           </div>

@@ -248,7 +248,7 @@ export default function HomePage() {
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-400/20 text-primary-400 rounded-full text-sm font-semibold mb-6 uppercase tracking-wide border border-primary-400/30">
               <Sparkles className="w-4 h-4" />
-              #1 TRỢ LÝ AI TẠI VIỆT NAM
+              #1 SÀN TRỢ LÝ AI TẠI VIỆT NAM
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
               CHỌN <span className="text-primary-400">LĨNH VỰC</span> CỦA BẠN
@@ -264,8 +264,8 @@ export default function HomePage() {
             <button
               onClick={() => setSelectedCategory("all")}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${selectedCategory === "all"
-                  ? "bg-primary-400 text-slate-900 shadow-lg shadow-primary-400/40"
-                  : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700 hover:border-primary-400/50"
+                ? "bg-primary-400 text-slate-900 shadow-lg shadow-primary-400/40"
+                : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700 hover:border-primary-400/50"
                 }`}
             >
               <span className="text-lg">🌟</span>
@@ -276,8 +276,8 @@ export default function HomePage() {
                 key={category.id}
                 onClick={() => setSelectedCategory(category.slug)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${selectedCategory === category.slug
-                    ? "bg-primary-400 text-slate-900 shadow-lg shadow-primary-400/40"
-                    : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700 hover:border-primary-400/50"
+                  ? "bg-primary-400 text-slate-900 shadow-lg shadow-primary-400/40"
+                  : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700 hover:border-primary-400/50"
                   }`}
               >
                 <span className="text-lg">{category.icon || "📦"}</span>
@@ -407,7 +407,7 @@ export default function HomePage() {
               TÍNH NĂNG NỔI BẬT
             </span>
             <h2 className="section-title">
-              TẠI SAO CHỌN <span className="text-primary-400">TRỢ LÝ AI VN</span>?
+              TẠI SAO CHỌN <span className="text-primary-400">SÀN TRỢ LÝ AI</span>?
             </h2>
             <p className="section-subtitle">
               Giải pháp ChatBot AI toàn diện, giúp doanh nghiệp tự động hóa và tăng trưởng
@@ -535,7 +535,7 @@ export default function HomePage() {
               Sẵn sàng tự động hóa kinh doanh?
             </h2>
             <p className="text-xl text-slate-300 mb-8">
-              Bắt đầu ngay hôm nay với Trợ lý AI. Chỉ từ <span className="text-primary-400 font-bold">29K/tháng</span>!
+              Bắt đầu ngay hôm nay với Sàn trợ lý AI. Chỉ từ <span className="text-primary-400 font-bold">29K/tháng</span>!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/dat-hang" className="btn bg-primary-400 text-slate-900 hover:bg-primary-300 text-lg font-bold uppercase shadow-lg shadow-primary-400/30">

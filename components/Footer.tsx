@@ -17,15 +17,15 @@ export default function Footer({ settings }: FooterProps) {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
-                <Bot className="w-6 h-6 text-slate-900" />
+              <div className="w-10 h-10 rounded-xl overflow-hidden bg-white flex items-center justify-center">
+                <img src="/logo.png" alt="Sàn trợ lý AI Logo" className="w-full h-full object-contain" />
               </div>
               <span className="text-2xl font-bold">
-                ChatBot<span className="text-primary-400">VN</span>
+                Sàn trợ lý <span className="text-primary-400">AI</span>
               </span>
             </Link>
             <p className="text-slate-400 mb-6 leading-relaxed">
-              Giải pháp ChatBot AI hàng đầu Việt Nam, giúp doanh nghiệp tự động hóa chăm sóc khách hàng và tăng trưởng doanh số.
+              Hệ thống cung cấp Trợ lý AI hàng đầu Việt Nam, giúp doanh nghiệp tự động hóa chăm sóc khách hàng và tăng trưởng doanh số vượt trội.
             </p>
             <div className="flex gap-3">
               <a
@@ -150,7 +150,7 @@ export default function Footer({ settings }: FooterProps) {
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-slate-500 text-sm">
-              © {currentYear} ChatBot VN. All rights reserved.
+              © {currentYear} Sàn trợ lý AI. All rights reserved.
             </p>
             <div className="flex items-center gap-2 text-sm text-slate-500">
               <span>Được phát triển với</span>

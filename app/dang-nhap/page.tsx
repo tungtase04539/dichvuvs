@@ -85,8 +85,8 @@ export default function LoginPage() {
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-lg">
               <Bot className="w-7 h-7 text-slate-900" />
             </div>
-            <span className="text-2xl font-bold text-white">
-              Trợ lý AI<span className="text-primary-400">VN</span>
+            <span className="text-2xl font-bold text-white uppercase tracking-tighter">
+              Sàn trợ lý <span className="text-primary-400">AI</span>
             </span>
           </Link>
         </div>
@@ -173,8 +173,8 @@ export default function LoginPage() {
             </p>
             <p className="text-center text-xs text-slate-500 mt-2">
               Hoặc{" "}
-              <Link href="/dang-ky-ctv" className="text-primary-400 hover:text-primary-300">
-                đăng ký làm CTV
+              <Link href="/quan-tri-vien-dang-nhap" className="text-primary-400 hover:text-primary-300 font-bold uppercase">
+                Đăng nhập đối tác (CTV)
               </Link>
             </p>
           </div>

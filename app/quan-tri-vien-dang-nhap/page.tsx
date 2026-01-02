@@ -43,11 +43,11 @@ export default function AdminLoginPage() {
         const role = data.user.user_metadata?.role;
         const isAdminEmail = data.user.email === "admin@admin.com";
 
-        if (role === "admin" || role === "staff" || isAdminEmail) {
+        if (role === "admin" || role === "staff" || role === "collaborator" || isAdminEmail) {
           router.push("/admin");
           router.refresh();
         } else {
-          // Nếu không phải admin/staff, đăng xuất ngay để tránh kẹt session
+          // Nếu không phải admin/staff/collaborator, đăng xuất ngay để tránh kẹt session
           await supabase.auth.signOut();
           setError("Tài khoản này không có quyền truy cập trang quản trị");
           setIsLoading(false);

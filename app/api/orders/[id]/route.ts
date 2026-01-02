@@ -57,6 +57,15 @@ export async function GET(
       return NextResponse.json({ error: "Không tìm thấy đơn hàng" }, { status: 404 });
     }
 
+    // Auth check: Admin/Staff or Customer (owner) or CTV (referrer)
+    const isAdminOrStaff = ["admin", "staff"].includes(user.role);
+    const isOwner = order.customerEmail === user.email;
+    const isReferrer = order.referrerId === user.id;
+
+    if (!isAdminOrStaff && !isOwner && !isReferrer) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     return NextResponse.json({ order });
   } catch (error) {
     console.error("Get order error:", error);
@@ -73,7 +82,7 @@ export async function PATCH(
 ) {
   try {
     const user = await getSession();
-    if (!user) {
+    if (!user || !["admin", "staff"].includes(user.role)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

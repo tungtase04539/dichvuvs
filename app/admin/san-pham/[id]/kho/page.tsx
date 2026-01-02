@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Plus, Trash2, Loader2, Package, ExternalLink, ShieldCheck, Clock } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface InventoryItem {
     id: string;
@@ -30,6 +31,15 @@ export default function InventoryManagementPage() {
     const [product, setProduct] = useState<Product | null>(null);
     const [inventory, setInventory] = useState<InventoryItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { user, isLoading: authLoading } = useAuth();
+
+    useEffect(() => {
+        if (!authLoading && user) {
+            if (user.role === "collaborator" || user.role === "ctv") {
+                router.push("/admin/san-pham");
+            }
+        }
+    }, [user, authLoading, router]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isUpdatingLink, setIsUpdatingLink] = useState(false);
 

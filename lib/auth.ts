@@ -66,14 +66,22 @@ export async function isAdmin(): Promise<boolean> {
   return session.role === "admin";
 }
 
-// Kiểm tra quyền Nhân viên (bao gồm cả Admin)
+// Kiểm tra quyền vào trang quản trị (Admin, Staff, Agent, CTV)
 export async function isStaff(): Promise<boolean> {
   const session = await getSession();
   if (!session) return false;
 
   if (session.email === "admin@admin.com") return true;
 
-  return ["admin", "staff"].includes(session.role);
+  return ["admin", "staff", "master_agent", "agent", "collaborator", "ctv"].includes(session.role);
+}
+
+// Kiểm tra quyền Đối tác (Agent, CTV)
+export async function isPartner(): Promise<boolean> {
+  const session = await getSession();
+  if (!session) return false;
+
+  return ["master_agent", "agent", "collaborator", "ctv"].includes(session.role);
 }
 
 // Các hàm cũ sẽ trả ra null/empty vì không sử dụng nữa

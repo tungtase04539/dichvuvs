@@ -96,6 +96,12 @@ export async function GET(request: NextRequest) {
     if (dbUser.role === "staff") {
       query = query.eq("assignedToId", dbUser.id);
     }
+
+    // CTV chỉ xem đơn hàng của mình (do mình giới thiệu)
+    if (dbUser.role === "collaborator" || dbUser.role === "ctv") {
+      query = query.eq("referrerId", dbUser.id);
+    }
+
     // Admin xem tất cả (không filter thêm)
 
     const { data: orders, error } = await query;
@@ -204,9 +210,35 @@ export async function POST(request: NextRequest) {
 
     const orderCode = generateOrderCode();
 
-    // Referral features are disabled in this MVP
-    const referrerId = null;
-    const finalReferralCode = null;
+    // 4. Referral tracking logic
+    let referrerId = null;
+    let finalReferralCode = referralCode || null;
+
+    if (finalReferralCode) {
+      try {
+        const refLink = await prisma.referralLink.findUnique({
+          where: { code: finalReferralCode }
+        });
+        if (refLink) {
+          referrerId = refLink.userId;
+          console.log(`[Orders POST] Referral link found. Referrer: ${referrerId}`);
+
+          // Increment order count and revenue
+          await prisma.referralLink.update({
+            where: { id: refLink.id },
+            data: {
+              orderCount: { increment: 1 },
+              revenue: { increment: totalPrice }
+            }
+          });
+        } else {
+          console.warn(`[Orders POST] Referral code ${finalReferralCode} not found.`);
+          finalReferralCode = null;
+        }
+      } catch (e) {
+        console.error("[Orders POST] Referral lookup error:", e);
+      }
+    }
 
     console.log("Creating order with data:", {
       customerName,

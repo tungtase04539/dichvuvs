@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Save, Loader2, Youtube, Star } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Category {
   id: string;
@@ -19,6 +20,16 @@ export default function EditProductPage() {
   const productId = params.id as string;
 
   const [isLoading, setIsLoading] = useState(true);
+  const { user, isLoading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      if (user.role === "collaborator" || user.role === "ctv") {
+        router.push("/admin/san-pham");
+      }
+    }
+  }, [user, authLoading, router]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);

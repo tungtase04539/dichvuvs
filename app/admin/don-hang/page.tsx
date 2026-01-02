@@ -16,6 +16,7 @@ import {
 import { formatCurrency, formatDateTime, getStatusLabel, getStatusColor } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import ExportExcel from "./ExportExcel";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Order {
   id: string;
@@ -43,6 +44,9 @@ interface Order {
 }
 
 export default function OrdersPage() {
+  const { user } = useAuth();
+  const isAdminOrStaff = user?.role === "admin" || user?.role === "staff";
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -238,41 +242,45 @@ export default function OrdersPage() {
                         >
                           <Eye className="w-4 h-4" />
                         </Link>
-                        {order.status === "pending" && (
+                        {isAdminOrStaff && (
                           <>
-                            <button
-                              onClick={() => handleStatusChange(order.id, "confirmed")}
-                              className="p-2 rounded-lg hover:bg-green-50 text-green-600"
-                              title="Xác nhận"
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleStatusChange(order.id, "cancelled")}
-                              className="p-2 rounded-lg hover:bg-red-50 text-red-600"
-                              title="Hủy"
-                            >
-                              <XCircle className="w-4 h-4" />
-                            </button>
+                            {order.status === "pending" && (
+                              <>
+                                <button
+                                  onClick={() => handleStatusChange(order.id, "confirmed")}
+                                  className="p-2 rounded-lg hover:bg-green-50 text-green-600"
+                                  title="Xác nhận"
+                                >
+                                  <CheckCircle className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleStatusChange(order.id, "cancelled")}
+                                  className="p-2 rounded-lg hover:bg-red-50 text-red-600"
+                                  title="Hủy"
+                                >
+                                  <XCircle className="w-4 h-4" />
+                                </button>
+                              </>
+                            )}
+                            {order.status === "confirmed" && (
+                              <button
+                                onClick={() => handleStatusChange(order.id, "in_progress")}
+                                className="p-2 rounded-lg hover:bg-purple-50 text-purple-600"
+                                title="Bắt đầu thực hiện"
+                              >
+                                <Clock className="w-4 h-4" />
+                              </button>
+                            )}
+                            {order.status === "in_progress" && (
+                              <button
+                                onClick={() => handleStatusChange(order.id, "completed")}
+                                className="p-2 rounded-lg hover:bg-green-50 text-green-600"
+                                title="Hoàn thành"
+                              >
+                                <CheckCircle className="w-4 h-4" />
+                              </button>
+                            )}
                           </>
-                        )}
-                        {order.status === "confirmed" && (
-                          <button
-                            onClick={() => handleStatusChange(order.id, "in_progress")}
-                            className="p-2 rounded-lg hover:bg-purple-50 text-purple-600"
-                            title="Bắt đầu thực hiện"
-                          >
-                            <Clock className="w-4 h-4" />
-                          </button>
-                        )}
-                        {order.status === "in_progress" && (
-                          <button
-                            onClick={() => handleStatusChange(order.id, "completed")}
-                            className="p-2 rounded-lg hover:bg-green-50 text-green-600"
-                            title="Hoàn thành"
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                          </button>
                         )}
                       </div>
                     </td>

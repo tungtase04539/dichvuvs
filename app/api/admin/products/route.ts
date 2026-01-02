@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminSupabaseClient } from "@/lib/supabase-server";
-import { isStaff } from "@/lib/auth";
+import { isStaff, getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +33,8 @@ export async function GET() {
 // Create new product
 export async function POST(request: NextRequest) {
   try {
-    if (!(await isStaff())) {
+    const session = await getSession();
+    if (!session || !["admin", "staff"].includes(session.role)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const adminSupabase = createAdminSupabaseClient()!;

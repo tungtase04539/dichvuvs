@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminSupabaseClient } from "@/lib/supabase-server";
-import { isStaff } from "@/lib/auth";
+import { isStaff, getSession, isAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -9,7 +9,9 @@ export async function GET(
     request: NextRequest
 ) {
     try {
-        if (!(await isStaff())) {
+        const session = await getSession();
+        const role = session?.role;
+        if (!session || !["admin", "staff"].includes(role || "")) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
         const { searchParams } = new URL(request.url);
@@ -74,7 +76,9 @@ export async function GET(
 // Add new inventory item
 export async function POST(request: NextRequest) {
     try {
-        if (!(await isStaff())) {
+        const session = await getSession();
+        const role = session?.role;
+        if (!session || !["admin", "staff"].includes(role || "")) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
         const adminSupabase = createAdminSupabaseClient();
@@ -134,7 +138,9 @@ export async function POST(request: NextRequest) {
 // Update service chatbot link
 export async function PUT(request: NextRequest) {
     try {
-        if (!(await isStaff())) {
+        const session = await getSession();
+        const role = session?.role;
+        if (!session || !["admin", "staff"].includes(role || "")) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
         const adminSupabase = createAdminSupabaseClient();
@@ -176,7 +182,9 @@ export async function PUT(request: NextRequest) {
 // Delete inventory item
 export async function DELETE(request: NextRequest) {
     try {
-        if (!(await isStaff())) {
+        const session = await getSession();
+        const role = session?.role;
+        if (!session || !["admin", "staff"].includes(role || "")) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
         const adminSupabase = createAdminSupabaseClient();

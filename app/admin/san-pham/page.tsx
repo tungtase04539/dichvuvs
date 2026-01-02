@@ -1,8 +1,11 @@
 import { createAdminSupabaseClient } from "@/lib/supabase-server";
 import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
-import { Plus, Pencil, Package } from "lucide-react";
+import { Plus, Pencil, Package, Link as LinkIcon } from "lucide-react";
 import DeleteProductButton from "./DeleteProductButton";
+import { getSession } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import CopyRefButton from "@/app/admin/san-pham/CopyRefButton";
 
 export const dynamic = "force-dynamic";
 
@@ -30,22 +33,53 @@ async function getProducts() {
 }
 
 export default async function AdminProductsPage() {
-  const products = await getProducts();
+  const [products, session] = await Promise.all([
+    getProducts(),
+    getSession()
+  ]);
+
+  const isAdmin = session?.role === "admin";
+  const isCTV = session?.role === "collaborator" || session?.role === "ctv";
+
+  // Get referral code for CTV
+  let refCode = "";
+  if (isCTV && session?.id) {
+    const refLink = await prisma.referralLink.findFirst({
+      where: { userId: session.id }
+    });
+    if (refLink) {
+      refCode = refLink.code;
+    } else {
+      // Auto-create if not exists
+      const newCode = `REF-${session.id.substring(0, 6).toUpperCase()}`;
+      const newLink = await prisma.referralLink.create({
+        data: {
+          code: newCode,
+          userId: session.id
+        }
+      });
+      refCode = newLink.code;
+    }
+  }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Quản lý ChatBot</h1>
-          <p className="text-slate-600">Thêm, sửa, xóa các sản phẩm ChatBot</p>
+          <h1 className="text-2xl font-bold text-slate-900">Danh sách Trợ lý AI</h1>
+          <p className="text-slate-600">
+            {isAdmin ? "Quản lý sản phẩm hệ thống" : "Lấy link giới thiệu để nhận hoa hồng"}
+          </p>
         </div>
-        <Link
-          href="/admin/san-pham/them"
-          className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
-        >
-          <Plus className="w-5 h-5" />
-          Thêm ChatBot
-        </Link>
+        {isAdmin && (
+          <Link
+            href="/admin/san-pham/them"
+            className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+            Thêm ChatBot
+          </Link>
+        )}
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -110,21 +144,32 @@ export default async function AdminProductsPage() {
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center justify-end gap-2">
-                    <Link
-                      href={`/admin/san-pham/${product.id}/kho`}
-                      className="p-2 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                      title="Quản lý kho (Link & Mã)"
-                    >
-                      <Package className="w-4 h-4" />
-                    </Link>
-                    <Link
-                      href={`/admin/san-pham/${product.id}`}
-                      className="p-2 text-slate-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-                      title="Chỉnh sửa"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Link>
-                    <DeleteProductButton productId={product.id} productName={product.name} />
+                    {isCTV && (
+                      <CopyRefButton
+                        slug={product.slug}
+                        refCode={refCode}
+                      />
+                    )}
+
+                    {isAdmin && (
+                      <>
+                        <Link
+                          href={`/admin/san-pham/${product.id}/kho`}
+                          className="p-2 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                          title="Quản lý kho (Link & Mã)"
+                        >
+                          <Package className="w-4 h-4" />
+                        </Link>
+                        <Link
+                          href={`/admin/san-pham/${product.id}`}
+                          className="p-2 text-slate-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                          title="Chỉnh sửa"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Link>
+                        <DeleteProductButton productId={product.id} productName={product.name} />
+                      </>
+                    )}
                   </div>
                 </td>
               </tr>

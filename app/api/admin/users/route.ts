@@ -56,6 +56,8 @@ export async function GET(request: NextRequest) {
       users = users.filter((u: any) => u.parentId === user.id);
     } else if (user.role === "agent") {
       users = users.filter((u: any) => u.parentId === user.id && u.role === "collaborator");
+    } else if (user.role === "collaborator" || user.role === "ctv") {
+      users = users.filter((u: any) => u.parentId === user.id);
     } else if (user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

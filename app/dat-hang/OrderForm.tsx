@@ -7,6 +7,7 @@ import { formatCurrency } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import VideoModal from "@/components/VideoModal";
 import { Plus, Minus, Trash2, ShoppingCart, User, Phone, Mail, MessageSquare, Loader2, Gift, Play, Search, ChevronLeft, ChevronRight, Bot } from "lucide-react";
+import { getCurrentReferralCode } from "@/components/ReferralTracker";
 
 interface Product {
   id: string;
@@ -188,6 +189,8 @@ export default function OrderForm() {
         packageType: item.packageType
       }));
 
+      const refCode = getCurrentReferralCode();
+
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -197,7 +200,7 @@ export default function OrderForm() {
           email,
           notes,
           items,
-          referralCode: null,
+          referralCode: refCode,
         }),
       });
 

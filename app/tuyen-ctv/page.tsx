@@ -20,13 +20,30 @@ export default function CTVRecruitmentPage() {
         fullName: "",
         phone: "",
         email: "",
+        website: "", // Honeypot field
     });
+    const [pageLoadTime] = useState(Date.now());
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [error, setError] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Anti-spam: check if submission is too fast (less than 3 seconds)
+        const timeElapsed = Date.now() - pageLoadTime;
+        if (timeElapsed < 3000) {
+            setError("Vui lòng điền thông tin cẩn thận.");
+            return;
+        }
+
+        // Basic phone validation (VN format)
+        const phoneRegex = /^(0|84)(3|5|7|8|9)([0-9]{8})$/;
+        if (!phoneRegex.test(formData.phone)) {
+            setError("Số điện thoại không hợp lệ. Vui lòng kiểm tra lại.");
+            return;
+        }
+
         setIsSubmitting(true);
         setError("");
 
@@ -137,6 +154,18 @@ export default function CTVRecruitmentPage() {
                                                 value={formData.fullName}
                                                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                                                 className="w-full px-5 py-4 bg-slate-900/50 border border-white/10 rounded-2xl focus:border-primary-400 focus:ring-1 focus:ring-primary-400/30 outline-none transition-all placeholder:text-slate-600"
+                                            />
+                                        </div>
+
+                                        {/* Honeypot field (hidden from users) */}
+                                        <div className="hidden overflow-hidden w-0 h-0 opacity-0 bg-transparent border-none outline-none -z-50 pointer-events-none">
+                                            <input
+                                                type="text"
+                                                name="website"
+                                                tabIndex={-1}
+                                                autoComplete="off"
+                                                value={formData.website}
+                                                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                                             />
                                         </div>
 

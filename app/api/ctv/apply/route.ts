@@ -5,7 +5,12 @@ import { getSession } from "@/lib/auth";
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { fullName, phone, email } = body;
+        const { fullName, phone, email, website } = body;
+
+        // 1. Anti-spam: Honeypot check
+        if (website) {
+            return NextResponse.json({ error: "Xác minh không thành công" }, { status: 400 });
+        }
 
         if (!fullName || !phone || !email) {
             return NextResponse.json(
@@ -14,14 +19,30 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 1. Check if user already exists in Prisma or create one
-        // Note: We don't necessarily need a Supabase user for the initial application
-        // but the schema says ctvApplication belongs to a User.
-        // So we lookup by email.
+        // 2. Stricter validation
+        const phoneRegex = /^(0|84)(3|5|7|8|9)([0-9]{8})$/;
+        if (!phoneRegex.test(phone)) {
+            return NextResponse.json({ error: "Số điện thoại không hợp lệ" }, { status: 400 });
+        }
 
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return NextResponse.json({ error: "Email không hợp lệ" }, { status: 400 });
+        }
+
+        // 3. Check if user already exists in Prisma or create one
         let user = await prisma.user.findUnique({
             where: { email }
         });
+
+        // Also check if phone is already used by another user to prevent multi-email/phone spam
+        const userByPhone = await prisma.user.findFirst({
+            where: { phone }
+        });
+
+        if (!user && userByPhone) {
+            return NextResponse.json({ error: "Số điện thoại này đã được đăng ký với email khác" }, { status: 400 });
+        }
 
         if (!user) {
             // Create a skeleton user if not exists

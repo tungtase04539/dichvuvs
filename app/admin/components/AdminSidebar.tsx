@@ -51,6 +51,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
       { href: "/admin/don-hang", icon: Package, label: "Đơn hàng" },
       { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" },
+      { href: "/admin/ctv-duyet", icon: Users, label: "Duyệt CTV" },
       { href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" },
       { href: "/admin/cau-hinh-goi", icon: Bot, label: "Cấu hình gói" },
       { href: "/admin/tai-khoan", icon: Key, label: "Tài khoản" },
@@ -73,14 +74,16 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
     <aside className="fixed left-0 top-0 bottom-0 w-64 bg-slate-900 hidden lg:block z-40">
       <div className="p-6">
         <Link href="/admin" className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-lg">
-            <Bot className="w-6 h-6 text-white" />
+          <div className="w-10 h-10 flex items-center justify-center">
+            <img src="/logo.png" alt="Sàn trợ lý AI Logo" className="w-full h-full object-contain" />
           </div>
           <div>
-            <span className="text-xl font-bold text-white block">
-              ChatBotVN
+            <span className="text-xl font-black tracking-tighter text-white block leading-tight uppercase">
+              SÀN TRỢ LÝ <span className="text-primary-400">AI</span>
             </span>
-            <span className="text-xs text-slate-400">{roleLabels[user.role]}</span>
+            <span className="text-[10px] font-bold text-primary-400 tracking-[0.1em] uppercase opacity-80">
+              Quản trị hệ thống
+            </span>
           </div>
         </Link>
       </div>

@@ -250,16 +250,14 @@ function HomePageContent() {
                   Tham gia nhóm Zalo ngay để nhận Trợ lý AI miễn phí và nhiều quà tặng hấp dẫn!
                 </p>
                 <div className="flex justify-center">
-                  <a
-                    href="https://zalo.me/0345501969"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    href="/qua-tang"
                     className="inline-flex items-center gap-2 px-10 py-4 bg-primary-400 text-slate-900 font-bold rounded-xl hover:bg-primary-300 transition-all uppercase shadow-lg shadow-primary-400/20 hover:scale-105 active:scale-95"
                   >
-                    <MessageCircle className="w-6 h-6" />
-                    ZALO NHẬN BÃO QUÀ TẶNG
+                    <Gift className="w-6 h-6" />
+                    NHẬN BÃO QUÀ TẶNG
                     <ArrowRight className="w-6 h-6" />
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

@@ -65,7 +65,7 @@ export default function QuaTangPage() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
             <a
-              href="https://zalo.me/g/ubarcp690"
+              href="https://zalo.me/0345501969"
               target="_blank"
               rel="noopener noreferrer"
               className="group relative inline-flex items-center gap-5 px-14 py-7 bg-white text-emerald-800 font-extrabold rounded-full hover:bg-yellow-400 hover:text-emerald-900 transition-all duration-500 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] hover:scale-110 active:scale-95 text-2xl uppercase tracking-tighter"
@@ -141,7 +141,7 @@ export default function QuaTangPage() {
 
           <div className="flex flex-col md:flex-row justify-center items-stretch gap-12 max-w-6xl mx-auto">
             {[
-              { n: 1, t: "Tham gia nhóm", d: "Ấn vào nút trắng nổi bật phía trên" },
+              { n: 1, t: "Liên hệ Zalo", d: "Ấn vào nút trắng nổi bật phía trên" },
               { n: 2, t: "Gõ lệnh Nhận", d: "Chào mọi người và gõ 'NHẬN QUÀ'" },
               { n: 3, t: "Hưởng ưu đãi", d: "Bot sẽ tự động gửi quà tặng ngay lập tức" },
             ].map((step, i) => (
@@ -162,10 +162,12 @@ export default function QuaTangPage() {
         <div className="container mx-auto px-4">
           <h2 className="text-6xl md:text-8xl font-black text-white mb-12 uppercase drop-shadow-2xl">ĐỪNG BỎ LỠ!</h2>
           <a
-            href="https://zalo.me/g/ubarcp690"
+            href="https://zalo.me/0345501969"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-block px-20 py-10 bg-white text-emerald-700 font-black text-4xl rounded-full shadow-[0_30px_60px_-10px_rgba(0,0,0,0.5)] hover:bg-yellow-400 hover:text-emerald-900 transition-all uppercase hover:scale-110 active:scale-95 border-b-8 border-gray-200 hover:border-yellow-600"
           >
-            VÀO NHÓM NGAY 🏮
+            LIÊN HỆ ZALO NGAY 🏮
           </a>
           <p className="mt-12 text-2xl text-emerald-200 font-bold animate-pulse">Quà tặng giới hạn cho 50 người đầu tiên mỗi ngày!</p>
         </div>

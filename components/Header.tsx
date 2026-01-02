@@ -45,7 +45,7 @@ export default function Header({ settings }: HeaderProps) {
   const navLinks = [
     { href: "/", label: "TRANG CHỦ" },
     { href: "/san-pham", label: "SẢN PHẨM" },
-    { href: "/qua-tang", label: "MIỄN PHÍ" },
+    { href: "/qua-tang", label: "QUÀ TẶNG" },
     { href: "/tuyen-ctv", label: "TUYỂN CTV" },
   ];
 
@@ -86,13 +86,6 @@ export default function Header({ settings }: HeaderProps) {
 
             {/* Desktop CTA */}
             <div className="hidden lg:flex items-center gap-4">
-              <a
-                href={`tel:${settings.site_phone?.replace(/[\s–]/g, "").split("–")[0] || "0345501969"}`}
-                className="flex items-center gap-2 font-bold text-primary-400 hover:text-primary-300 transition-colors"
-              >
-                <Phone className="w-5 h-5" />
-                {settings.site_phone || "0345 501 969"}
-              </a>
 
               {/* User Account */}
               {!isLoading && (
@@ -156,12 +149,6 @@ export default function Header({ settings }: HeaderProps) {
 
             {/* Mobile buttons */}
             <div className="flex lg:hidden items-center gap-2">
-              <a
-                href={`tel:${settings.site_phone?.replace(/[\s–]/g, "").split("–")[0] || "0345501969"}`}
-                className="p-2 rounded-lg bg-primary-400/20 text-primary-400"
-              >
-                <Phone className="w-5 h-5" />
-              </a>
               <button
                 className="p-2 rounded-lg bg-white/10"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

@@ -47,25 +47,29 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
 
   // Navigation items based on role
   const getNavItems = (): NavItem[] => {
-    const baseItems: NavItem[] = [
+    const isPartner = user.role === "collaborator" || user.role === "ctv" || user.role === "agent" || user.role === "master_agent";
+    const isAdmin = user.role === "admin";
+
+    const items: NavItem[] = [
       { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
       { href: "/admin/don-hang", icon: Package, label: "Đơn hàng" },
       { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" },
-      { href: "/admin/ctv-duyet", icon: Users, label: "Duyệt CTV" },
-      { href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" },
-      { href: "/admin/cau-hinh-goi", icon: Bot, label: "Cấu hình gói" },
-      { href: "/admin/tai-khoan", icon: Key, label: "Tài khoản" },
     ];
 
-    if (user.role === "admin") {
-      return [
-        ...baseItems,
-        // Admin specific extra items if any, but keeping it simple now
-      ];
+    // Only show 'Duyệt CTV' to admin/staff
+    if (!isPartner) {
+      items.push({ href: "/admin/ctv-duyet", icon: Users, label: "Duyệt CTV" });
     }
 
-    // Staff / Default
-    return baseItems;
+    items.push({ href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" });
+
+    // Only show technical/admin configs to admins
+    if (isAdmin) {
+      items.push({ href: "/admin/cau-hinh-goi", icon: Bot, label: "Cấu hình gói" });
+      items.push({ href: "/admin/tai-khoan", icon: Key, label: "Tài khoản" });
+    }
+
+    return items;
   };
 
   const navItems = getNavItems();

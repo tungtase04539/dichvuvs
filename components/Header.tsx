@@ -53,12 +53,19 @@ export default function Header({ settings }: HeaderProps) {
     <>
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-300 overflow-hidden",
           isScrolled || isMobileMenuOpen
-            ? "bg-slate-900 shadow-lg shadow-black/50 py-2 sm:py-3"
-            : "bg-slate-900/80 backdrop-blur-md py-3 sm:py-5"
+            ? "bg-gradient-to-r from-red-700 via-red-600 to-red-800 shadow-lg shadow-black/50 py-2 sm:py-3"
+            : "bg-red-700/90 backdrop-blur-md py-3 sm:py-5 border-b border-yellow-400/30"
         )}
       >
+        {/* Tet Decorations */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-40">
+          <div className="absolute top-0 left-1/4 text-xl animate-bounce" style={{ animationDuration: '4s' }}>🌸</div>
+          <div className="absolute top-2 right-1/3 text-lg animate-pulse" style={{ animationDuration: '3s' }}>🌼</div>
+          <div className="absolute -top-1 right-10 text-2xl animate-bounce" style={{ animationDuration: '5s' }}>🏮</div>
+          <div className="absolute top-4 left-10 text-lg opacity-60">✨</div>
+        </div>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
@@ -77,7 +84,7 @@ export default function Header({ settings }: HeaderProps) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="font-bold text-primary-400 hover:text-primary-300 transition-colors tracking-wide"
+                  className="font-bold text-yellow-200 hover:text-white transition-colors tracking-wide"
                 >
                   {link.label}
                 </Link>
@@ -175,7 +182,7 @@ export default function Header({ settings }: HeaderProps) {
       {/* Mobile menu panel */}
       <div
         className={cn(
-          "fixed top-0 right-0 h-full w-72 max-w-[85vw] bg-slate-900 z-50 transform transition-transform duration-300 lg:hidden shadow-2xl",
+          "fixed top-0 right-0 h-full w-72 max-w-[85vw] bg-red-800 z-50 transform transition-transform duration-300 lg:hidden shadow-2xl border-l border-yellow-400/20",
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
@@ -208,7 +215,7 @@ export default function Header({ settings }: HeaderProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-4 py-4 rounded-xl font-bold text-primary-400 hover:bg-primary-400/10 text-lg"
+                className="px-4 py-4 rounded-xl font-bold text-yellow-200 hover:bg-white/10 text-lg"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.label}

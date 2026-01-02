@@ -74,7 +74,7 @@ export default function Header({ settings }: HeaderProps) {
                 <img
                   src="/logo.png"
                   alt="Sàn trợ lý AI Logo"
-                  className="w-full h-full object-contain mix-blend-screen"
+                  className="w-full h-full object-contain"
                 />
               </div>
               <span className="text-xl sm:text-2xl font-bold text-white tracking-tight">

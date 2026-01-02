@@ -270,17 +270,19 @@ function OrderSuccessContent() {
 
       if (res.ok) {
         console.log("Simulation triggered successfully");
-        // We don't set isPaid = true here immediately, 
-        // we let the checkPaymentStatus() or its auto-interval find the update in the DB
         await checkPaymentStatus();
       } else {
         let errorMessage = "Không xác định";
         try {
           const errData = await res.json();
-          errorMessage = errData.message || errorMessage;
+          // Check for message (SePay style) or error (standard API style)
+          errorMessage = errData.message || errData.error || errorMessage;
         } catch (e) {
-          // If 504, Vercel returns HTML, res.json() fails
-          errorMessage = "Máy chủ đang xử lý (Timeout). Vui lòng chờ 10-30 giây để hệ thống tự cập nhật.";
+          if (res.status === 504) {
+            errorMessage = "Máy chủ đang xử lý (Timeout). Vui lòng chờ 10-30 giây.";
+          } else if (res.status === 500) {
+            errorMessage = "Lỗi hệ thống (Internal Server Error). Vui lòng thử lại sau.";
+          }
         }
         console.error("Simulation error:", errorMessage);
         alert("Lỗi mô phỏng: " + errorMessage);

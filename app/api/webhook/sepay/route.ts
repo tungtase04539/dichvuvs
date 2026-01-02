@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { createAdminSupabaseClient } from "@/lib/supabase-server";
 
+// Standard SePay Webhook Payload
 interface SepayWebhookPayload {
   id: number;
   gateway: string;
@@ -19,27 +20,29 @@ interface SepayWebhookPayload {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log("[Webhook] Starting SePay processing...");
     const transaction: SepayWebhookPayload = await request.json();
+    console.log("[Webhook] Payload received:", JSON.stringify(transaction));
 
-    console.log("SePay webhook received:", transaction);
-
-    // Only process incoming transfers (transferType = "in")
+    // 1. Filter incoming transfers
     if (transaction.transferType !== "in") {
+      console.log("[Webhook] Ignoring outgoing transfer");
       return NextResponse.json({ success: true, message: "Outgoing transfer ignored" });
     }
 
-    // Extract order code from content
+    // 2. Extract Order Code
     const content = transaction.content || transaction.description || "";
     const orderCodeMatch = content.match(/VS\d{6}[A-Z0-9]{4}/i);
 
     if (!orderCodeMatch) {
-      console.log("No order code found in:", content);
+      console.warn("[Webhook] No order code found in content:", content);
       return NextResponse.json({ success: true, message: "No order code found" });
     }
 
     const orderCode = orderCodeMatch[0].toUpperCase();
+    console.log("[Webhook] Searching for order:", orderCode);
 
-    // Find order with service info - Using resilient select
+    // 3. Find Order with resilient select
     const order = await prisma.order.findUnique({
       where: { orderCode },
       select: {
@@ -64,190 +67,179 @@ export async function POST(request: NextRequest) {
     });
 
     if (!order) {
-      console.log("Order not found:", orderCode);
+      console.warn("[Webhook] Order not found in DB:", orderCode);
       return NextResponse.json({ success: true, message: "Order not found" });
     }
 
-    // Check if already confirmed
     if (order.status !== "pending") {
-      console.log("Order already processed:", orderCode);
+      console.log(`[Webhook] Order ${orderCode} already processed (status: ${order.status})`);
       return NextResponse.json({ success: true, message: "Order already processed" });
     }
 
-    // Verify order total price matches transaction amount
+    // 4. Verify Amount
     const tolerance = 1000;
-    const expectedPrice = order.totalPrice;
-    const receivedAmount = transaction.transferAmount;
-    const isAmountMatch = Math.abs(receivedAmount - expectedPrice) <= tolerance;
+    const expected = order.totalPrice;
+    const received = transaction.transferAmount;
+    const isAmountMatch = Math.abs(received - expected) <= tolerance;
 
     if (!isAmountMatch) {
-      console.error(`[SePay Webhook] Price mismatch for order ${orderCode}. Expected: ${expectedPrice}, Received: ${receivedAmount}`);
+      console.error(`[Webhook] Price mismatch. Order: ${expected}, Received: ${received}`);
       return NextResponse.json({
         success: false,
-        message: `Sai số tiền thanh toán. Mong đợi: ${expectedPrice.toLocaleString()}đ, Nhận được: ${receivedAmount.toLocaleString()}đ`,
+        message: `Sai số tiền thanh toán. Mong đợi: ${expected.toLocaleString()}đ, Nhận: ${received.toLocaleString()}đ`,
         error: "Price mismatch"
       }, { status: 400 });
     }
 
-    // Determine package type (handling fallback to notes since orderPackageType is not selected)
+    // 5. Detect Package Type
     let packageType = "standard";
     if (order.notes?.includes("[Package: gold]")) packageType = "gold";
     else if (order.notes?.includes("[Package: platinum]")) packageType = "platinum";
+    console.log(`[Webhook] Package detected: ${packageType}`);
 
-    console.log(`[SePay Webhook] Processing order ${orderCode} with package: ${packageType}`);
-
-    // Consolidate inventory logic - Find available code first
-    const availableChatbot = await prisma.chatbotInventory.findFirst({
-      where: {
-        serviceId: order.serviceId,
-        isUsed: false,
-      },
-      orderBy: { createdAt: "asc" },
-    });
-
-    const inventoryCount = await prisma.chatbotInventory.count({
-      where: { serviceId: order.serviceId }
-    });
-
-    const isShared = inventoryCount === 1;
-
-    // Fetch global dedicated links
-    const globalLinks = await prisma.setting.findMany({
-      where: { key: { in: ["chatbot_link_gold", "chatbot_link_platinum"] } }
-    });
-    const linksMap = new Map(globalLinks.map(s => [s.key, s.value]));
-
+    // 6. Transactional Update
+    console.log("[Webhook] Starting transaction block...");
     await prisma.$transaction(async (tx) => {
-      // --- Special Logic for Premium Packages (Gold/Platinum) ---
+
+      // A. Premium Logic
       if (packageType === "gold" || packageType === "platinum") {
+        console.log(`[Webhook] Processing premium package: ${packageType}`);
+        const globalLinks = await tx.setting.findMany({
+          where: { key: { in: ["chatbot_link_gold", "chatbot_link_platinum"] } },
+          select: { key: true, value: true }
+        });
+        const linksMap = new Map(globalLinks.map(s => [s.key, s.value]));
+
         const dedicatedLink = packageType === "gold"
           ? linksMap.get("chatbot_link_gold")
           : linksMap.get("chatbot_link_platinum");
 
-        const deliveryMessage = dedicatedLink
-          ? `✅ Đã tự động bàn giao Link ${packageType.toUpperCase()}: ${dedicatedLink}`
-          : `⚠️ Gói ${packageType.toUpperCase()} chưa có link bàn giao riêng. Vui lòng liên hệ Admin.`;
+        const msg = dedicatedLink
+          ? `✅ Đã bàn giao Link ${packageType.toUpperCase()}: ${dedicatedLink}`
+          : `⚠️ Gói ${packageType.toUpperCase()} chưa có link bàn giao riêng.`;
 
         await tx.order.update({
           where: { id: order.id },
           data: {
             status: "confirmed",
-            notes: order.notes
-              ? `${order.notes}\n\n${deliveryMessage}`
-              : deliveryMessage,
-          },
+            notes: order.notes ? `${order.notes}\n\n${msg}` : msg
+          }
         });
-        console.log(`✅ Dedicated link for ${packageType} assigned to order ${orderCode}`);
+        console.log("[Webhook] Premium order updated");
         return;
       }
 
-      // --- Standard Logic (activation codes) ---
-      if (availableChatbot) {
+      // B. Standard Logic
+      console.log("[Webhook] Processing standard activation code...");
+      const available = await tx.chatbotInventory.findFirst({
+        where: { serviceId: order.serviceId, isUsed: false },
+        orderBy: { createdAt: "asc" },
+        select: { id: true, activationCode: true }
+      });
+
+      const count = await tx.chatbotInventory.count({
+        where: { serviceId: order.serviceId }
+      });
+
+      const isShared = count === 1;
+
+      if (available) {
         if (!isShared) {
           await tx.chatbotInventory.update({
-            where: { id: availableChatbot.id },
-            data: { isUsed: true, orderId: order.id },
+            where: { id: available.id },
+            data: { isUsed: true, orderId: order.id }
           });
         }
-
         await tx.order.update({
           where: { id: order.id },
           data: {
             status: "confirmed",
             notes: order.notes
-              ? `${order.notes}\n\n✅ Đã tự động bàn giao Trợ lý AI: ${availableChatbot.activationCode}`
-              : `✅ Đã tự động bàn giao Trợ lý AI: ${availableChatbot.activationCode}`,
-          },
+              ? `${order.notes}\n\n✅ Đã bàn giao: ${available.activationCode}`
+              : `✅ Đã bàn giao: ${available.activationCode}`
+          }
         });
-        console.log(`✅ Chatbot data [${availableChatbot.activationCode}] assigned to order ${orderCode}`);
+        console.log("[Webhook] Standard order updated with code");
       } else {
         await tx.order.update({
           where: { id: order.id },
           data: {
             status: "confirmed",
             notes: order.notes
-              ? `${order.notes}\n\n⚠️ Không có sẵn dữ liệu Trợ lý AI để bàn giao tự động.`
-              : `⚠️ Không có sẵn dữ liệu Trợ lý AI để bàn giao tự động.`,
-          },
+              ? `${order.notes}\n\n⚠️ Không có sẵn mã để bàn giao.`
+              : `⚠️ Không có sẵn mã để bàn giao.`
+          }
         });
-        console.log(`⚠️ No chatbot data available for service ${order.service.name} - Order ${orderCode} confirmed without delivery`);
+        console.log("[Webhook] Standard order confirmed without code");
       }
     });
 
-    // --- Logic tạo tài khoản khách hàng tự động ---
+    // 7. Auto-Account Logic (Non-blocking but safe-selected)
     try {
-      if (order.customerEmail && order.customerEmail.trim() !== "") {
-        const existingUser = await prisma.user.findFirst({
-          where: { email: order.customerEmail }
+      if (order.customerEmail && order.customerEmail.trim()) {
+        console.log("[Webhook] Checking auto-account for:", order.customerEmail);
+        const existing = await prisma.user.findFirst({
+          where: { email: order.customerEmail },
+          select: { id: true }
         });
 
-        if (!existingUser) {
-          console.log(`Creating auto-account for: ${order.customerEmail}`);
+        if (!existing) {
+          console.log("[Webhook] Creating account...");
           const adminSupabase = createAdminSupabaseClient();
-
           if (adminSupabase) {
-            const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
+            const { data: auth, error: authErr } = await adminSupabase.auth.admin.createUser({
               email: order.customerEmail,
-              password: order.customerPhone || "Aa123456", // Default password if phone not provided
+              password: order.customerPhone || "Aa123456",
               email_confirm: true,
-              user_metadata: {
-                name: order.customerName,
-                role: "customer"
-              }
+              user_metadata: { name: order.customerName, role: "customer" }
             });
 
-            if (authError) {
-              console.error("Supabase Auth auto-creation error:", authError.message);
-            } else if (authData.user) {
+            if (authErr) {
+              console.error("[Webhook] Auth Error:", authErr.message);
+            } else if (auth?.user) {
               await prisma.user.create({
                 data: {
-                  id: authData.user.id,
+                  id: auth.user.id,
                   email: order.customerEmail,
                   name: order.customerName,
                   phone: order.customerPhone,
                   role: "customer",
-                  password: "",
+                  password: ""
                 }
               });
-
               await prisma.order.update({
                 where: { id: order.id },
                 data: {
-                  notes: `${order.notes || ""}\n\n🔑 ĐÃ TẠO TÀI KHOÀN QUẢN LÝ:\n- Email: ${order.customerEmail}\n- Mật khẩu: ${order.customerPhone || "Aa123456"}\n- Đăng nhập tại: /dang-nhap`
+                  notes: `${order.notes || ""}\n\n🔑 Đã tạo tài khoản: ${order.customerEmail} / ${order.customerPhone || "Aa123456"}`
                 }
               });
-              console.log(`✅ Auto-account created for ${order.customerEmail}`);
+              console.log("[Webhook] Auto-account created");
             }
           }
         }
       }
-    } catch (accError) {
-      console.error("Auto-account creation flow error:", accError);
+    } catch (err: any) {
+      console.error("[Webhook] Auto-account error (ignored):", err.message);
     }
 
-    console.log(`✅ Order ${orderCode} confirmed with payment ${receivedAmount}`);
-
+    console.log(`[Webhook] SUCCESS: Order ${orderCode} finished`);
     return NextResponse.json({
       success: true,
       message: `Order ${orderCode} confirmed`,
       data: { orderCode, packageType }
     });
+
   } catch (error: any) {
-    console.error("SePay webhook error:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Lỗi hệ thống khi xử lý thanh toán",
-        error: error.message || "Internal server error"
-      },
-      { status: 500 }
-    );
+    console.error("[Webhook] CRITICAL ERROR:", error);
+    return NextResponse.json({
+      success: false,
+      message: "Lỗi hệ thống khi xử lý thanh toán",
+      error: error.message || "Unknown error",
+      stack: process.env.NODE_ENV === "development" ? error.stack : undefined
+    }, { status: 500 });
   }
 }
 
 export async function GET() {
-  return NextResponse.json({
-    success: true,
-    message: "SePay webhook endpoint is active"
-  });
+  return NextResponse.json({ success: true, message: "Active" });
 }

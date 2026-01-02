@@ -114,39 +114,6 @@ function HomePageContent() {
     }
   };
 
-  const features = [
-    {
-      icon: Zap,
-      title: "Cài đặt 5 phút",
-      description: "Không cần code, cài đặt nhanh chóng với hướng dẫn chi tiết",
-    },
-    {
-      icon: Clock,
-      title: "Hoạt động 24/7",
-      description: "ChatBot tự động trả lời mọi lúc, không bỏ lỡ khách hàng",
-    },
-    {
-      icon: Shield,
-      title: "Bảo mật cao",
-      description: "Dữ liệu được mã hóa, bảo vệ thông tin khách hàng tuyệt đối",
-    },
-    {
-      icon: TrendingUp,
-      title: "Tăng doanh số",
-      description: "Tỷ lệ chuyển đổi tăng 300% với tư vấn tự động thông minh",
-    },
-    {
-      icon: Users,
-      title: "Đa nền tảng",
-      description: "Tích hợp Facebook, Zalo, Website chỉ với 1 ChatBot",
-    },
-    {
-      icon: HeadphonesIcon,
-      title: "Hỗ trợ tận tâm",
-      description: "Đội ngũ kỹ thuật hỗ trợ 24/7, giải đáp mọi thắc mắc",
-    },
-  ];
-
   const stats = [
     { value: "10,000+", label: "Khách hàng tin dùng" },
     { value: "50M+", label: "Tin nhắn xử lý/tháng" },
@@ -157,20 +124,20 @@ function HomePageContent() {
   const testimonials = [
     {
       name: "Nguyễn Văn An",
-      role: "CEO, TechStore",
-      content: "Sàn trợ lý AI giúp shop tôi tiết kiệm 80% thời gian trả lời tin nhắn. Doanh số tăng 40% sau 2 tháng sử dụng!",
+      role: "CEO, BDS Leader",
+      content: "Sàn trợ lý AI cung cấp các trợ lý được lập trình chuyên sâu cho ngành Bất động sản. Trợ lý này hiểu rõ các dự án và tư vấn cho khách hàng của tôi cực kỳ chuyên nghiệp.",
       avatar: "A",
     },
     {
       name: "Trần Thị Bình",
       role: "Founder, BeautyShop",
-      content: "Rất hài lòng với dịch vụ. Trợ lý AI thông minh, hiểu khách hàng và tư vấn chính xác. Đội ngũ support rất nhiệt tình!",
+      content: "Tôi rất ấn tượng với Trợ lý AI ngành Thẩm mỹ. Nó không chỉ trả lời tin nhắn mà còn nắm rõ quy trình tư vấn làm đẹp, giúp khách hàng tin tưởng hơn rất nhiều.",
       avatar: "B",
     },
     {
       name: "Lê Minh Châu",
-      role: "Marketing Manager",
-      content: "Giá cả phải chăng, hiệu quả cao. Sàn trợ lý AI giúp team tôi focus vào những việc quan trọng hơn.",
+      role: "Giám đốc trung tâm Anh ngữ",
+      content: "Sử dụng Trợ lý AI chuyên biệt cho ngành Giáo dục giúp trung tâm của tôi giải đáp thắc mắc của học viên ngay lập tức và chính xác 100%.",
       avatar: "C",
     },
   ];
@@ -205,9 +172,9 @@ function HomePageContent() {
             <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-700/50">
               <h3 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
                 <Bot className="w-6 h-6 text-primary-400" />
-                Tất cả Trợ lý AI
+                Dành cho bạn
                 <span className="bg-primary-400/10 text-primary-400 text-sm px-3 py-1 rounded-full border border-primary-400/20">
-                  {allProducts.length} sản phẩm
+                  {allProducts.length} trợ lý chuyên biệt
                 </span>
               </h3>
             </div>
@@ -267,72 +234,59 @@ function HomePageContent() {
         </div>
       </section>
 
-      {/* Flash Sale Banner */}
-      <section className="py-16 bg-gradient-to-r from-red-900 via-slate-900 to-orange-900 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-64 h-64 bg-red-500/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-orange-500/20 rounded-full blur-3xl" />
-        </div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 text-red-400 rounded-full text-sm font-bold uppercase tracking-wide mb-4 border border-red-500/30">
-                <Flame className="w-4 h-4" />
-                FLASH SALE - GIẢM SỐC
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
-                GIẢM ĐẾN <span className="text-red-500">50%</span> TẤT CẢ TRỢ LÝ AI
-              </h2>
-              <p className="text-slate-300 text-lg">
-                Mua ngay kẻo lỡ! Ưu đãi có hạn + Quà tặng hấp dẫn
-              </p>
-            </div>
-            <Link
-              href="/flash-sale"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold rounded-xl shadow-lg shadow-red-500/30 text-lg uppercase transition-all hover:scale-105 active:scale-95"
-            >
-              <Flame className="w-5 h-5" />
-              XEM FLASH SALE
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="tinh-nang" className="py-20 bg-slate-900">
+      {/* Gift & Free Trial Section */}
+      <section className="py-16 bg-slate-800">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-400/20 text-primary-400 rounded-full text-sm font-semibold mb-4 uppercase tracking-wide">
-              <Zap className="w-4 h-4" />
-              TÍNH NĂNG NỔI BẬT
-            </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 uppercase">
-              TẠI SAO CHỌN <span className="text-primary-400">SÀN TRỢ LÝ AI</span>?
-            </h2>
-            <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-              Giải pháp Trợ lý AI toàn diện, giúp doanh nghiệp tự động hóa và tăng trưởng vượt trội
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="bg-slate-800/50 p-8 rounded-3xl border border-slate-700/50 hover:border-primary-400/50 transition-all hover:translate-y-[-5px] group"
-              >
-                <div className="w-14 h-14 rounded-2xl bg-primary-400/10 flex items-center justify-center mb-6 group-hover:bg-primary-400 transition-all duration-300">
-                  <feature.icon className="w-7 h-7 text-primary-400 group-hover:text-slate-900 transition-colors" />
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Quà tặng */}
+            <div className="bg-gradient-to-br from-primary-400/20 to-primary-600/10 rounded-3xl p-8 border border-primary-400/30 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary-400/10 rounded-full blur-2xl" />
+              <div className="relative z-10">
+                <div className="w-16 h-16 rounded-2xl bg-primary-400/20 flex items-center justify-center mb-6">
+                  <Gift className="w-8 h-8 text-primary-400" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                <p className="text-slate-400 leading-relaxed">{feature.description}</p>
+                <h3 className="text-2xl font-bold text-white mb-3 uppercase">NHẬN QUÀ MIỄN PHÍ</h3>
+                <p className="text-slate-300 mb-6">
+                  Tham gia nhóm Zalo ngay để nhận Trợ lý AI miễn phí và nhiều quà tặng hấp dẫn!
+                </p>
+                <Link
+                  href="/qua-tang"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-primary-400 text-slate-900 font-bold rounded-xl hover:bg-primary-300 transition-all uppercase"
+                >
+                  <Gift className="w-5 h-5" />
+                  NHẬN QUÀ NGAY
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
               </div>
-            ))}
+            </div>
+
+            {/* Dùng thử */}
+            <div className="bg-gradient-to-br from-green-900/30 to-emerald-900/20 rounded-3xl p-8 border border-green-500/30 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-2xl" />
+              <div className="relative z-10">
+                <div className="w-16 h-16 rounded-2xl bg-green-500/20 flex items-center justify-center mb-6">
+                  <Timer className="w-8 h-8 text-green-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-3 uppercase">DÙNG THỬ 3 NGÀY</h3>
+                <p className="text-slate-300 mb-6">
+                  Trải nghiệm Trợ lý AI hoàn toàn miễn phí trong 3 ngày. Không cần thẻ tín dụng!
+                </p>
+                <Link
+                  href="/dung-thu"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 text-white font-bold rounded-xl hover:bg-green-400 transition-all uppercase"
+                >
+                  <Zap className="w-5 h-5" />
+                  ĐĂNG KÝ DÙNG THỬ
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 bg-slate-800/30">
+      <section className="py-20 bg-slate-900">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-400/20 text-primary-400 rounded-full text-sm font-semibold mb-4 uppercase tracking-wide">
@@ -346,7 +300,7 @@ function HomePageContent() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-slate-900 p-8 rounded-3xl border border-slate-700/50 shadow-xl">
+              <div key={index} className="bg-slate-800/40 p-8 rounded-3xl border border-slate-700/50 shadow-xl">
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 text-primary-400 fill-primary-400" />

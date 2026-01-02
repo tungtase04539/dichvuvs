@@ -69,11 +69,15 @@ export default function Header({ settings }: HeaderProps) {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 group relative z-10">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center border border-yellow-400/30 shadow-lg group-hover:scale-110 transition-transform duration-500">
-                <Brain className="w-6 h-6 text-yellow-400" />
+            <Link href="/" className="flex items-center gap-2 group relative z-10" onClick={() => setIsMobileMenuOpen(false)}>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-transparent">
+                <img
+                  src="/logo.png"
+                  alt="Sàn trợ lý AI Logo"
+                  className="w-full h-full object-contain mix-blend-screen"
+                />
               </div>
-              <span className="text-xl font-bold text-white tracking-tight">
+              <span className="text-xl sm:text-2xl font-bold text-white tracking-tight">
                 Sàn trợ lý <span className="text-yellow-400 font-black">AI</span>
               </span>
             </Link>

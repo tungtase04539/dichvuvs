@@ -16,14 +16,13 @@ export default function FloatingButtons() {
 
   return (
     <div className="fixed bottom-24 right-4 sm:right-6 z-40 flex flex-col gap-4 items-end pointer-events-none">
-      {/* Tặng quà - Xanh Emerald & Vàng Gold */}
       <Link
         href="/qua-tang"
         className="group pointer-events-auto w-52 sm:w-64"
       >
-        <div className="relative flex items-center h-14 sm:h-16 pr-4 pl-14 sm:pl-16 bg-gradient-to-r from-emerald-600 via-green-600 to-teal-700 text-white rounded-full shadow-lg shadow-emerald-500/40 hover:shadow-emerald-500/60 transition-all duration-300 hover:scale-110 animate-glow-green border border-yellow-400/30 overflow-hidden">
+        <div className="relative flex items-center h-14 sm:h-16 pr-4 pl-14 sm:pl-16 bg-gradient-to-r from-red-600 via-red-500 to-rose-600 text-white rounded-full shadow-lg shadow-red-500/40 hover:shadow-red-500/60 transition-all duration-300 hover:scale-110 animate-glow-red border border-white/30 overflow-hidden">
           <div className="absolute left-1 sm:left-1.5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform">
-            <Gift className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600 animate-wiggle" />
+            <Gift className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 animate-wiggle" />
           </div>
           <div className="flex flex-col">
             <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] leading-none opacity-90 animate-pulse text-yellow-200">Ưu đãi hôm nay</span>
@@ -77,6 +76,10 @@ export default function FloatingButtons() {
           0%, 100% { opacity: 1; transform: scale(1) rotate(0); }
           50% { opacity: 0.5; transform: scale(0.8) rotate(45deg); }
         }
+        @keyframes glow-red {
+          0%, 100% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+          50% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.6); }
+        }
         @keyframes glow-green {
           0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
           50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.6); }
@@ -102,6 +105,7 @@ export default function FloatingButtons() {
         .animate-flash { animation: flash 0.8s infinite ease-in-out; }
         .animate-twinkle { animation: twinkle 1s infinite alternate; }
         .animate-glow-red { animation: glow-red 2s infinite ease-in-out; }
+        .animate-glow-green { animation: glow-green 2s infinite ease-in-out; }
         .animate-glow-green { animation: glow-green 2s infinite ease-in-out; }
         .animate-glow-yellow { animation: glow-yellow 2s infinite ease-in-out; }
         .animate-scan { animation: scan 3s linear infinite; }

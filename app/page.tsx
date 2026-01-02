@@ -252,7 +252,7 @@ function HomePageContent() {
                 <div className="flex justify-center">
                   <Link
                     href="/qua-tang"
-                    className="inline-flex items-center gap-2 px-10 py-4 bg-primary-400 text-slate-900 font-bold rounded-xl hover:bg-primary-300 transition-all uppercase shadow-lg shadow-primary-400/20 hover:scale-105 active:scale-95"
+                    className="inline-flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-red-600 to-rose-500 text-white font-bold rounded-xl hover:from-red-500 hover:to-rose-400 transition-all uppercase shadow-lg shadow-red-600/30 hover:shadow-red-600/50 hover:scale-105 active:scale-95"
                   >
                     <Gift className="w-6 h-6" />
                     NHẬN BÃO QUÀ TẶNG

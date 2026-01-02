@@ -103,8 +103,8 @@ export default function ProductDetailPage({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+      <div className="min-h-screen bg-[#1a0101] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-yellow-400" />
       </div>
     );
   }
@@ -150,32 +150,40 @@ export default function ProductDetailPage({
   ];
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-[#1a0101]">
       <Header settings={{ site_phone: "0345 501 969" }} />
 
       {/* Hero */}
-      <section className="bg-gradient-hero pt-32 pb-16">
-        <div className="container mx-auto px-4">
+      <section className="bg-gradient-hero pt-32 pb-20 relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute inset-0 pointer-events-none opacity-20">
+          <div className="absolute top-10 right-10 text-4xl animate-bounce">🌸</div>
+          <div className="absolute bottom-10 left-10 text-4xl animate-pulse">🏮</div>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
           <Link
             href="/san-pham"
-            className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 mb-6 transition-colors font-medium"
+            className="inline-flex items-center gap-2 text-yellow-400 hover:text-yellow-300 mb-8 transition-all font-bold group"
           >
-            <ArrowLeft className="w-4 h-4" />
-            QUAY LẠI DANH SÁCH
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <span className="uppercase tracking-widest text-sm">Quay lại danh sách</span>
           </Link>
-          <div className="flex items-center gap-4">
-            <span className="text-6xl">🤖</span>
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+            <div className="w-24 h-24 bg-yellow-400 rounded-[2rem] flex items-center justify-center text-5xl shadow-lg shadow-yellow-400/20 rotate-3">
+              🤖
+            </div>
             <div>
               {product.featured && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary-400 text-slate-900 text-xs font-bold rounded-full mb-2">
+                <span className="inline-flex items-center gap-1 px-4 py-1.5 bg-yellow-400 text-red-950 text-xs font-black rounded-full mb-3 uppercase tracking-tighter shadow-lg">
                   <Star className="w-3 h-3 fill-current" />
-                  BÁN CHẠY NHẤT
+                  Lộc Xuân Đặc Biệt
                 </span>
               )}
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              <h1 className="text-4xl md:text-5xl font-black text-white mb-4 uppercase tracking-tight">
                 {product.name}
               </h1>
-              <p className="text-slate-300 text-lg max-w-2xl leading-relaxed">
+              <p className="text-red-100/80 text-lg max-w-2xl leading-relaxed font-medium">
                 {product.description}
               </p>
             </div>
@@ -191,9 +199,12 @@ export default function ProductDetailPage({
               {/* Description */}
 
               {/* Long Description */}
-              <div className="bg-slate-800 rounded-2xl p-8 shadow-sm border border-slate-700">
-                <h2 className="text-xl font-bold text-white mb-6 uppercase">Chi tiết sản phẩm</h2>
-                <div className="prose prose-slate max-w-none">
+              <div className="bg-[#2a0101]/40 rounded-3xl p-8 md:p-10 shadow-xl border border-yellow-400/10 backdrop-blur-md">
+                <h2 className="text-2xl font-black text-white mb-8 uppercase tracking-tight flex items-center gap-3">
+                  <div className="w-2 h-8 bg-yellow-400 rounded-full" />
+                  Chi tiết Trợ lý AI
+                </h2>
+                <div className="prose prose-invert max-w-none">
                   {product.longDescription ? (
                     <div className="whitespace-pre-wrap text-slate-300">{product.longDescription}</div>
                   ) : (
@@ -373,54 +384,52 @@ export default function ProductDetailPage({
                         <div className={`absolute -inset-[2.5px] rounded-[19px] z-0 bg-[length:300%_300%] bg-gradient-to-r from-amber-600 via-yellow-200 to-amber-400 via-orange-400 to-amber-600 animate-border-sparkle`}></div>
 
                         {/* Front Side */}
-                        <div className={`relative z-10 h-full backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "gold" ? "bg-slate-900/40 border-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.4)] animate-premium-glow" : "bg-slate-900/95 border-transparent"}`}>
+                        <div className={`relative z-10 h-full backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "gold" ? "bg-[#2a0101]/60 border-yellow-400 shadow-[0_0_30px_rgba(250,204,21,0.4)] animate-premium-glow" : "bg-[#1a0101]/95 border-transparent"}`}>
                           <div className="flex justify-between items-start mb-3">
-                            <span className={`text-[10px] font-black uppercase flex items-center gap-1 tracking-wider ${selectedPackage === "gold" ? "text-white" : "text-amber-400"}`}>
-                              <Star className={`w-3 h-3 ${selectedPackage === "gold" ? "fill-white" : "fill-amber-400"}`} />
+                            <span className={`text-[10px] font-black uppercase flex items-center gap-1 tracking-wider ${selectedPackage === "gold" ? "text-white" : "text-yellow-500"}`}>
+                              <Star className={`w-3 h-3 ${selectedPackage === "gold" ? "fill-white" : "fill-yellow-500"}`} />
                               Gói VÀNG
                             </span>
-                            {selectedPackage === "gold" && <CheckCircle className="w-5 h-5 text-amber-400 drop-shadow-glow" />}
+                            {selectedPackage === "gold" && <CheckCircle className="w-5 h-5 text-yellow-400 drop-shadow-glow" />}
                           </div>
-                          <div className={`text-2xl font-black mb-1 drop-shadow-sm ${selectedPackage === "gold" ? "text-white" : "text-amber-400"}`}>{formatCurrency(priceGold)}</div>
-                          <p className={`text-[10px] mb-4 font-medium ${selectedPackage === "gold" ? "text-amber-100" : "text-amber-100/60"}`}>{descriptionGold}</p>
+                          <div className={`text-2xl font-black mb-1 drop-shadow-sm ${selectedPackage === "gold" ? "text-white" : "text-yellow-400"}`}>{formatCurrency(priceGold)}</div>
+                          <p className={`text-[10px] mb-4 font-medium ${selectedPackage === "gold" ? "text-yellow-100" : "text-yellow-100/60"}`}>{descriptionGold}</p>
 
                           <div className="mt-auto space-y-3">
-                            {selectedPackage === "gold" && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const cart = [{ id: product.id, quantity: 1, packageType: "gold" }];
-                                  sessionStorage.setItem("cart", JSON.stringify(cart));
-                                  router.push("/dat-hang");
-                                }}
-                                className="relative overflow-hidden w-full py-2.5 bg-gradient-to-r from-amber-400 to-amber-600 text-slate-900 text-xs font-black rounded-lg hover:from-amber-300 hover:to-amber-500 transition-all uppercase shadow-[0_0_15px_rgba(245,158,11,0.4)] hover:shadow-[0_0_25px_rgba(245,158,11,0.6)] group/btn"
-                              >
-                                <span className="relative z-10 flex items-center justify-center gap-2">
-                                  Đăng ký sử dụng
-                                  <Star className="w-3.5 h-3.5 fill-slate-900" />
-                                </span>
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
-                              </button>
-                            )}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const cart = [{ id: product.id, quantity: 1, packageType: "gold" }];
+                                sessionStorage.setItem("cart", JSON.stringify(cart));
+                                router.push("/dat-hang");
+                              }}
+                              className="relative overflow-hidden w-full py-2.5 bg-yellow-400 text-red-950 text-xs font-black rounded-lg hover:bg-yellow-300 transition-all uppercase shadow-[0_0_20px_rgba(250,204,21,0.4)] group/btn"
+                            >
+                              <span className="relative z-10 flex items-center justify-center gap-2">
+                                Đăng ký sử dụng
+                                <Star className="w-3.5 h-3.5 fill-red-950" />
+                              </span>
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
+                            </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setFlippedCards(prev => ({ ...prev, gold: !prev.gold }));
                               }}
-                              className="w-full text-center text-[10px] text-amber-500 font-bold hover:text-amber-400 underline underline-offset-4"
+                              className="w-full text-center text-[10px] text-yellow-500 font-bold hover:text-yellow-400 underline underline-offset-4"
                             >
-                              Xem chi tiết ưu đãi ➔
+                              Xem ưu đãi ➔
                             </button>
                           </div>
                         </div>
 
                         {/* Back Side */}
-                        <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-amber-950 border-2 border-amber-500 rotate-y-180 flex flex-col">
-                          <p className="text-white font-bold text-xs mb-2">Ưu đãi Combo Vàng:</p>
+                        <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-[#4a0404] border-2 border-yellow-400 rotate-y-180 flex flex-col shadow-2xl">
+                          <p className="text-yellow-400 font-bold text-xs mb-2">Đặc quyền Gói Vàng:</p>
                           <div className="grid grid-cols-1 gap-1.5 overflow-hidden pr-1 mb-4">
                             {featuresGoldStr.split("\n").filter((f: string) => f.trim()).map((feat: string, idx: number) => (
-                              <div key={idx} className="flex items-start gap-1.5 text-[10px] text-amber-100/90 leading-tight">
-                                <CheckCircle className="w-2.5 h-2.5 shrink-0 mt-0.5 text-amber-400" />
+                              <div key={idx} className="flex items-start gap-1.5 text-[10px] text-yellow-100/90 leading-tight">
+                                <CheckCircle className="w-2.5 h-2.5 shrink-0 mt-0.5 text-yellow-500" />
                                 <span>{feat}</span>
                               </div>
                             ))}
@@ -434,11 +443,11 @@ export default function ProductDetailPage({
                                 sessionStorage.setItem("cart", JSON.stringify(cart));
                                 router.push("/dat-hang");
                               }}
-                              className="relative overflow-hidden w-full py-2.5 bg-gradient-to-r from-amber-400 to-amber-600 text-slate-900 text-xs font-black rounded-lg hover:from-amber-300 hover:to-amber-500 transition-all uppercase shadow-[0_0_15px_rgba(245,158,11,0.4)] hover:shadow-[0_0_25px_rgba(245,158,11,0.6)] group/btn"
+                              className="relative overflow-hidden w-full py-2.5 bg-yellow-400 text-red-950 text-xs font-black rounded-lg hover:bg-yellow-300 transition-all uppercase shadow-lg group/btn"
                             >
                               <span className="relative z-10 flex items-center justify-center gap-2">
                                 Đăng ký sử dụng
-                                <Star className="w-3.5 h-3.5 fill-slate-900" />
+                                <Star className="w-3.5 h-3.5 fill-red-950" />
                               </span>
                               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
                             </button>
@@ -447,7 +456,7 @@ export default function ProductDetailPage({
                                 e.stopPropagation();
                                 setFlippedCards(prev => ({ ...prev, gold: !prev.gold }));
                               }}
-                              className="w-full text-center text-[10px] text-amber-200 font-bold hover:text-amber-300"
+                              className="w-full text-center text-[10px] text-yellow-200 font-bold hover:text-yellow-300"
                             >
                               🠔 Quay lại
                             </button>
@@ -464,16 +473,16 @@ export default function ProductDetailPage({
                         <div className={`absolute -inset-[2.5px] rounded-[19px] z-0 bg-[length:300%_300%] bg-gradient-to-r from-cyan-600 via-white to-blue-400 via-cyan-200 to-cyan-600 animate-border-sparkle`}></div>
 
                         {/* Front Side */}
-                        <div className={`relative z-10 h-full backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "platinum" ? "bg-slate-900/40 border-cyan-300 shadow-[0_0_35px_rgba(34,211,238,0.4)] animate-premium-glow-platinum" : "bg-slate-900/95 border-transparent"}`}>
+                        <div className={`relative z-10 h-full backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "platinum" ? "bg-[#2a0101]/60 border-yellow-400 shadow-[0_0_35px_rgba(250,204,21,0.4)] animate-premium-glow-platinum" : "bg-[#1a0101]/95 border-transparent"}`}>
                           <div className="flex justify-between items-start mb-3">
-                            <span className={`text-[10px] font-black uppercase flex items-center gap-1 tracking-wider ${selectedPackage === "platinum" ? "text-white" : "text-cyan-400"}`}>
+                            <span className={`text-[10px] font-black uppercase flex items-center gap-1 tracking-wider ${selectedPackage === "platinum" ? "text-white" : "text-yellow-400"}`}>
                               <Bot className="w-3 h-3" />
-                              BACH KIM
+                              BẠCH KIM
                             </span>
-                            {selectedPackage === "platinum" && <CheckCircle className="w-5 h-5 text-cyan-400 drop-shadow-glow" />}
+                            {selectedPackage === "platinum" && <CheckCircle className="w-5 h-5 text-yellow-400 drop-shadow-glow" />}
                           </div>
-                          <div className={`text-2xl font-black mb-1 drop-shadow-sm ${selectedPackage === "platinum" ? "text-white" : "text-cyan-400"}`}>{formatCurrency(pricePlatinum)}</div>
-                          <p className={`text-[10px] mb-4 font-medium ${selectedPackage === "platinum" ? "text-cyan-100" : "text-cyan-100/60"}`}>{descriptionPlatinum}</p>
+                          <div className={`text-2xl font-black mb-1 drop-shadow-sm ${selectedPackage === "platinum" ? "text-white" : "text-yellow-400"}`}>{formatCurrency(pricePlatinum)}</div>
+                          <p className={`text-[10px] mb-4 font-medium ${selectedPackage === "platinum" ? "text-yellow-100" : "text-yellow-100/60"}`}>{descriptionPlatinum}</p>
 
                           <div className="mt-auto space-y-3">
                             {selectedPackage === "platinum" && (
@@ -484,7 +493,7 @@ export default function ProductDetailPage({
                                   sessionStorage.setItem("cart", JSON.stringify(cart));
                                   router.push("/dat-hang");
                                 }}
-                                className="relative overflow-hidden w-full py-2.5 bg-gradient-to-r from-cyan-400 to-cyan-600 text-slate-900 text-xs font-black rounded-lg hover:from-cyan-300 hover:to-cyan-500 transition-all uppercase shadow-[0_0_15px_rgba(34,211,238,0.4)] hover:shadow-[0_0_25px_rgba(34,211,238,0.6)] group/btn"
+                                className="relative overflow-hidden w-full py-2.5 bg-yellow-400 text-red-950 text-xs font-black rounded-lg hover:bg-yellow-300 transition-all uppercase shadow-lg group/btn"
                               >
                                 <span className="relative z-10 flex items-center justify-center gap-2">
                                   Đăng ký sử dụng
@@ -498,20 +507,20 @@ export default function ProductDetailPage({
                                 e.stopPropagation();
                                 setFlippedCards(prev => ({ ...prev, platinum: !prev.platinum }));
                               }}
-                              className="w-full text-center text-[10px] text-cyan-400 font-bold hover:text-cyan-300 underline underline-offset-4"
+                              className="w-full text-center text-[10px] text-yellow-400 font-bold hover:text-yellow-300 underline underline-offset-4"
                             >
-                              Xem chi tiết ưu đãi ➔
+                              Xem ưu đãi ➔
                             </button>
                           </div>
                         </div>
 
                         {/* Back Side */}
-                        <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-cyan-950 border-2 border-cyan-400 rotate-y-180 flex flex-col">
-                          <p className="text-white font-bold text-xs mb-2">Đặc quyền Bạch Kim:</p>
+                        <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-[#5a0505] border-2 border-yellow-400 rotate-y-180 flex flex-col shadow-2xl">
+                          <p className="text-yellow-400 font-bold text-xs mb-2">Đặc quyền Bạch Kim:</p>
                           <div className="grid grid-cols-1 gap-1.5 overflow-hidden pr-1 mb-4">
                             {featuresPlatinumStr.split("\n").filter((f: string) => f.trim()).map((feat: string, idx: number) => (
-                              <div key={idx} className="flex items-start gap-1.5 text-[10px] text-cyan-100/90 leading-tight">
-                                <CheckCircle className="w-2.5 h-2.5 shrink-0 mt-0.5 text-cyan-400" />
+                              <div key={idx} className="flex items-start gap-1.5 text-[10px] text-yellow-100/90 leading-tight">
+                                <CheckCircle className="w-2.5 h-2.5 shrink-0 mt-0.5 text-yellow-500" />
                                 <span>{feat}</span>
                               </div>
                             ))}
@@ -525,7 +534,7 @@ export default function ProductDetailPage({
                                 sessionStorage.setItem("cart", JSON.stringify(cart));
                                 router.push("/dat-hang");
                               }}
-                              className="relative overflow-hidden w-full py-2.5 bg-gradient-to-r from-cyan-400 to-cyan-600 text-slate-900 text-xs font-black rounded-lg hover:from-cyan-300 hover:to-cyan-500 transition-all uppercase shadow-[0_0_15px_rgba(34,211,238,0.4)] hover:shadow-[0_0_25px_rgba(34,211,238,0.6)] group/btn"
+                              className="relative overflow-hidden w-full py-2.5 bg-yellow-400 text-red-950 text-xs font-black rounded-lg hover:bg-yellow-300 transition-all uppercase shadow-lg group/btn"
                             >
                               <span className="relative z-10 flex items-center justify-center gap-2">
                                 Đăng ký sử dụng
@@ -538,7 +547,7 @@ export default function ProductDetailPage({
                                 e.stopPropagation();
                                 setFlippedCards(prev => ({ ...prev, platinum: !prev.platinum }));
                               }}
-                              className="w-full text-center text-[10px] text-cyan-200 font-bold hover:text-cyan-300"
+                              className="w-full text-center text-[10px] text-yellow-200 font-bold hover:text-yellow-300"
                             >
                               🠔 Quay lại
                             </button>
@@ -558,8 +567,8 @@ export default function ProductDetailPage({
                     <span className="text-xs text-slate-500 ml-2">128 khách hàng đã tin dùng</span>
                   </div>
 
-                  <div className="pt-6 border-t border-slate-700 mt-6">
-                    <p className="text-[10px] text-slate-500 italic text-center uppercase tracking-widest font-bold">
+                  <div className="pt-6 border-t border-yellow-400/10 mt-6">
+                    <p className="text-[10px] text-yellow-500/40 italic text-center uppercase tracking-widest font-black">
                       Giao dịch được bảo mật bởi hệ thống thanh toán tự động
                     </p>
                   </div>

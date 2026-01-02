@@ -92,42 +92,48 @@ export default function CTVRecruitmentPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-slate-900 text-white">
+        <div className="min-h-screen bg-[#1a0101] text-white">
             <Header settings={{ site_phone: "0345 501 969" }} />
 
             <main className="pt-28 pb-20">
                 {/* Hero Section */}
-                <section className="container mx-auto px-4 mb-20 text-center">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-400/10 text-primary-400 rounded-full text-sm font-bold border border-primary-400/20 mb-6 uppercase tracking-widest">
-                        <Users className="w-4 h-4" />
-                        Tuyển Cộng Tác Viên AI
+                <section className="container mx-auto px-4 mb-20 text-center relative overflow-hidden">
+                    {/* Decorations */}
+                    <div className="absolute inset-0 pointer-events-none opacity-20">
+                        <div className="absolute top-0 right-[10%] text-6xl animate-bounce">🏮</div>
+                        <div className="absolute bottom-0 left-[10%] text-5xl animate-pulse">🌸</div>
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tight">
+
+                    <div className="inline-flex items-center gap-2 px-5 py-2 bg-yellow-400 text-red-950 rounded-full text-sm font-black mb-10 uppercase tracking-[0.2em] shadow-lg shadow-yellow-400/20 relative z-10">
+                        <Users className="w-4 h-4" />
+                        Lộc Xuân Tuyển Dụng 2026
+                    </div>
+                    <h1 className="text-5xl md:text-7xl font-black mb-8 tracking-tighter uppercase relative z-10">
                         GIA NHẬP ĐỘI NGŨ <br className="hidden md:block" />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-primary-200 to-white">
+                        <span className="text-yellow-400 drop-shadow-[0_0_30px_rgba(250,204,21,0.3)]">
                             SÀN TRỢ LÝ AI
                         </span>
                     </h1>
-                    <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-                        Sở hữu nguồn thu nhập thụ động bền vững bằng cách mang giải pháp Trợ lý AI chuyên biệt đến cho doanh nghiệp và hộ kinh doanh.
+                    <p className="text-red-100/70 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-medium relative z-10">
+                        Sở hữu nguồn thu nhập thụ động bền vững bằng cách lan tỏa giải pháp Trợ lý AI chuyên biệt trong dịp khai xuân rạng rỡ.
                     </p>
                 </section>
 
                 <section className="container mx-auto px-4 grid lg:grid-cols-2 gap-12 items-start">
-                    {/* Benefits */}
-                    <div className="space-y-8">
-                        <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
-                            <Sparkles className="w-8 h-8 text-primary-400" />
-                            Tại sao nên trở thành CTV?
+                    {/* Benefits Section */}
+                    <div className="space-y-12">
+                        <h2 className="text-3xl md:text-4xl font-black flex items-center gap-4 uppercase tracking-tight">
+                            <Sparkles className="w-10 h-10 text-yellow-400" />
+                            Đặc quyền CTV
                         </h2>
-                        <div className="grid sm:grid-cols-2 gap-6">
+                        <div className="grid sm:grid-cols-2 gap-8">
                             {benefits.map((b, i) => (
-                                <div key={i} className="p-6 bg-slate-800/40 rounded-2xl border border-white/5 hover:border-primary-400/30 transition-all hover:translate-y-[-4px]">
-                                    <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center mb-4 shadow-inner">
+                                <div key={i} className="group p-8 bg-[#2a0101]/40 rounded-[2.5rem] border border-yellow-400/5 hover:border-yellow-400/30 transition-all hover:-translate-y-2 duration-500">
+                                    <div className="w-16 h-16 bg-[#1a0101] rounded-2xl flex items-center justify-center mb-6 shadow-inner border border-yellow-400/10 group-hover:bg-yellow-400 group-hover:text-red-950 transition-colors">
                                         {b.icon}
                                     </div>
-                                    <h3 className="font-bold text-lg mb-2">{b.title}</h3>
-                                    <p className="text-slate-400 text-sm leading-relaxed">{b.description}</p>
+                                    <h3 className="font-black text-xl mb-3 text-white uppercase tracking-tight">{b.title}</h3>
+                                    <p className="text-red-100/50 text-sm leading-relaxed font-medium">{b.description}</p>
                                 </div>
                             ))}
                         </div>
@@ -135,25 +141,25 @@ export default function CTVRecruitmentPage() {
 
                     {/* Registration Form Card */}
                     <div className="relative group">
-                        <div className="absolute -inset-1 bg-gradient-to-r from-primary-500 to-purple-600 rounded-3xl blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-                        <div className="relative bg-slate-800/80 backdrop-blur-xl p-8 md:p-10 rounded-3xl border border-white/10 shadow-2xl">
+                        <div className="absolute -inset-1 bg-yellow-400 rounded-[3rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+                        <div className="relative bg-[#2a0101]/80 backdrop-blur-2xl p-8 md:p-12 rounded-[3rem] border border-yellow-400/10 shadow-2xl">
                             {!isSuccess ? (
                                 <>
-                                    <div className="mb-8">
-                                        <h2 className="text-2xl font-bold mb-2">Đăng ký ngay</h2>
-                                        <p className="text-slate-400">Điền thông tin bên dưới, chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.</p>
+                                    <div className="mb-10 text-center">
+                                        <h2 className="text-3xl font-black mb-3 uppercase tracking-tight">Đăng ký tham gia</h2>
+                                        <p className="text-red-100/50 font-medium">Bắt đầu hành trình chinh phục AI ngay hôm nay.</p>
                                     </div>
 
                                     <form onSubmit={handleSubmit} className="space-y-6">
                                         <div className="space-y-2">
-                                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Họ và tên</label>
+                                            <label className="text-xs font-black text-yellow-500/60 uppercase tracking-widest ml-1">Họ và tên</label>
                                             <input
                                                 required
                                                 type="text"
                                                 placeholder="VD: Nguyễn Văn An"
                                                 value={formData.fullName}
                                                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                                                className="w-full px-5 py-4 bg-slate-900/50 border border-white/10 rounded-2xl focus:border-primary-400 focus:ring-1 focus:ring-primary-400/30 outline-none transition-all placeholder:text-slate-600"
+                                                className="w-full px-6 py-4 bg-[#1a0101]/60 border border-yellow-400/10 rounded-2xl focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/30 outline-none transition-all placeholder:text-white/10 font-medium text-white"
                                             />
                                         </div>
 
@@ -171,25 +177,25 @@ export default function CTVRecruitmentPage() {
 
                                         <div className="grid md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
-                                                <label className="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Số điện thoại</label>
+                                                <label className="text-xs font-black text-yellow-500/60 uppercase tracking-widest ml-1">Số điện thoại</label>
                                                 <input
                                                     required
                                                     type="tel"
                                                     placeholder="Số điện thoại Zalo"
                                                     value={formData.phone}
                                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                                    className="w-full px-5 py-4 bg-slate-900/50 border border-white/10 rounded-2xl focus:border-primary-400 focus:ring-1 focus:ring-primary-400/30 outline-none transition-all placeholder:text-slate-600"
+                                                    className="w-full px-6 py-4 bg-[#1a0101]/60 border border-yellow-400/10 rounded-2xl focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/30 outline-none transition-all placeholder:text-white/10 font-medium text-white"
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Email</label>
+                                                <label className="text-xs font-black text-yellow-500/60 uppercase tracking-widest ml-1">Email</label>
                                                 <input
                                                     required
                                                     type="email"
                                                     placeholder="Email liên hệ"
                                                     value={formData.email}
                                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                                    className="w-full px-5 py-4 bg-slate-900/50 border border-white/10 rounded-2xl focus:border-primary-400 focus:ring-1 focus:ring-primary-400/30 outline-none transition-all placeholder:text-slate-600"
+                                                    className="w-full px-6 py-4 bg-[#1a0101]/60 border border-yellow-400/10 rounded-2xl focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/30 outline-none transition-all placeholder:text-white/10 font-medium text-white"
                                                 />
                                             </div>
                                         </div>

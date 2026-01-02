@@ -9,8 +9,10 @@
   --primary-dark: #eab308;
   --primary-light: #fde047;
   --accent: #facc15;
-  --dark: #0f172a;
-  --dark-light: #1e293b;
+  --dark: #1a0101;
+  --dark-light: #2a0101;
+  --red-premium: #4a0404;
+  --red-deep: #2a0101;
 }
 
 * {
@@ -62,7 +64,7 @@ body {
   }
   
   .btn-primary {
-    @apply bg-primary-400 text-slate-900 hover:bg-primary-300 shadow-lg shadow-primary-400/30 hover:shadow-xl hover:shadow-primary-400/40 active:scale-[0.98];
+    @apply bg-yellow-400 text-red-950 hover:bg-yellow-300 shadow-lg shadow-yellow-400/20 hover:shadow-xl hover:shadow-yellow-400/30 active:scale-[0.98] font-bold;
   }
   
   .btn-secondary {
@@ -140,11 +142,11 @@ body {
 
   /* Glass Effect */
   .glass {
-    @apply bg-slate-900/80 backdrop-blur-lg border border-slate-700/50;
+    @apply bg-[#2a0101]/60 backdrop-blur-lg border border-yellow-400/10;
   }
 
   .glass-dark {
-    @apply bg-slate-950/80 backdrop-blur-lg border border-slate-800/50;
+    @apply bg-[#1a0101]/80 backdrop-blur-lg border border-yellow-400/20;
   }
 }
 
@@ -169,15 +171,15 @@ body {
 
 /* Gradient backgrounds */
 .bg-gradient-hero {
-  background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e293b 100%);
+  background: linear-gradient(135deg, #4a0404 0%, #2a0101 50%, #1a0101 100%);
 }
 
 .bg-gradient-section {
-  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+  background: linear-gradient(180deg, #2a0101 0%, #1a0101 100%);
 }
 
 .bg-gradient-cta {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background: linear-gradient(135deg, #6b0000 0%, #2a0101 100%);
   border: 1px solid rgba(250, 204, 21, 0.2);
 }
 

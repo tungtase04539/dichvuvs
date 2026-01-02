@@ -151,7 +151,7 @@ export default function ProductDetailPage({
 
   return (
     <div className="min-h-screen bg-slate-900">
-      <Header settings={{}} />
+      <Header settings={{ site_phone: "0345 501 969" }} />
 
       {/* Hero */}
       <section className="bg-gradient-hero pt-32 pb-16">
@@ -652,11 +652,11 @@ export default function ProductDetailPage({
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                 <a
-                  href="tel:0363189699"
+                  href="tel:0345501969"
                   className="btn bg-primary-400 text-slate-900 hover:bg-primary-300 px-10 py-4 text-xl font-black uppercase shadow-xl shadow-primary-400/40 flex items-center gap-3 transition-all hover:scale-105"
                 >
                   <Bot className="w-6 h-6" />
-                  0363 189 699
+                  0345 501 969
                 </a>
                 <span className="text-slate-500 font-bold uppercase tracking-widest text-sm">Hoặc Chat qua Zalo</span>
               </div>
@@ -665,7 +665,7 @@ export default function ProductDetailPage({
         </div>
       </main>
 
-      <Footer settings={{}} />
+      <Footer settings={{ site_phone: "0345 501 969" }} />
     </div>
   );
 }

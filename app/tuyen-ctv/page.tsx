@@ -93,7 +93,7 @@ export default function CTVRecruitmentPage() {
 
     return (
         <div className="min-h-screen bg-slate-900 text-white">
-            <Header settings={{ site_phone: "0363 189 699" }} />
+            <Header settings={{ site_phone: "0345 501 969" }} />
 
             <main className="pt-28 pb-20">
                 {/* Hero Section */}
@@ -252,7 +252,7 @@ export default function CTVRecruitmentPage() {
                 </section>
             </main>
 
-            <Footer settings={{ site_phone: "0363 189 699" }} />
+            <Footer settings={{ site_phone: "0345 501 969" }} />
         </div>
     );
 }

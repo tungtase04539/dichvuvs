@@ -183,8 +183,8 @@ export default function LoginPage() {
         {/* Help */}
         <p className="text-center text-sm text-slate-500 mt-6">
           Cần hỗ trợ?{" "}
-          <a href="tel:0363189699" className="text-primary-400 hover:text-primary-300">
-            0363 189 699
+          <a href="tel:0345501969" className="text-primary-400 hover:text-primary-300">
+            0345 501 969
           </a>
         </p>
       </div>

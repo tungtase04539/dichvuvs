@@ -23,7 +23,7 @@ interface Product {
 function ProductsContent() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category");
-  
+
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,13 +37,13 @@ function ProductsContent() {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const baseUrl = categoryParam 
+        const baseUrl = categoryParam
           ? `/api/products?category=${categoryParam}`
           : "/api/products";
         // Thêm timestamp để tránh cache, sử dụng & nếu đã có query params
         const separator = categoryParam ? "&" : "?";
         const url = `${baseUrl}${separator}_=${Date.now()}`;
-        
+
         const res = await fetch(url, {
           cache: 'no-store',
           headers: {
@@ -143,7 +143,7 @@ function ProductsContent() {
             TẤT CẢ <span className="text-primary-400">CHATBOT</span>
           </h1>
           <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-8">
-            Chọn ChatBot AI phù hợp với nhu cầu kinh doanh của bạn. 
+            Chọn ChatBot AI phù hợp với nhu cầu kinh doanh của bạn.
             Mỗi bot chỉ <span className="text-primary-400 font-bold">29K/tháng</span>!
           </p>
 
@@ -208,7 +208,7 @@ function ProductsContent() {
                         </span>
                       </div>
                     )}
-                    
+
                     {/* Product Image or Icon - Clickable */}
                     <Link href={`/san-pham/${product.slug}`} className="block">
                       {product.image ? (
@@ -234,7 +234,7 @@ function ProductsContent() {
                           {product.name}
                         </h3>
                       </Link>
-                      
+
                       <p className="text-slate-400 text-sm mb-4 line-clamp-2 flex-grow">
                         {product.description}
                       </p>
@@ -250,7 +250,7 @@ function ProductsContent() {
                               {formatCurrency(product.price * 2)}
                             </span>
                           </div>
-                          <Link 
+                          <Link
                             href={`/san-pham/${product.slug}`}
                             className="w-9 h-9 rounded-full bg-primary-400/20 flex items-center justify-center hover:bg-primary-400 transition-colors"
                           >
@@ -308,10 +308,10 @@ function ProductsContent() {
                       MUA NHIỀU CHATBOT
                     </Link>
                     <a
-                      href="tel:0363189699"
+                      href="tel:0345501969"
                       className="btn bg-transparent text-primary-400 border-2 border-primary-400/50 hover:bg-primary-400/10 font-bold uppercase"
                     >
-                      TƯ VẤN: 0363 189 699
+                      TƯ VẤN: 0345 501 969
                     </a>
                   </div>
                 </div>

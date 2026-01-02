@@ -144,7 +144,7 @@ function HomePageContent() {
 
   return (
     <div className="min-h-screen bg-slate-900">
-      <Header settings={{ site_phone: "0363 189 699" }} />
+      <Header settings={{ site_phone: "0345 501 969" }} />
 
       {/* Hero Section */}
       <section className="pt-28 pb-16 bg-gradient-to-b from-slate-800 via-slate-900 to-slate-900 relative overflow-hidden">
@@ -159,8 +159,8 @@ function HomePageContent() {
               <Sparkles className="w-4 h-4" />
               #1 SÀN TRỢ LÝ AI TẠI VIỆT NAM
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 uppercase">
-              DANH SÁCH <span className="text-primary-400">TRỢ LÝ AI</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 uppercase tracking-tight">
+              SÀN TRỢ LÝ AI <span className="text-primary-400">SIÊU THÔNG MINH VIP</span> <span className="text-white/80 text-2xl md:text-3xl block mt-2">( CHATBOT AI )</span>
             </h1>
             <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto">
               Sở hữu ngay Trợ lý AI tối ưu cho ngành nghề của bạn.
@@ -172,7 +172,7 @@ function HomePageContent() {
             <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-700/50">
               <h3 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
                 <Bot className="w-6 h-6 text-primary-400" />
-                Dành cho bạn
+                DANH SÁCH CÁC TRỢ LÝ AI
                 <span className="bg-primary-400/10 text-primary-400 text-sm px-3 py-1 rounded-full border border-primary-400/20">
                   {allProducts.length} trợ lý chuyên biệt
                 </span>
@@ -254,7 +254,7 @@ function HomePageContent() {
                   className="inline-flex items-center gap-2 px-6 py-3 bg-primary-400 text-slate-900 font-bold rounded-xl hover:bg-primary-300 transition-all uppercase"
                 >
                   <Gift className="w-5 h-5" />
-                  NHẬN QUÀ NGAY
+                  NHẬN BÃO QUÀ TẶNG CỰC XỊN
                   <ArrowRight className="w-5 h-5" />
                 </Link>
               </div>
@@ -336,14 +336,14 @@ function HomePageContent() {
             <Link href="/dat-hang" className="px-10 py-5 bg-white text-primary-600 hover:bg-primary-50 text-lg font-black rounded-2xl shadow-2xl transition-all hover:scale-105 active:scale-95 uppercase">
               MUA TRỢ LÝ AI NGAY
             </Link>
-            <a href="tel:0363189699" className="px-10 py-5 bg-transparent text-white border-2 border-white/40 hover:bg-white/10 text-lg font-black rounded-2xl transition-all uppercase">
-              GỌI TƯ VẤN: 0363 189 699
+            <a href="tel:0345501969" className="px-10 py-5 bg-transparent text-white border-2 border-white/40 hover:bg-white/10 text-lg font-black rounded-2xl transition-all uppercase">
+              GỌI TƯ VẤN: 0345 501 969
             </a>
           </div>
         </div>
       </section>
 
-      <Footer settings={{ site_phone: "0363 189 699" }} />
+      <Footer settings={{ site_phone: "0345 501 969" }} />
 
       <VideoModal
         isOpen={videoModal.isOpen}

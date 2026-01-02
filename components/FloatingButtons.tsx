@@ -27,7 +27,7 @@ export default function FloatingButtons() {
           </div>
           <div className="flex flex-col">
             <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] leading-none opacity-90 animate-pulse text-yellow-200">Ưu đãi hôm nay</span>
-            <span className="font-black text-sm sm:text-lg whitespace-nowrap drop-shadow-sm uppercase">TẶNG QUÀ MIỄN PHÍ</span>
+            <span className="font-black text-sm sm:text-lg whitespace-nowrap drop-shadow-sm uppercase text-white animate-bounce-slow">BÃO QUÀ TẶNG CỰC XỊN</span>
           </div>
           <Sparkles className="absolute top-1 right-2 w-4 h-4 text-yellow-300 animate-twinkle" />
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />

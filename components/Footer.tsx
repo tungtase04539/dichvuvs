@@ -109,8 +109,8 @@ export default function Footer({ settings }: FooterProps) {
                 </div>
                 <div>
                   <p className="text-sm text-slate-500">HOTLINE/ZALO</p>
-                  <a href={`tel:${settings.site_phone?.replace(/[\s–]/g, "").split("–")[0] || "0363189699"}`} className="font-semibold text-white hover:text-primary-400">
-                    {settings.site_phone || "0363 189 699 – 0345 501 969"}
+                  <a href={`tel:${settings.site_phone?.replace(/[\s–]/g, "").split("–")[0] || "0345501969"}`} className="font-semibold text-white hover:text-primary-400">
+                    {settings.site_phone || "0345 501 969"}
                   </a>
                 </div>
               </li>

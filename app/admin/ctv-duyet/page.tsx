@@ -80,6 +80,10 @@ export default function AdminCTVApprovalPage() {
             });
 
             if (res.ok) {
+                const data = await res.json();
+                if (action === "approve") {
+                    alert(data.message || "Duyệt thành công");
+                }
                 setApplications(prev => prev.filter(app => app.id !== id));
             } else {
                 const data = await res.json();

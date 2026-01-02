@@ -55,8 +55,8 @@ export default function Header({ settings }: HeaderProps) {
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-300 overflow-hidden",
           isScrolled || isMobileMenuOpen
-            ? "bg-gradient-to-r from-red-700 via-red-600 to-red-800 shadow-lg shadow-black/50 py-2 sm:py-3"
-            : "bg-red-700/90 backdrop-blur-md py-3 sm:py-5 border-b border-yellow-400/30"
+            ? "bg-gradient-to-r from-[#5a0505] via-[#4a0404] to-[#6b0000] shadow-xl shadow-black/60 py-2 sm:py-3 border-b border-yellow-400/20"
+            : "bg-[#4a0404]/90 backdrop-blur-xl py-3 sm:py-5 border-b border-yellow-400/30"
         )}
       >
         {/* Tet Decorations */}

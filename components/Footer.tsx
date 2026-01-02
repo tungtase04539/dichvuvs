@@ -11,7 +11,7 @@ export default function Footer({ settings }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-slate-950 text-white border-t border-slate-800">
+    <footer className="bg-[#110101] text-white border-t border-yellow-400/10">
       <div className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand */}
@@ -21,7 +21,7 @@ export default function Footer({ settings }: FooterProps) {
                 <img src="/logo.png" alt="Sàn trợ lý AI Logo" className="w-full h-full object-contain" />
               </div>
               <span className="text-2xl font-bold">
-                Sàn trợ lý <span className="text-primary-400">AI</span>
+                Sàn trợ lý <span className="text-yellow-400 font-black">AI</span>
               </span>
             </Link>
             <p className="text-slate-400 mb-6 leading-relaxed">
@@ -30,7 +30,7 @@ export default function Footer({ settings }: FooterProps) {
             <div className="flex gap-3">
               <a
                 href="#"
-                className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-primary-400 hover:text-slate-900 flex items-center justify-center transition-colors"
+                className="w-10 h-10 rounded-xl bg-white/5 hover:bg-yellow-400 hover:text-red-900 flex items-center justify-center transition-all hover:scale-110 shadow-lg shadow-black/20"
               >
                 <Facebook className="w-5 h-5" />
               </a>
@@ -38,7 +38,7 @@ export default function Footer({ settings }: FooterProps) {
                 href="https://zalo.me/0345501969"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-primary-400 hover:text-slate-900 flex items-center justify-center transition-colors"
+                className="w-10 h-10 rounded-xl bg-white/5 hover:bg-yellow-400 hover:text-red-900 flex items-center justify-center transition-all hover:scale-110 shadow-lg shadow-black/20"
               >
                 <MessageCircle className="w-5 h-5" />
               </a>
@@ -47,7 +47,7 @@ export default function Footer({ settings }: FooterProps) {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-bold mb-4 text-primary-400 uppercase">SẢN PHẨM</h3>
+            <h3 className="text-lg font-black mb-6 text-yellow-500 uppercase tracking-widest">SẢN PHẨM</h3>
             <ul className="space-y-3">
               <li>
                 <Link href="/san-pham" className="text-slate-400 hover:text-primary-400 transition-colors">
@@ -65,7 +65,7 @@ export default function Footer({ settings }: FooterProps) {
                 </Link>
               </li>
               <li>
-                <Link href="/tuyen-ctv" className="text-slate-400 hover:text-primary-400 transition-colors font-semibold">
+                <Link href="/tuyen-ctv" className="text-slate-400 hover:text-yellow-400 transition-colors font-bold">
                   Tuyển Cộng tác viên
                 </Link>
               </li>
@@ -74,7 +74,7 @@ export default function Footer({ settings }: FooterProps) {
 
           {/* Support */}
           <div>
-            <h3 className="text-lg font-bold mb-4 text-primary-400 uppercase">HỖ TRỢ</h3>
+            <h3 className="text-lg font-black mb-6 text-yellow-500 uppercase tracking-widest">HỖ TRỢ</h3>
             <ul className="space-y-3">
               <li>
                 <a href="#" className="text-slate-400 hover:text-primary-400 transition-colors">
@@ -101,46 +101,46 @@ export default function Footer({ settings }: FooterProps) {
 
           {/* Contact */}
           <div>
-            <h3 className="text-lg font-bold mb-4 text-primary-400 uppercase">LIÊN HỆ</h3>
+            <h3 className="text-lg font-black mb-6 text-yellow-500 uppercase tracking-widest">LIÊN HỆ</h3>
             <ul className="space-y-4">
               <li className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary-400/20 flex items-center justify-center">
-                  <Phone className="w-5 h-5 text-primary-400" />
+                <div className="w-10 h-10 rounded-xl bg-yellow-400/10 flex items-center justify-center border border-yellow-400/20">
+                  <Phone className="w-5 h-5 text-yellow-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500">HOTLINE/ZALO</p>
-                  <a href={`tel:${settings.site_phone?.replace(/[\s–]/g, "").split("–")[0] || "0345501969"}`} className="font-semibold text-white hover:text-primary-400">
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none mb-1">HOTLINE/ZALO</p>
+                  <a href={`tel:${settings.site_phone?.replace(/[\s–]/g, "").split("–")[0] || "0345501969"}`} className="font-bold text-white hover:text-yellow-400">
                     {settings.site_phone || "0345 501 969"}
                   </a>
                 </div>
               </li>
               <li className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary-400/20 flex items-center justify-center">
-                  <Mail className="w-5 h-5 text-primary-400" />
+                <div className="w-10 h-10 rounded-xl bg-yellow-400/10 flex items-center justify-center border border-yellow-400/20">
+                  <Mail className="w-5 h-5 text-yellow-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500">EMAIL</p>
-                  <a href="mailto:support@chatbotvn.com" className="font-semibold text-white hover:text-primary-400">
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none mb-1">EMAIL</p>
+                  <a href="mailto:support@chatbotvn.com" className="font-bold text-white hover:text-yellow-400">
                     support@chatbotvn.com
                   </a>
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary-400/20 flex items-center justify-center shrink-0">
-                  <MapPin className="w-5 h-5 text-primary-400" />
+                <div className="w-10 h-10 rounded-xl bg-yellow-400/10 flex items-center justify-center shrink-0 border border-yellow-400/20">
+                  <MapPin className="w-5 h-5 text-yellow-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500">ĐỊA CHỈ</p>
-                  <p className="font-semibold text-white">RUBY CT1-2-3 PHÚC LỢI – HÀ NỘI</p>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none mb-1">ĐỊA CHỈ</p>
+                  <p className="font-bold text-white">RUBY CT1-2-3 PHÚC LỢI – HÀ NỘI</p>
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary-400/20 flex items-center justify-center shrink-0">
-                  <MessageCircle className="w-5 h-5 text-primary-400" />
+                <div className="w-10 h-10 rounded-xl bg-yellow-400/10 flex items-center justify-center shrink-0 border border-yellow-400/20">
+                  <MessageCircle className="w-5 h-5 text-yellow-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500">ZALO HỖ TRỢ</p>
-                  <a href="https://zalo.me/0345501969" target="_blank" rel="noopener noreferrer" className="font-semibold text-white hover:text-primary-400">
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none mb-1">ZALO HỖ TRỢ</p>
+                  <a href="https://zalo.me/0345501969" target="_blank" rel="noopener noreferrer" className="font-bold text-white hover:text-yellow-400">
                     Liên hệ Zalo
                   </a>
                 </div>
@@ -157,9 +157,9 @@ export default function Footer({ settings }: FooterProps) {
             <p className="text-slate-500 text-sm">
               © {currentYear} Sàn trợ lý AI. All rights reserved.
             </p>
-            <div className="flex items-center gap-2 text-sm text-slate-500">
+            <div className="flex items-center gap-2 text-sm text-slate-500 group">
               <span>Được phát triển với</span>
-              <span className="text-primary-400">❤️</span>
+              <span className="text-yellow-400 animate-pulse">❤️</span>
               <span>tại Việt Nam</span>
             </div>
           </div>

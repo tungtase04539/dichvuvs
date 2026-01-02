@@ -143,40 +143,53 @@ function HomePageContent() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-[#1a0101]">
       <Header settings={{ site_phone: "0345 501 969" }} />
 
       {/* Hero Section */}
-      <section className="pt-28 pb-16 bg-gradient-to-b from-slate-800 via-slate-900 to-slate-900 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-primary-400 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary-600 rounded-full blur-3xl" />
+      <section className="pt-28 pb-16 bg-gradient-to-b from-[#4a0404] via-[#2a0101] to-[#1a0101] relative overflow-hidden">
+        {/* Tet Decorations */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-10 left-10 text-4xl animate-bounce opacity-30" style={{ animationDuration: '4s' }}>🌸</div>
+          <div className="absolute top-24 right-20 text-3xl animate-pulse opacity-30" style={{ animationDuration: '3s' }}>🌼</div>
+          <div className="absolute top-40 left-1/4 text-5xl animate-bounce opacity-10" style={{ animationDuration: '5s' }}>🏮</div>
+          <div className="absolute top-60 right-1/4 text-4xl animate-pulse opacity-10" style={{ animationDuration: '6s' }}>🏮</div>
+
+          <div className="absolute top-20 left-10 w-72 h-72 bg-red-600 rounded-full blur-[120px] opacity-20" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-yellow-600 rounded-full blur-[120px] opacity-10" />
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-400/20 text-primary-400 rounded-full text-sm font-semibold mb-6 uppercase tracking-wide border border-primary-400/30">
-              <Sparkles className="w-4 h-4" />
-              #1 SÀN TRỢ LÝ AI TẠI VIỆT NAM
+            <div className="inline-flex items-center gap-2 px-6 py-2 bg-yellow-400/10 text-yellow-400 rounded-full text-sm font-bold mb-6 uppercase tracking-widest border border-yellow-400/30 backdrop-blur-md shadow-[0_0_20px_rgba(250,204,21,0.2)]">
+              <Sparkles className="w-4 h-4 animate-spin-slow" />
+              #1 SÀN TRỢ LÝ AI TẠI VIỆT NAM - XUÂN BÍNH NGỌ 2026
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 uppercase tracking-tight">
-              SÀN TRỢ LÝ AI <span className="text-primary-400">SIÊU THÔNG MINH VIP</span> <span className="text-white/80 text-2xl md:text-3xl block mt-2">( CHATBOT AI )</span>
+            <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-white mb-6 uppercase tracking-tight leading-tight">
+              SÀN TRỢ LÝ AI <span className="text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.4)]">SIÊU THÔNG MINH</span> <br />
+              <span className="text-white/80 text-2xl md:text-4xl block mt-4 font-bold">( CHATBOT AI THẾ HỆ MỚI )</span>
             </h1>
-            <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto">
-              Sở hữu ngay Trợ lý AI tối ưu cho ngành nghề của bạn.
-              Chỉ từ <span className="text-primary-400 font-bold">29K/tháng</span>!
+            <p className="text-lg md:text-2xl text-slate-200 max-w-2xl mx-auto font-medium">
+              Khai xuân rạng rỡ với Trợ lý AI tối ưu cho doanh nghiệp.
+              Giá cực lộc chỉ từ <span className="text-yellow-400 font-black decoration-yellow-400/30 underline underline-offset-8">29K/tháng</span>!
             </p>
           </div>
 
-          <div className="bg-slate-800/50 rounded-3xl p-6 md:p-8 border border-slate-700/50 backdrop-blur-sm">
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-700/50">
-              <h3 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
-                <Bot className="w-6 h-6 text-primary-400" />
-                DANH SÁCH CÁC TRỢ LÝ AI
-                <span className="bg-primary-400/10 text-primary-400 text-sm px-3 py-1 rounded-full border border-primary-400/20">
-                  {allProducts.length} trợ lý chuyên biệt
-                </span>
+          <div className="bg-[#2a0101]/60 rounded-[2.5rem] p-6 md:p-10 border border-yellow-400/20 backdrop-blur-xl shadow-2xl relative">
+            <div className="absolute top-0 left-10 -translate-y-1/2 bg-yellow-400 text-red-900 px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest shadow-lg border-2 border-white">
+              Lộc Xuân Tràn Đầy
+            </div>
+
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 pb-6 border-b border-yellow-400/10 gap-4">
+              <h3 className="text-2xl md:text-3xl font-black text-white flex items-center gap-4 uppercase tracking-tighter">
+                <div className="w-12 h-12 bg-yellow-400 rounded-2xl flex items-center justify-center shadow-lg rotate-3 group-hover:rotate-0 transition-transform">
+                  <Bot className="w-7 h-7 text-red-800" />
+                </div>
+                DANH SÁCH TRỢ LÝ AI
               </h3>
+              <div className="bg-white/10 text-yellow-200 text-sm px-5 py-2 rounded-full border border-yellow-400/20 font-bold backdrop-blur-md">
+                {allProducts.length} trợ lý chuyên nghiệp
+              </div>
             </div>
 
             {allProducts.length > 0 ? (
@@ -184,7 +197,7 @@ function HomePageContent() {
                 {allProducts.map((product) => (
                   <div
                     key={product.id}
-                    className="flex flex-col p-4 bg-slate-700/30 rounded-2xl hover:bg-slate-700/50 transition-all group hover:scale-[1.02] border border-slate-700/50 hover:border-primary-400/50 shadow-lg"
+                    className="flex flex-col p-5 bg-[#3a0202]/40 rounded-3xl hover:bg-[#4a0404]/60 transition-all group hover:scale-[1.05] border border-white/5 hover:border-yellow-400/50 shadow-xl relative overflow-hidden"
                   >
                     <Link href={`/san-pham/${product.slug}`} className="flex flex-col flex-1">
                       <div className="w-full aspect-video rounded-xl bg-slate-600 flex items-center justify-center mb-4 overflow-hidden relative shadow-inner">
@@ -203,20 +216,20 @@ function HomePageContent() {
                           </span>
                         </div>
                       </div>
-                      <div className="flex-1 flex flex-col">
-                        <h4 className="font-bold text-white group-hover:text-primary-400 transition-colors mb-2 line-clamp-2 text-lg">
+                      <div className="flex-1 flex flex-col pt-4">
+                        <h4 className="font-black text-white group-hover:text-yellow-400 transition-colors mb-3 line-clamp-2 text-xl uppercase tracking-tight">
                           {product.name}
                         </h4>
-                        <p className="text-sm text-slate-400 mb-4 line-clamp-2 flex-grow leading-relaxed">
+                        <p className="text-base text-slate-300/80 mb-5 line-clamp-3 flex-grow leading-relaxed">
                           {product.description}
                         </p>
-                        <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-700/50">
+                        <div className="flex items-center justify-between mt-auto pt-5 border-t border-white/5">
                           <div className="flex flex-col">
-                            <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Chỉ từ</span>
-                            <span className="text-primary-400 font-black text-xl">{formatCurrency(product.price)}</span>
+                            <span className="text-[10px] text-yellow-500/60 uppercase font-black tracking-widest">Giá khai xuân</span>
+                            <span className="text-yellow-400 font-black text-2xl drop-shadow-sm">{formatCurrency(product.price)}</span>
                           </div>
-                          <div className="p-2 bg-primary-400 text-slate-900 rounded-lg group-hover:scale-110 transition-transform">
-                            <ArrowRight className="w-5 h-5" />
+                          <div className="w-12 h-12 bg-yellow-400 text-red-900 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all shadow-lg">
+                            <ArrowRight className="w-6 h-6" />
                           </div>
                         </div>
                       </div>
@@ -235,7 +248,7 @@ function HomePageContent() {
       </section>
 
       {/* Gift & Free Trial Section */}
-      <section className="py-16 bg-slate-800">
+      <section className="py-20 bg-[#2a0101]">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto">
             {/* Quà tặng */}
@@ -247,7 +260,7 @@ function HomePageContent() {
                 <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-red-500/20 to-rose-600/10 flex items-center justify-center mb-6 border border-red-500/20 shadow-inner group-hover:scale-110 transition-transform duration-500">
                   <Gift className="w-8 h-8 text-red-500" />
                 </div>
-                <h3 className="text-3xl font-black text-white mb-3 uppercase text-center tracking-tight">NHẬN QUÀ <span className="text-red-500">MIỄN PHÍ</span></h3>
+                <h3 className="text-3xl font-black text-white mb-3 uppercase text-center tracking-tight">NHẬN QUÀ <span className="text-yellow-400">KHAI XUÂN</span></h3>
                 <p className="text-slate-400 mb-8 text-center text-lg leading-relaxed max-w-lg mx-auto">
                   Tham gia cộng đồng ngay để nhận Trợ lý AI miễn phí và nhận gói quà tặng đặc biệt trị giá <span className="text-red-400 font-bold">2.000.000đ</span>!
                 </p>
@@ -268,34 +281,36 @@ function HomePageContent() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 bg-slate-900">
+      <section className="py-24 bg-[#1a0101] relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-yellow-400/30 to-transparent" />
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-400/20 text-primary-400 rounded-full text-sm font-semibold mb-4 uppercase tracking-wide">
-              <Star className="w-4 h-4" />
-              ĐÁNH GIÁ
+            <span className="inline-flex items-center gap-2 px-6 py-2 bg-yellow-400/10 text-yellow-400 rounded-full text-sm font-bold mb-6 uppercase tracking-widest border border-yellow-400/20">
+              <Star className="w-4 h-4 fill-yellow-400" />
+              ĐÁNH GIÁ TỪ KHÁCH HÀNG
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 uppercase">
-              KHÁCH HÀNG <span className="text-primary-400">NÓI GÌ</span>?
+            <h2 className="text-3xl md:text-5xl font-black text-white mb-8 uppercase tracking-tighter">
+              CHIA SẺ <span className="text-yellow-400">ĐẦU XUÂN</span>
             </h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-slate-800/40 p-8 rounded-3xl border border-slate-700/50 shadow-xl">
-                <div className="flex items-center gap-1 mb-4">
+              <div key={index} className="bg-[#2a0101]/40 p-8 rounded-[2rem] border border-yellow-400/10 shadow-xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">🏮</div>
+                <div className="flex items-center gap-1 mb-6">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-primary-400 fill-primary-400" />
+                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
                   ))}
                 </div>
-                <p className="text-slate-300 mb-8 italic leading-relaxed text-lg">&ldquo;{testimonial.content}&rdquo;</p>
+                <p className="text-slate-200 mb-8 italic leading-relaxed text-lg">&ldquo;{testimonial.content}&rdquo;</p>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-primary-400/20 flex items-center justify-center text-primary-400 font-black text-xl">
+                  <div className="w-14 h-14 rounded-2xl bg-yellow-400 text-red-900 flex items-center justify-center font-black text-2xl shadow-lg shadow-yellow-400/20 group-hover:scale-110 transition-transform">
                     {testimonial.avatar}
                   </div>
                   <div>
-                    <p className="font-bold text-white">{testimonial.name}</p>
-                    <p className="text-xs text-slate-500 uppercase tracking-widest">{testimonial.role}</p>
+                    <p className="font-bold text-white text-lg">{testimonial.name}</p>
+                    <p className="text-xs text-yellow-500/60 uppercase tracking-[0.2em] font-black">{testimonial.role}</p>
                   </div>
                 </div>
               </div>
@@ -305,21 +320,22 @@ function HomePageContent() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-br from-primary-600 to-primary-900 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 pattern-dots" />
+      <section className="py-28 bg-gradient-to-br from-[#6b0000] to-[#2a0101] relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #facc15 1px, transparent 0)', backgroundSize: '40px 40px' }} />
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 uppercase tracking-tight">
-            Sẵn sàng tự động hóa kinh doanh?
+          <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-8 uppercase tracking-tighter leading-none">
+            BẮT ĐẦU NĂM MỚI <br />
+            <span className="text-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.2)]">BỨT PHÁ DOANH SỐ</span>
           </h2>
-          <p className="text-xl text-primary-100 mb-10 max-w-2xl mx-auto">
-            Bắt đầu ngay hôm nay với Sàn trợ lý AI. Chỉ từ <span className="text-white font-black underline decoration-white/30 underline-offset-8">29K/tháng</span>!
+          <p className="text-xl md:text-2xl text-red-100 mb-12 max-w-3xl mx-auto font-medium">
+            Sở hữu Trợ lý AI chuyên biệt ngay hôm nay. Vận hành tự động, chốt đơn xuyên Tết!
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/dat-hang" className="px-10 py-5 bg-white text-primary-600 hover:bg-primary-50 text-lg font-black rounded-2xl shadow-2xl transition-all hover:scale-105 active:scale-95 uppercase">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <Link href="/dat-hang" className="px-12 py-6 bg-yellow-400 text-red-900 hover:bg-yellow-300 text-xl font-black rounded-[2rem] shadow-[0_20px_50px_rgba(250,204,21,0.3)] transition-all hover:scale-105 active:scale-95 uppercase tracking-wider">
               MUA TRỢ LÝ AI NGAY
             </Link>
-            <a href="tel:0345501969" className="px-10 py-5 bg-transparent text-white border-2 border-white/40 hover:bg-white/10 text-lg font-black rounded-2xl transition-all uppercase">
-              GỌI TƯ VẤN: 0345 501 969
+            <a href="tel:0345501969" className="px-12 py-6 bg-transparent text-white border-2 border-white/40 hover:bg-white/10 text-xl font-black rounded-[2rem] transition-all uppercase tracking-wider border-2">
+              HOTLINE: 0345 501 969
             </a>
           </div>
         </div>
@@ -333,7 +349,7 @@ function HomePageContent() {
         youtubeUrl={videoModal.url}
         title={videoModal.title}
       />
-    </div>
+    </div >
   );
 }
 

@@ -188,8 +188,7 @@ export default function ProductDetailPage({
             </div>
           </div>
         </div>
-    </div>
-      </section >
+      </section>
 
       <main className="py-20 relative">
         <div className="container mx-auto px-4">
@@ -289,94 +288,94 @@ export default function ProductDetailPage({
                       Chọn gói phù hợp
                     </div>
 
-                      {/* Package Grid Title */}
-                      <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none">
-                          CHỌN GÓI <span className="text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.4)]">KHAI XUÂN</span>
-                        </h2>
-                        <div className="h-2 w-24 bg-amber-400 mx-auto mt-6 rounded-full shadow-[0_0_15px_rgba(251,191,36,0.5)]" />
-                      </div>
+                    {/* Package Grid Title */}
+                    <div className="text-center mb-16">
+                      <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none">
+                        CHỌN GÓI <span className="text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.4)]">KHAI XUÂN</span>
+                      </h2>
+                      <div className="h-2 w-24 bg-amber-400 mx-auto mt-6 rounded-full shadow-[0_0_15px_rgba(251,191,36,0.5)]" />
+                    </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* Standard Package */}
-                        <div
-                          className={`relative group cursor-pointer transition-all preserve-3d min-h-[480px] ${flippedCards['standard'] ? 'flipped' : ''}`}
-                          onClick={() => setSelectedPackage("standard")}
-                        >
-                          {/* Front Side */}
-                          <div className={`relative z-10 h-full backface-hidden rounded-[2.5rem] p-8 border-2 transition-all flex flex-col ${selectedPackage === "standard" ? "bg-[#250000] border-amber-400 shadow-[0_0_50px_rgba(251,191,36,0.3)]" : "bg-[#100000] border-white/5 hover:border-amber-400/30"}`}>
-                            <div className="flex justify-between items-start mb-6">
-                              <span className="text-[10px] font-black uppercase text-amber-500/80 tracking-[0.2em]">Dành cho cá nhân</span>
-                              {selectedPackage === "standard" && <CheckCircle className="w-7 h-7 text-amber-400 drop-shadow-glow" />}
-                            </div>
-                            <div className="text-[10px] text-amber-400 font-black uppercase tracking-widest mb-1">Gói Tiêu Chuẩn</div>
-                            <div className="text-4xl font-black mb-4 text-white drop-shadow-sm">{formatCurrency(priceStandard)}</div>
-                            <p className="text-sm text-red-50/60 mb-8 font-medium leading-relaxed">{descriptionStandard}</p>
-
-                            <div className="mt-auto space-y-4">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const cart = [{ id: product.id, quantity: 1, packageType: "standard" }];
-                                  sessionStorage.setItem("cart", JSON.stringify(cart));
-                                  router.push("/dat-hang");
-                                }}
-                                className="relative overflow-hidden w-full py-4 bg-amber-400 text-red-950 text-sm font-black rounded-2xl hover:bg-yellow-400 transition-all uppercase tracking-widest shadow-xl border-2 border-white/20 group/btn"
-                              >
-                                <span className="relative z-10 flex items-center justify-center gap-2">
-                                  Đăng ký ngay
-                                  <ArrowRight className="w-5 h-5" />
-                                </span>
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setFlippedCards(prev => ({ ...prev, standard: !prev.standard }));
-                                }}
-                                className="w-full text-center text-xs text-amber-500 font-black hover:text-amber-400 uppercase tracking-widest transition-colors"
-                              >
-                                Xem tính năng ➔
-                              </button>
-                            </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                      {/* Standard Package */}
+                      <div
+                        className={`relative group cursor-pointer transition-all preserve-3d min-h-[480px] ${flippedCards['standard'] ? 'flipped' : ''}`}
+                        onClick={() => setSelectedPackage("standard")}
+                      >
+                        {/* Front Side */}
+                        <div className={`relative z-10 h-full backface-hidden rounded-[2.5rem] p-8 border-2 transition-all flex flex-col ${selectedPackage === "standard" ? "bg-[#250000] border-amber-400 shadow-[0_0_50px_rgba(251,191,36,0.3)]" : "bg-[#100000] border-white/5 hover:border-amber-400/30"}`}>
+                          <div className="flex justify-between items-start mb-6">
+                            <span className="text-[10px] font-black uppercase text-amber-500/80 tracking-[0.2em]">Dành cho cá nhân</span>
+                            {selectedPackage === "standard" && <CheckCircle className="w-7 h-7 text-amber-400 drop-shadow-glow" />}
                           </div>
+                          <div className="text-[10px] text-amber-400 font-black uppercase tracking-widest mb-1">Gói Tiêu Chuẩn</div>
+                          <div className="text-4xl font-black mb-4 text-white drop-shadow-sm">{formatCurrency(priceStandard)}</div>
+                          <p className="text-sm text-red-50/60 mb-8 font-medium leading-relaxed">{descriptionStandard}</p>
 
-                          {/* Back Side */}
-                          <div className="absolute inset-0 backface-hidden rounded-[2.5rem] p-8 bg-[#300000] border-2 border-amber-400 rotate-y-180 flex flex-col shadow-2xl">
-                            <h4 className="text-amber-400 font-black text-xs uppercase tracking-widest mb-6">Đặc quyền Tiêu chuẩn:</h4>
-                            <div className="grid grid-cols-1 gap-4 mb-8">
-                              {featuresStandardStr.split("\n").filter((f: string) => f.trim()).map((feat: string, idx: number) => (
-                                <div key={idx} className="flex items-start gap-3 text-xs text-white/90 leading-tight group/item">
-                                  <CheckCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-400 drop-shadow-glow" />
-                                  <span className="font-medium">{feat}</span>
-                                </div>
-                              ))}
-                            </div>
-
-                            <div className="mt-auto space-y-4">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const cart = [{ id: product.id, quantity: 1, packageType: "standard" }];
-                                  sessionStorage.setItem("cart", JSON.stringify(cart));
-                                  router.push("/dat-hang");
-                                }}
-                                className="w-full py-4 bg-amber-400 text-red-950 text-sm font-black rounded-2xl hover:bg-yellow-400 transition-all uppercase tracking-widest shadow-xl border-2 border-white/20"
-                              >
+                          <div className="mt-auto space-y-4">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const cart = [{ id: product.id, quantity: 1, packageType: "standard" }];
+                                sessionStorage.setItem("cart", JSON.stringify(cart));
+                                router.push("/dat-hang");
+                              }}
+                              className="relative overflow-hidden w-full py-4 bg-amber-400 text-red-950 text-sm font-black rounded-2xl hover:bg-yellow-400 transition-all uppercase tracking-widest shadow-xl border-2 border-white/20 group/btn"
+                            >
+                              <span className="relative z-10 flex items-center justify-center gap-2">
                                 Đăng ký ngay
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setFlippedCards(prev => ({ ...prev, standard: !prev.standard }));
-                                }}
-                                className="w-full text-center text-xs text-amber-500/60 font-black hover:text-amber-400 uppercase tracking-widest transition-colors"
-                              >
-                                🠔 Quay lại
-                              </button>
-                            </div>
+                                <ArrowRight className="w-5 h-5" />
+                              </span>
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setFlippedCards(prev => ({ ...prev, standard: !prev.standard }));
+                              }}
+                              className="w-full text-center text-xs text-amber-500 font-black hover:text-amber-400 uppercase tracking-widest transition-colors"
+                            >
+                              Xem tính năng ➔
+                            </button>
                           </div>
                         </div>
+
+                        {/* Back Side */}
+                        <div className="absolute inset-0 backface-hidden rounded-[2.5rem] p-8 bg-[#300000] border-2 border-amber-400 rotate-y-180 flex flex-col shadow-2xl">
+                          <h4 className="text-amber-400 font-black text-xs uppercase tracking-widest mb-6">Đặc quyền Tiêu chuẩn:</h4>
+                          <div className="grid grid-cols-1 gap-4 mb-8">
+                            {featuresStandardStr.split("\n").filter((f: string) => f.trim()).map((feat: string, idx: number) => (
+                              <div key={idx} className="flex items-start gap-3 text-xs text-white/90 leading-tight group/item">
+                                <CheckCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-400 drop-shadow-glow" />
+                                <span className="font-medium">{feat}</span>
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="mt-auto space-y-4">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const cart = [{ id: product.id, quantity: 1, packageType: "standard" }];
+                                sessionStorage.setItem("cart", JSON.stringify(cart));
+                                router.push("/dat-hang");
+                              }}
+                              className="w-full py-4 bg-amber-400 text-red-950 text-sm font-black rounded-2xl hover:bg-yellow-400 transition-all uppercase tracking-widest shadow-xl border-2 border-white/20"
+                            >
+                              Đăng ký ngay
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setFlippedCards(prev => ({ ...prev, standard: !prev.standard }));
+                              }}
+                              className="w-full text-center text-xs text-amber-500/60 font-black hover:text-amber-400 uppercase tracking-widest transition-colors"
+                            >
+                              🠔 Quay lại
+                            </button>
+                          </div>
+                        </div>
+                      </div>
 
                       {/* Gold Package */}
                       <div
@@ -553,27 +552,27 @@ export default function ProductDetailPage({
                           </div>
                         </div>
                       </div>
-                  </div>
-
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
-                      ))}
                     </div>
-                    <span className="text-xs text-slate-500 ml-2">128 khách hàng đã tin dùng</span>
-                  </div>
 
-                  <div className="pt-6 border-t border-yellow-400/10 mt-6">
-                    <p className="text-[10px] text-yellow-500/40 italic text-center uppercase tracking-widest font-black">
-                      Giao dịch được bảo mật bởi hệ thống thanh toán tự động
-                    </p>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                        ))}
+                      </div>
+                      <span className="text-xs text-slate-500 ml-2">128 khách hàng đã tin dùng</span>
+                    </div>
+
+                    <div className="pt-6 border-t border-yellow-400/10 mt-6">
+                      <p className="text-[10px] text-yellow-500/40 italic text-center uppercase tracking-widest font-black">
+                        Giao dịch được bảo mật bởi hệ thống thanh toán tự động
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <style jsx>{`
+                <style jsx>{`
                 .preserve-3d {
                   transform-style: preserve-3d;
                   perspective: 1000px;
@@ -623,56 +622,57 @@ export default function ProductDetailPage({
 
 
 
-            </div>
-          </div>
-
-          {/* Related Products */}
-          {relatedProducts.length > 0 && (
-            <div className="mt-16">
-              <h2 className="text-2xl font-bold text-white mb-8 uppercase">Trợ lý AI liên quan</h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {relatedProducts.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={`/san-pham/${item.slug}`}
-                    className="group bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-sm hover:shadow-lg hover:border-primary-400/50 transition-all hover:-translate-y-1"
-                  >
-                    <div className="text-4xl mb-3">🤖</div>
-                    <h3 className="font-bold text-white mb-2 group-hover:text-primary-400 transition-colors">
-                      {item.name}
-                    </h3>
-                    <p className="text-primary-400 font-bold">
-                      {formatCurrency(item.price)}
-                    </p>
-                  </Link>
-                ))}
               </div>
             </div>
-          )}
 
-          {/* Contact Card - NOW AT BOTTOM */}
-          <div className="mt-20">
-            <div className="bg-gradient-cta rounded-3xl p-10 text-white border border-primary-400/20 text-center max-w-4xl mx-auto shadow-2xl">
-              <h3 className="text-3xl font-black mb-4 text-primary-400 uppercase tracking-tighter">CẦN TƯ VẤN CHUYÊN SÂU?</h3>
-              <p className="text-slate-300 text-lg mb-8 max-w-2xl mx-auto">
-                Bạn chưa biết chọn gói nào? Liên hệ ngay với đội ngũ chuyên gia của chúng tôi để được tư vấn giải pháp AI tối ưu nhất cho doanh nghiệp của bạn.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                <a
-                  href="tel:0345501969"
-                  className="btn bg-primary-400 text-slate-900 hover:bg-primary-300 px-10 py-4 text-xl font-black uppercase shadow-xl shadow-primary-400/40 flex items-center gap-3 transition-all hover:scale-105"
-                >
-                  <Bot className="w-6 h-6" />
-                  0345 501 969
-                </a>
-                <a
-                  href="https://zalo.me/0345501969"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary-400 hover:text-primary-300 font-bold uppercase tracking-widest text-sm underline underline-offset-4 transition-all"
-                >
-                  Hoặc Chat qua Zalo
-                </a>
+            {/* Related Products */}
+            {relatedProducts.length > 0 && (
+              <div className="mt-16">
+                <h2 className="text-2xl font-bold text-white mb-8 uppercase">Trợ lý AI liên quan</h2>
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {relatedProducts.map((item) => (
+                    <Link
+                      key={item.id}
+                      href={`/san-pham/${item.slug}`}
+                      className="group bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-sm hover:shadow-lg hover:border-primary-400/50 transition-all hover:-translate-y-1"
+                    >
+                      <div className="text-4xl mb-3">🤖</div>
+                      <h3 className="font-bold text-white mb-2 group-hover:text-primary-400 transition-colors">
+                        {item.name}
+                      </h3>
+                      <p className="text-primary-400 font-bold">
+                        {formatCurrency(item.price)}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Contact Card - NOW AT BOTTOM */}
+            <div className="mt-20">
+              <div className="bg-gradient-cta rounded-3xl p-10 text-white border border-primary-400/20 text-center max-w-4xl mx-auto shadow-2xl">
+                <h3 className="text-3xl font-black mb-4 text-primary-400 uppercase tracking-tighter">CẦN TƯ VẤN CHUYÊN SÂU?</h3>
+                <p className="text-slate-300 text-lg mb-8 max-w-2xl mx-auto">
+                  Bạn chưa biết chọn gói nào? Liên hệ ngay với đội ngũ chuyên gia của chúng tôi để được tư vấn giải pháp AI tối ưu nhất cho doanh nghiệp của bạn.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                  <a
+                    href="tel:0345501969"
+                    className="btn bg-primary-400 text-slate-900 hover:bg-primary-300 px-10 py-4 text-xl font-black uppercase shadow-xl shadow-primary-400/40 flex items-center gap-3 transition-all hover:scale-105"
+                  >
+                    <Bot className="w-6 h-6" />
+                    0345 501 969
+                  </a>
+                  <a
+                    href="https://zalo.me/0345501969"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary-400 hover:text-primary-300 font-bold uppercase tracking-widest text-sm underline underline-offset-4 transition-all"
+                  >
+                    Hoặc Chat qua Zalo
+                  </a>
+                </div>
               </div>
             </div>
           </div>

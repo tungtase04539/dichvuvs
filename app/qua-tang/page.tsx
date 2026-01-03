@@ -12,7 +12,6 @@ export default function QuaTangPage() {
       title: "Capcut Pro",
       duration: "1 THÁNG",
       description: "Mở khóa toàn bộ tính năng và hiệu ứng cao cấp nhất của Capcut.",
-      highlight: true,
     },
     {
       logo: "https://img.icons8.com/fluency/512/chatgpt.png",
@@ -106,23 +105,20 @@ export default function QuaTangPage() {
             {gifts.map((gift, index) => (
               <div
                 key={index}
-                className={`group p-10 rounded-[2.5rem] border-2 transition-all duration-500 hover:-translate-y-3 flex flex-col items-center text-center relative overflow-hidden ${gift.highlight
-                  ? "bg-gradient-to-br from-yellow-400 to-amber-500 border-white/20 shadow-[0_20px_50px_rgba(250,204,21,0.2)]"
-                  : "bg-[#2a0101]/60 border-yellow-400/10 hover:border-yellow-400/40"
-                  }`}
+                className="group p-10 rounded-[2.5rem] border-2 transition-all duration-500 hover:-translate-y-3 flex flex-col items-center text-center relative overflow-hidden bg-[#2a0101]/60 border-yellow-400/20 hover:border-yellow-400/60 shadow-[0_10px_40px_-15px_rgba(250,204,21,0.1)] hover:shadow-[0_20px_60px_-10px_rgba(250,204,21,0.2)]"
               >
-                <div className="w-24 h-24 mb-8 transform group-hover:scale-110 transition-transform duration-500 flex items-center justify-center bg-white/10 rounded-3xl p-4 backdrop-blur-md">
+                <div className="w-24 h-24 mb-8 transform group-hover:scale-110 transition-transform duration-500 flex items-center justify-center bg-white/5 rounded-3xl p-4 backdrop-blur-md border border-white/10">
                   <img src={gift.logo} alt={gift.title} className="w-full h-full object-contain" />
                 </div>
                 {gift.duration && (
-                  <div className={`text-[10px] font-black tracking-widest uppercase mb-2 ${gift.highlight ? "text-red-900/60" : "text-yellow-400/60"}`}>
+                  <div className="text-[10px] font-black tracking-widest uppercase mb-2 text-yellow-400/60">
                     {gift.duration}
                   </div>
                 )}
-                <h3 className={`text-2xl font-black mb-4 uppercase leading-tight ${gift.highlight ? "text-red-950" : "text-white"}`}>
+                <h3 className="text-2xl font-black mb-4 uppercase leading-tight text-white group-hover:text-yellow-400 transition-colors">
                   {gift.title}
                 </h3>
-                <p className={`text-base font-medium leading-relaxed ${gift.highlight ? "text-red-900/80" : "text-red-100/60"}`}>
+                <p className="text-base font-medium leading-relaxed text-red-100/60">
                   {gift.description}
                 </p>
               </div>

@@ -8,7 +8,7 @@ import { Gift, Users, MessageCircle, Star, ArrowRight, CheckCircle, Sparkles, Bo
 export default function QuaTangPage() {
   const gifts = [
     {
-      logo: "https://img.icons8.com/color/512/capcut.png",
+      logo: "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/assets-color/icons/capcut.svg",
       title: "Capcut Pro",
       duration: "1 THÁNG",
       description: "Mở khóa toàn bộ tính năng và hiệu ứng cao cấp nhất của Capcut.",
@@ -21,7 +21,7 @@ export default function QuaTangPage() {
       description: "Trải nghiệm mô hình GPT-4o mới nhất với tốc độ phản hồi cực nhanh.",
     },
     {
-      logo: "https://img.icons8.com/color/512/google-gemini.png",
+      logo: "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/assets-color/icons/gemini-color.svg",
       title: "Google Ultra",
       duration: "45K CREDIT",
       description: "Sử dụng veo3 và các tính năng AI đỉnh cao của Google.",

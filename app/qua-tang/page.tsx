@@ -8,26 +8,26 @@ import { Gift, Users, MessageCircle, Star, ArrowRight, CheckCircle, Sparkles, Bo
 export default function QuaTangPage() {
   const gifts = [
     {
-      logo: "https://freelogopng.com/images/all_img/1664035817capcut-logo-png.png",
+      logo: "https://img.icons8.com/color/512/capcut.png",
       title: "Capcut Pro",
       duration: "1 THÁNG",
       description: "Mở khóa toàn bộ tính năng và hiệu ứng cao cấp nhất của Capcut.",
       highlight: true,
     },
     {
-      logo: "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
+      logo: "https://img.icons8.com/fluency/512/chatgpt.png",
       title: "ChatGPT Plus",
       duration: "1 THÁNG / 1 NĂM",
       description: "Trải nghiệm mô hình GPT-4o mới nhất với tốc độ phản hồi cực nhanh.",
     },
     {
-      logo: "https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg",
+      logo: "https://img.icons8.com/color/512/google-gemini.png",
       title: "Google Ultra",
       duration: "45K CREDIT",
       description: "Sử dụng veo3 và các tính năng AI đỉnh cao của Google.",
     },
     {
-      logo: "https://upload.wikimedia.org/wikipedia/commons/0/08/Canva_icon_2021.svg",
+      logo: "https://img.icons8.com/color/512/canva.png",
       title: "Canva Pro Edu",
       duration: "1 NĂM",
       description: "Thiết kế không giới hạn với kho tài nguyên Pro khổng lồ.",

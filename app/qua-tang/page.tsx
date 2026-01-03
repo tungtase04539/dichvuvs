@@ -1,35 +1,62 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Gift, Users, MessageCircle, Star, ArrowRight, CheckCircle, Sparkles, Bot } from "lucide-react";
 
 export default function QuaTangPage() {
+  const [flippedCards, setFlippedCards] = useState<Record<number, boolean>>({});
+
   const gifts = [
     {
       logo: "/gifts/capcut.png",
       title: "Capcut Pro",
       duration: "1 THÁNG",
       description: "Mở khóa toàn bộ tính năng và hiệu ứng cao cấp nhất của Capcut.",
+      conditions: [
+        "Tài khoản sử dụng trong 30 ngày",
+        "Đăng nhập tối đa 1 thiết bị",
+        "Không thay đổi thông tin tài khoản",
+        "Bảo hành trọn đời thời gian sử dụng"
+      ]
     },
     {
       logo: "https://img.icons8.com/fluency/512/chatgpt.png",
       title: "ChatGPT Plus",
       duration: "1 THÁNG / 1 NĂM",
       description: "Trải nghiệm mô hình GPT-4o mới nhất với tốc độ phản hồi cực nhanh.",
+      conditions: [
+        "Sử dụng mô hình GPT-4o không giới hạn",
+        "Hỗ trợ cài đặt trên App Mobile",
+        "Bảo hành lỗi 1 đổi 1 nhanh chóng",
+        "Tặng kèm bộ Prompt chuyên sâu"
+      ]
     },
     {
       logo: "/gifts/google.png",
       title: "Google Ultra",
       duration: "45K CREDIT",
       description: "Sử dụng veo3 và các tính năng AI đỉnh cao của Google.",
+      conditions: [
+        "Nạp trực tiếp vào tài khoản cá nhân",
+        "Hạn dùng Credit trong 12 tháng",
+        "Sử dụng full tính năng Google Gemini Ultra",
+        "Hỗ trợ xử lý lỗi kỹ thuật 24/7"
+      ]
     },
     {
       logo: "https://img.icons8.com/color/512/canva.png",
       title: "Canva Pro Edu",
       duration: "1 NĂM",
       description: "Thiết kế không giới hạn với kho tài nguyên Pro khổng lồ.",
+      conditions: [
+        "Tính năng Canva Pro đầy đủ",
+        "Sử dụng trên mọi thiết bị",
+        "Thời hạn sử dụng cam kết 1 năm",
+        "Join vào Group Design độc quyền"
+      ]
     },
   ];
 
@@ -105,22 +132,52 @@ export default function QuaTangPage() {
             {gifts.map((gift, index) => (
               <div
                 key={index}
-                className="group p-10 rounded-[2.5rem] border-2 transition-all duration-500 hover:-translate-y-3 flex flex-col items-center text-center relative overflow-hidden bg-[#2a0101]/60 border-yellow-400/20 hover:border-yellow-400/60 shadow-[0_10px_40px_-15px_rgba(250,204,21,0.1)] hover:shadow-[0_20px_60px_-10px_rgba(250,204,21,0.2)]"
+                className={`relative min-h-[480px] preserve-3d transition-all duration-700 cursor-pointer ${flippedCards[index] ? 'flipped' : ''}`}
+                onClick={() => setFlippedCards(prev => ({ ...prev, [index]: !prev[index] }))}
               >
-                <div className="w-24 h-24 mb-8 transform group-hover:scale-110 transition-transform duration-500 flex items-center justify-center bg-white rounded-3xl p-4 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.3)] border-2 border-yellow-400/20 group-hover:border-yellow-400 group-hover:shadow-[0_15px_40px_-5px_rgba(251,191,36,0.3)]">
-                  <img src={gift.logo} alt={gift.title} className="w-full h-full object-contain" />
-                </div>
-                {gift.duration && (
-                  <div className="text-[10px] font-black tracking-widest uppercase mb-2 text-yellow-400/60">
-                    {gift.duration}
+                {/* Front Face */}
+                <div className="absolute inset-0 backface-hidden group p-10 rounded-[2.5rem] border-2 transition-all duration-500 flex flex-col items-center text-center overflow-hidden bg-[#2a0101]/60 border-yellow-400/20 hover:border-yellow-400/60 shadow-[0_10px_40px_-15px_rgba(250,204,21,0.1)]">
+                  <div className="w-24 h-24 mb-8 transform group-hover:scale-110 transition-transform duration-500 flex items-center justify-center bg-white rounded-3xl p-4 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.3)] border-2 border-yellow-400/20 group-hover:border-yellow-400">
+                    <img src={gift.logo} alt={gift.title} className="w-full h-full object-contain" />
                   </div>
-                )}
-                <h3 className="text-2xl font-black mb-4 uppercase leading-tight text-white group-hover:text-yellow-400 transition-colors">
-                  {gift.title}
-                </h3>
-                <p className="text-base font-medium leading-relaxed text-red-100/60">
-                  {gift.description}
-                </p>
+                  {gift.duration && (
+                    <div className="text-[10px] font-black tracking-widest uppercase mb-2 text-yellow-400/60">
+                      {gift.duration}
+                    </div>
+                  )}
+                  <h3 className="text-2xl font-black mb-4 uppercase leading-tight text-white group-hover:text-yellow-400 transition-colors">
+                    {gift.title}
+                  </h3>
+                  <p className="text-base font-medium leading-relaxed text-red-100/60 mb-8">
+                    {gift.description}
+                  </p>
+                  <div className="mt-auto">
+                    <button className="px-6 py-3 bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 text-xs font-black rounded-xl hover:bg-yellow-400 hover:text-red-950 transition-all uppercase tracking-widest flex items-center gap-2">
+                      Xem điều kiện
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Back Face */}
+                <div className="absolute inset-0 backface-hidden rotate-y-180 p-10 rounded-[2.5rem] border-2 border-yellow-400 bg-[#3a0101] shadow-[0_0_60px_rgba(250,204,21,0.2)] flex flex-col items-center text-center">
+                  <h4 className="text-yellow-400 font-black text-xs uppercase tracking-[0.2em] mb-8 border-b border-yellow-400/20 pb-4 w-full">
+                    ĐIỀU KIỆN NHẬN QUÀ
+                  </h4>
+                  <div className="space-y-4 w-full">
+                    {gift.conditions.map((condition, i) => (
+                      <div key={i} className="flex items-start gap-3 text-sm text-red-50/90 text-left">
+                        <CheckCircle className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" />
+                        <span className="font-medium leading-tight">{condition}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-auto">
+                    <button className="text-xs text-yellow-400/60 font-black uppercase tracking-widest hover:text-yellow-400 transition-colors">
+                      🠔 Quay lại
+                    </button>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -169,6 +226,29 @@ export default function QuaTangPage() {
       </section>
 
       <Footer settings={{ site_phone: "0345 501 969" }} />
+
+      <style jsx>{`
+        .preserve-3d {
+          transform-style: preserve-3d;
+          perspective: 1200px;
+        }
+        .backface-hidden {
+          backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+          transform: rotateY(180deg);
+        }
+        .flipped {
+          transform: rotateY(180deg);
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0) rotate(3deg); }
+          50% { transform: translateY(-15px) rotate(5deg); }
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 }

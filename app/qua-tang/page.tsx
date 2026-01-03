@@ -26,9 +26,9 @@ export default function QuaTangPage() {
       logo: "https://img.icons8.com/fluency/512/chatgpt.png",
       title: "ChatGPT Plus",
       duration: "1 THÁNG / 1 NĂM",
-      description: "Trải nghiệm mô hình GPT-4o mới nhất với tốc độ phản hồi cực nhanh.",
+      description: "Trải nghiệm mô hình 5.2 mới nhất với tốc độ phản hồi cực nhanh.",
       conditions: [
-        "Sử dụng mô hình GPT-4o không giới hạn",
+        "Sử dụng mô hình 5.2 không giới hạn",
         "Hỗ trợ cài đặt trên App Mobile",
         "Bảo hành lỗi 1 đổi 1 nhanh chóng",
         "Tặng kèm bộ Prompt chuyên sâu"

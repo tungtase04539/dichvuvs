@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { ArrowLeft, Star, Bot, Loader2, CheckCircle, Minus, Plus } from "lucide-react";
+import { ArrowLeft, Star, Bot, Loader2, CheckCircle, Minus, Plus, Sparkles, Gift, Zap, ArrowRight } from "lucide-react";
 
 interface Product {
   id: string;
@@ -150,15 +150,17 @@ export default function ProductDetailPage({
   ];
 
   return (
-    <div className="min-h-screen bg-[#1a0101]">
+    <div className="min-h-screen bg-[#0a0000] text-white selection:bg-amber-400 selection:text-red-950">
       <Header settings={{ site_phone: "0345 501 969" }} />
 
-      {/* Hero */}
-      <section className="bg-gradient-hero pt-32 pb-20 relative overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute inset-0 pointer-events-none opacity-20">
-          <div className="absolute top-10 right-10 text-4xl animate-bounce">🌸</div>
-          <div className="absolute bottom-10 left-10 text-4xl animate-pulse">🏮</div>
+      {/* Hero Section */}
+      <section className="bg-gradient-hero pt-32 pb-24 relative overflow-hidden">
+        {/* Tet Decorations */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden select-none opacity-40">
+          <div className="absolute top-10 right-[10%] text-6xl animate-bounce">🏮</div>
+          <div className="absolute bottom-20 left-[5%] text-5xl animate-pulse">🌸</div>
+          <div className="absolute top-40 left-[15%] text-4xl animate-bounce" style={{ animationDuration: '5s' }}>🌼</div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(220,38,38,0.1)_0%,transparent_60%)]" />
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
@@ -169,29 +171,27 @@ export default function ProductDetailPage({
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             <span className="uppercase tracking-widest text-sm">Quay lại danh sách</span>
           </Link>
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-            <div className="w-24 h-24 bg-yellow-400 rounded-[2rem] flex items-center justify-center text-5xl shadow-lg shadow-yellow-400/20 rotate-3">
-              🤖
-            </div>
-            <div>
-              {product.featured && (
-                <span className="inline-flex items-center gap-1 px-4 py-1.5 bg-yellow-400 text-red-950 text-xs font-black rounded-full mb-3 uppercase tracking-tighter shadow-lg">
-                  <Star className="w-3 h-3 fill-current" />
-                  Lộc Xuân Đặc Biệt
-                </span>
-              )}
-              <h1 className="text-4xl md:text-5xl font-black text-white mb-4 uppercase tracking-tight">
-                {product.name}
-              </h1>
-              <p className="text-red-100/80 text-lg max-w-2xl leading-relaxed font-medium">
-                {product.description}
-              </p>
+          <div className="flex flex-col gap-6 max-w-4xl">
+            <p className="text-red-50/90 text-xl leading-relaxed font-bold drop-shadow-md">
+              {product.description}
+            </p>
+
+            <div className="flex flex-wrap gap-4 mt-4">
+              <div className="flex items-center gap-2 px-4 py-2 bg-red-950/40 rounded-xl border border-white/5 backdrop-blur-sm">
+                <Bot className="w-5 h-5 text-amber-400" />
+                <span className="text-xs font-black uppercase tracking-widest text-white/80">AI Pro ✨</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-red-950/40 rounded-xl border border-white/5 backdrop-blur-sm">
+                <Zap className="w-5 h-5 text-amber-400" />
+                <span className="text-xs font-black uppercase tracking-widest text-white/80">Fast Response ⚡</span>
+              </div>
             </div>
           </div>
         </div>
-      </section>
+    </div>
+      </section >
 
-      <main className="py-12">
+      <main className="py-20 relative">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Main Content */}
@@ -199,10 +199,10 @@ export default function ProductDetailPage({
               {/* Description */}
 
               {/* Long Description */}
-              <div className="bg-[#2a0101]/40 rounded-3xl p-8 md:p-10 shadow-xl border border-yellow-400/10 backdrop-blur-md">
-                <h2 className="text-2xl font-black text-white mb-8 uppercase tracking-tight flex items-center gap-3">
-                  <div className="w-2 h-8 bg-yellow-400 rounded-full" />
-                  Chi tiết Trợ lý AI
+              <div className="bg-[#200000]/60 rounded-[2.5rem] p-8 md:p-12 shadow-2xl border border-amber-400/10 backdrop-blur-2xl">
+                <h2 className="text-3xl font-black text-white mb-10 uppercase tracking-tighter flex items-center gap-4">
+                  <div className="w-3 h-10 bg-amber-400 rounded-full shadow-[0_0_15px_rgba(251,191,36,0.4)]" />
+                  CHI TIẾT TRỢ LÝ AI
                 </h2>
                 <div className="prose prose-invert max-w-none">
                   {product.longDescription ? (
@@ -289,23 +289,31 @@ export default function ProductDetailPage({
                       Chọn gói phù hợp
                     </div>
 
-                    <div className="grid grid-cols-1 gap-6">
-                      {/* Standard Package */}
-                      <div
-                        className={`relative group cursor-pointer transition-all preserve-3d min-h-[220px] ${flippedCards['standard'] ? 'flipped' : ''}`}
-                        onClick={() => setSelectedPackage("standard")}
-                      >
-                        {/* Front Side */}
-                        <div className={`absolute inset-0 backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "standard" ? "bg-slate-700 border-primary-500 shadow-lg shadow-primary-500/20" : "bg-slate-700/30 border-slate-700 hover:border-slate-600"}`}>
-                          <div className="flex justify-between items-start mb-3">
-                            <span className="text-slate-400 text-[10px] font-bold uppercase tracking-tight">MUA TRỢ LÝ AI (Tiêu chuẩn)</span>
-                            {selectedPackage === "standard" && <CheckCircle className="w-4 h-4 text-primary-500" />}
-                          </div>
-                          <div className="text-xl font-bold text-white mb-1">{formatCurrency(priceStandard)}</div>
-                          <p className="text-slate-400 text-[10px] mb-4">{descriptionStandard}</p>
+                      {/* Package Grid Title */}
+                      <div className="text-center mb-16">
+                        <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none">
+                          CHỌN GÓI <span className="text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.4)]">KHAI XUÂN</span>
+                        </h2>
+                        <div className="h-2 w-24 bg-amber-400 mx-auto mt-6 rounded-full shadow-[0_0_15px_rgba(251,191,36,0.5)]" />
+                      </div>
 
-                          <div className="mt-auto space-y-3">
-                            {selectedPackage === "standard" && (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {/* Standard Package */}
+                        <div
+                          className={`relative group cursor-pointer transition-all preserve-3d min-h-[480px] ${flippedCards['standard'] ? 'flipped' : ''}`}
+                          onClick={() => setSelectedPackage("standard")}
+                        >
+                          {/* Front Side */}
+                          <div className={`relative z-10 h-full backface-hidden rounded-[2.5rem] p-8 border-2 transition-all flex flex-col ${selectedPackage === "standard" ? "bg-[#250000] border-amber-400 shadow-[0_0_50px_rgba(251,191,36,0.3)]" : "bg-[#100000] border-white/5 hover:border-amber-400/30"}`}>
+                            <div className="flex justify-between items-start mb-6">
+                              <span className="text-[10px] font-black uppercase text-amber-500/80 tracking-[0.2em]">Dành cho cá nhân</span>
+                              {selectedPackage === "standard" && <CheckCircle className="w-7 h-7 text-amber-400 drop-shadow-glow" />}
+                            </div>
+                            <div className="text-[10px] text-amber-400 font-black uppercase tracking-widest mb-1">Gói Tiêu Chuẩn</div>
+                            <div className="text-4xl font-black mb-4 text-white drop-shadow-sm">{formatCurrency(priceStandard)}</div>
+                            <p className="text-sm text-red-50/60 mb-8 font-medium leading-relaxed">{descriptionStandard}</p>
+
+                            <div className="mt-auto space-y-4">
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -313,89 +321,85 @@ export default function ProductDetailPage({
                                   sessionStorage.setItem("cart", JSON.stringify(cart));
                                   router.push("/dat-hang");
                                 }}
-                                className="relative overflow-hidden w-full py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-slate-900 text-xs font-black rounded-lg hover:from-emerald-400 hover:to-emerald-500 transition-all uppercase shadow-[0_0_15px_rgba(16,185,129,0.4)] hover:shadow-[0_0_25px_rgba(16,185,129,0.6)] group/btn"
+                                className="relative overflow-hidden w-full py-4 bg-amber-400 text-red-950 text-sm font-black rounded-2xl hover:bg-yellow-400 transition-all uppercase tracking-widest shadow-xl border-2 border-white/20 group/btn"
                               >
                                 <span className="relative z-10 flex items-center justify-center gap-2">
-                                  Đăng ký sử dụng
-                                  <CheckCircle className="w-3.5 h-3.5" />
+                                  Đăng ký ngay
+                                  <ArrowRight className="w-5 h-5" />
                                 </span>
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
                               </button>
-                            )}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setFlippedCards(prev => ({ ...prev, standard: !prev.standard }));
-                              }}
-                              className="w-full text-center text-[10px] text-primary-400 font-bold hover:text-primary-300 underline underline-offset-4"
-                            >
-                              Xem chi tiết ưu đãi ➔
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Back Side */}
-                        <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-slate-800 border-2 border-primary-500 rotate-y-180 flex flex-col">
-                          <p className="text-white font-bold text-xs mb-2">Ưu đãi Tiêu chuẩn:</p>
-                          <div className="grid grid-cols-1 gap-1.5 overflow-hidden pr-1 mb-4">
-                            {featuresStandardStr.split("\n").filter((f: string) => f.trim()).map((feat: string, idx: number) => (
-                              <div key={idx} className="flex items-start gap-1.5 text-[10px] text-slate-300 leading-tight">
-                                <CheckCircle className="w-2.5 h-2.5 shrink-0 mt-0.5 text-emerald-400" />
-                                <span>{feat}</span>
-                              </div>
-                            ))}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setFlippedCards(prev => ({ ...prev, standard: !prev.standard }));
+                                }}
+                                className="w-full text-center text-xs text-amber-500 font-black hover:text-amber-400 uppercase tracking-widest transition-colors"
+                              >
+                                Xem tính năng ➔
+                              </button>
+                            </div>
                           </div>
 
-                          <div className="mt-auto space-y-3">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const cart = [{ id: product.id, quantity: 1, packageType: "standard" }];
-                                sessionStorage.setItem("cart", JSON.stringify(cart));
-                                router.push("/dat-hang");
-                              }}
-                              className="relative overflow-hidden w-full py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-slate-900 text-xs font-black rounded-lg hover:from-emerald-400 hover:to-emerald-500 transition-all uppercase shadow-[0_0_15px_rgba(16,185,129,0.4)] hover:shadow-[0_0_25px_rgba(16,185,129,0.6)] group/btn"
-                            >
-                              <span className="relative z-10 flex items-center justify-center gap-2">
-                                Đăng ký sử dụng
-                                <CheckCircle className="w-3.5 h-3.5" />
-                              </span>
-                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setFlippedCards(prev => ({ ...prev, standard: !prev.standard }));
-                              }}
-                              className="w-full text-center text-[10px] text-slate-500 font-bold hover:text-slate-400"
-                            >
-                              🠔 Quay lại
-                            </button>
+                          {/* Back Side */}
+                          <div className="absolute inset-0 backface-hidden rounded-[2.5rem] p-8 bg-[#300000] border-2 border-amber-400 rotate-y-180 flex flex-col shadow-2xl">
+                            <h4 className="text-amber-400 font-black text-xs uppercase tracking-widest mb-6">Đặc quyền Tiêu chuẩn:</h4>
+                            <div className="grid grid-cols-1 gap-4 mb-8">
+                              {featuresStandardStr.split("\n").filter((f: string) => f.trim()).map((feat: string, idx: number) => (
+                                <div key={idx} className="flex items-start gap-3 text-xs text-white/90 leading-tight group/item">
+                                  <CheckCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-400 drop-shadow-glow" />
+                                  <span className="font-medium">{feat}</span>
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="mt-auto space-y-4">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const cart = [{ id: product.id, quantity: 1, packageType: "standard" }];
+                                  sessionStorage.setItem("cart", JSON.stringify(cart));
+                                  router.push("/dat-hang");
+                                }}
+                                className="w-full py-4 bg-amber-400 text-red-950 text-sm font-black rounded-2xl hover:bg-yellow-400 transition-all uppercase tracking-widest shadow-xl border-2 border-white/20"
+                              >
+                                Đăng ký ngay
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setFlippedCards(prev => ({ ...prev, standard: !prev.standard }));
+                                }}
+                                className="w-full text-center text-xs text-amber-500/60 font-black hover:text-amber-400 uppercase tracking-widest transition-colors"
+                              >
+                                🠔 Quay lại
+                              </button>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
                       {/* Gold Package */}
                       <div
-                        className={`relative group cursor-pointer transition-all preserve-3d min-h-[220px] ${flippedCards['gold'] ? 'flipped' : ''}`}
+                        className={`relative group cursor-pointer transition-all preserve-3d min-h-[480px] ${flippedCards['gold'] ? 'flipped' : ''}`}
                         onClick={() => setSelectedPackage("gold")}
                       >
-                        {/* Sparkle Border Container - VIBRANT & PERSISTENT */}
-                        <div className={`absolute -inset-[2.5px] rounded-[19px] z-0 bg-[length:300%_300%] bg-gradient-to-r from-amber-600 via-yellow-200 to-amber-400 via-orange-400 to-amber-600 animate-border-sparkle`}></div>
+                        {/* Premium Sparkle Border */}
+                        <div className={`absolute -inset-[3px] rounded-[2.5rem] z-0 bg-[length:300%_300%] bg-gradient-to-r from-amber-600 via-white to-amber-400 animate-border-sparkle opacity-80 shadow-[0_0_40px_rgba(251,191,36,0.5)]`}></div>
 
                         {/* Front Side */}
-                        <div className={`relative z-10 h-full backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "gold" ? "bg-[#2a0101]/60 border-yellow-400 shadow-[0_0_30px_rgba(250,204,21,0.4)] animate-premium-glow" : "bg-[#1a0101]/95 border-transparent"}`}>
-                          <div className="flex justify-between items-start mb-3">
-                            <span className={`text-[10px] font-black uppercase flex items-center gap-1 tracking-wider ${selectedPackage === "gold" ? "text-white" : "text-yellow-500"}`}>
-                              <Star className={`w-3 h-3 ${selectedPackage === "gold" ? "fill-white" : "fill-yellow-500"}`} />
-                              Gói VÀNG
+                        <div className={`relative z-10 h-full backface-hidden rounded-[2.5rem] p-8 border-2 transition-all flex flex-col ${selectedPackage === "gold" ? "bg-[#300000] border-amber-400 shadow-2xl" : "bg-[#150000] border-transparent hover:border-amber-400/30"}`}>
+                          <div className="flex justify-between items-start mb-6">
+                            <span className={`text-[10px] font-black uppercase flex items-center gap-2 tracking-[0.2em] ${selectedPackage === "gold" ? "text-white" : "text-amber-500"}`}>
+                              <Star className={`w-4 h-4 ${selectedPackage === "gold" ? "fill-white" : "fill-amber-500"}`} />
+                              Gói Vàng (Gold)
                             </span>
-                            {selectedPackage === "gold" && <CheckCircle className="w-5 h-5 text-yellow-400 drop-shadow-glow" />}
+                            {selectedPackage === "gold" && <CheckCircle className="w-8 h-8 text-amber-400 drop-shadow-glow" />}
                           </div>
-                          <div className={`text-2xl font-black mb-1 drop-shadow-sm ${selectedPackage === "gold" ? "text-white" : "text-yellow-400"}`}>{formatCurrency(priceGold)}</div>
-                          <p className={`text-[10px] mb-4 font-medium ${selectedPackage === "gold" ? "text-yellow-100" : "text-yellow-100/60"}`}>{descriptionGold}</p>
+                          <div className="text-[10px] text-amber-400 font-black uppercase tracking-widest mb-1">Dành cho Doanh nghiệp</div>
+                          <div className={`text-4xl font-black mb-4 drop-shadow-md ${selectedPackage === "gold" ? "text-white" : "text-amber-400"}`}>{formatCurrency(priceGold)}</div>
+                          <p className={`text-sm mb-8 font-medium leading-relaxed ${selectedPackage === "gold" ? "text-amber-50" : "text-red-50/60"}`}>{descriptionGold}</p>
 
-                          <div className="mt-auto space-y-3">
+                          <div className="mt-auto space-y-4">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -403,39 +407,42 @@ export default function ProductDetailPage({
                                 sessionStorage.setItem("cart", JSON.stringify(cart));
                                 router.push("/dat-hang");
                               }}
-                              className="relative overflow-hidden w-full py-2.5 bg-yellow-400 text-red-950 text-xs font-black rounded-lg hover:bg-yellow-300 transition-all uppercase shadow-[0_0_20px_rgba(250,204,21,0.4)] group/btn"
+                              className="relative overflow-hidden w-full py-4 bg-amber-400 text-red-950 text-sm font-black rounded-2xl hover:bg-yellow-400 transition-all uppercase tracking-widest shadow-[0_20px_40px_rgba(251,191,36,0.4)] border-2 border-white/30 group/btn"
                             >
                               <span className="relative z-10 flex items-center justify-center gap-2">
-                                Đăng ký sử dụng
-                                <Star className="w-3.5 h-3.5 fill-red-950" />
+                                ĐĂNG KÝ NGAY
+                                <Star className="w-4 h-4 fill-red-950" />
                               </span>
-                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
                             </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setFlippedCards(prev => ({ ...prev, gold: !prev.gold }));
                               }}
-                              className="w-full text-center text-[10px] text-yellow-500 font-bold hover:text-yellow-400 underline underline-offset-4"
+                              className="w-full text-center text-xs text-amber-400 font-black hover:text-white uppercase tracking-widest transition-colors"
                             >
-                              Xem ưu đãi ➔
+                              Xem đặc quyền ➔
                             </button>
                           </div>
                         </div>
 
                         {/* Back Side */}
-                        <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-[#4a0404] border-2 border-yellow-400 rotate-y-180 flex flex-col shadow-2xl">
-                          <p className="text-yellow-400 font-bold text-xs mb-2">Đặc quyền Gói Vàng:</p>
-                          <div className="grid grid-cols-1 gap-1.5 overflow-hidden pr-1 mb-4">
+                        <div className="absolute inset-0 backface-hidden rounded-[2.5rem] p-8 bg-[#400000] border-2 border-amber-400 rotate-y-180 flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.8)]">
+                          <h4 className="text-amber-400 font-black text-sm uppercase tracking-widest mb-8 flex items-center gap-3">
+                            <Star className="w-5 h-5 fill-amber-400" />
+                            ĐẶC QUYỀN GÓI VÀNG:
+                          </h4>
+                          <div className="grid grid-cols-1 gap-5 mb-8">
                             {featuresGoldStr.split("\n").filter((f: string) => f.trim()).map((feat: string, idx: number) => (
-                              <div key={idx} className="flex items-start gap-1.5 text-[10px] text-yellow-100/90 leading-tight">
-                                <CheckCircle className="w-2.5 h-2.5 shrink-0 mt-0.5 text-yellow-500" />
-                                <span>{feat}</span>
+                              <div key={idx} className="flex items-start gap-4 text-xs text-amber-50 leading-tight">
+                                <CheckCircle className="w-5 h-5 shrink-0 mt-0.5 text-amber-400 drop-shadow-glow" />
+                                <span className="font-bold">{feat}</span>
                               </div>
                             ))}
                           </div>
 
-                          <div className="mt-auto space-y-3">
+                          <div className="mt-auto space-y-4">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -443,20 +450,16 @@ export default function ProductDetailPage({
                                 sessionStorage.setItem("cart", JSON.stringify(cart));
                                 router.push("/dat-hang");
                               }}
-                              className="relative overflow-hidden w-full py-2.5 bg-yellow-400 text-red-950 text-xs font-black rounded-lg hover:bg-yellow-300 transition-all uppercase shadow-lg group/btn"
+                              className="w-full py-4 bg-amber-400 text-red-950 text-sm font-black rounded-2xl hover:bg-yellow-400 transition-all uppercase tracking-widest shadow-xl border-2 border-white/20"
                             >
-                              <span className="relative z-10 flex items-center justify-center gap-2">
-                                Đăng ký sử dụng
-                                <Star className="w-3.5 h-3.5 fill-red-950" />
-                              </span>
-                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
+                              Đăng ký ngay
                             </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setFlippedCards(prev => ({ ...prev, gold: !prev.gold }));
                               }}
-                              className="w-full text-center text-[10px] text-yellow-200 font-bold hover:text-yellow-300"
+                              className="w-full text-center text-xs text-amber-200/60 font-black hover:text-amber-400 uppercase tracking-widest transition-colors"
                             >
                               🠔 Quay lại
                             </button>
@@ -466,67 +469,23 @@ export default function ProductDetailPage({
 
                       {/* Platinum Package */}
                       <div
-                        className={`relative group cursor-pointer transition-all preserve-3d min-h-[220px] ${flippedCards['platinum'] ? 'flipped' : ''}`}
+                        className={`relative group cursor-pointer transition-all preserve-3d min-h-[480px] ${flippedCards['platinum'] ? 'flipped' : ''}`}
                         onClick={() => setSelectedPackage("platinum")}
                       >
-                        {/* Sparkle Border Container - VIBRANT & PERSISTENT */}
-                        <div className={`absolute -inset-[2.5px] rounded-[19px] z-0 bg-[length:300%_300%] bg-gradient-to-r from-cyan-600 via-white to-blue-400 via-cyan-200 to-cyan-600 animate-border-sparkle`}></div>
+                        {/* Premium Sparkle Border */}
+                        <div className={`absolute -inset-[3px] rounded-[2.5rem] z-0 bg-[length:300%_300%] bg-gradient-to-r from-cyan-600 via-white to-blue-400 animate-border-sparkle opacity-80 shadow-[0_0_40px_rgba(34,211,238,0.3)]`}></div>
 
                         {/* Front Side */}
-                        <div className={`relative z-10 h-full backface-hidden rounded-2xl p-5 border-2 transition-all flex flex-col ${selectedPackage === "platinum" ? "bg-[#2a0101]/60 border-yellow-400 shadow-[0_0_35px_rgba(250,204,21,0.4)] animate-premium-glow-platinum" : "bg-[#1a0101]/95 border-transparent"}`}>
-                          <div className="flex justify-between items-start mb-3">
-                            <span className={`text-[10px] font-black uppercase flex items-center gap-1 tracking-wider ${selectedPackage === "platinum" ? "text-white" : "text-yellow-400"}`}>
-                              <Bot className="w-3 h-3" />
-                              BẠCH KIM
-                            </span>
-                            {selectedPackage === "platinum" && <CheckCircle className="w-5 h-5 text-yellow-400 drop-shadow-glow" />}
+                        <div className={`relative z-10 h-full backface-hidden rounded-[2.5rem] p-8 border-2 transition-all flex flex-col ${selectedPackage === "platinum" ? "bg-[#200000] border-amber-400 shadow-[0_0_60px_rgba(251,191,36,0.3)]" : "bg-[#100000] border-white/5 hover:border-amber-400/30"}`}>
+                          <div className="flex justify-between items-start mb-6">
+                            <span className="text-[10px] font-black uppercase text-amber-500/80 tracking-[0.2em]">Dành cho Đại lý</span>
+                            {selectedPackage === "platinum" && <CheckCircle className="w-7 h-7 text-amber-400 drop-shadow-glow" />}
                           </div>
-                          <div className={`text-2xl font-black mb-1 drop-shadow-sm ${selectedPackage === "platinum" ? "text-white" : "text-yellow-400"}`}>{formatCurrency(pricePlatinum)}</div>
-                          <p className={`text-[10px] mb-4 font-medium ${selectedPackage === "platinum" ? "text-yellow-100" : "text-yellow-100/60"}`}>{descriptionPlatinum}</p>
+                          <div className="text-[10px] text-amber-400 font-black uppercase tracking-widest mb-1">Gói Bạch Kim</div>
+                          <div className="text-4xl font-black mb-4 text-white drop-shadow-sm">{formatCurrency(pricePlatinum)}</div>
+                          <p className="text-sm text-red-50/60 mb-8 font-medium leading-relaxed">{descriptionPlatinum}</p>
 
-                          <div className="mt-auto space-y-3">
-                            {selectedPackage === "platinum" && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const cart = [{ id: product.id, quantity: 1, packageType: "platinum" }];
-                                  sessionStorage.setItem("cart", JSON.stringify(cart));
-                                  router.push("/dat-hang");
-                                }}
-                                className="relative overflow-hidden w-full py-2.5 bg-yellow-400 text-red-950 text-xs font-black rounded-lg hover:bg-yellow-300 transition-all uppercase shadow-lg group/btn"
-                              >
-                                <span className="relative z-10 flex items-center justify-center gap-2">
-                                  Đăng ký sử dụng
-                                  <Bot className="w-3.5 h-3.5" />
-                                </span>
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
-                              </button>
-                            )}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setFlippedCards(prev => ({ ...prev, platinum: !prev.platinum }));
-                              }}
-                              className="w-full text-center text-[10px] text-yellow-400 font-bold hover:text-yellow-300 underline underline-offset-4"
-                            >
-                              Xem ưu đãi ➔
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Back Side */}
-                        <div className="absolute inset-0 backface-hidden rounded-2xl p-5 bg-[#5a0505] border-2 border-yellow-400 rotate-y-180 flex flex-col shadow-2xl">
-                          <p className="text-yellow-400 font-bold text-xs mb-2">Đặc quyền Bạch Kim:</p>
-                          <div className="grid grid-cols-1 gap-1.5 overflow-hidden pr-1 mb-4">
-                            {featuresPlatinumStr.split("\n").filter((f: string) => f.trim()).map((feat: string, idx: number) => (
-                              <div key={idx} className="flex items-start gap-1.5 text-[10px] text-yellow-100/90 leading-tight">
-                                <CheckCircle className="w-2.5 h-2.5 shrink-0 mt-0.5 text-yellow-500" />
-                                <span>{feat}</span>
-                              </div>
-                            ))}
-                          </div>
-
-                          <div className="mt-auto space-y-3">
+                          <div className="mt-auto space-y-4">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -534,11 +493,11 @@ export default function ProductDetailPage({
                                 sessionStorage.setItem("cart", JSON.stringify(cart));
                                 router.push("/dat-hang");
                               }}
-                              className="relative overflow-hidden w-full py-2.5 bg-yellow-400 text-red-950 text-xs font-black rounded-lg hover:bg-yellow-300 transition-all uppercase shadow-lg group/btn"
+                              className="relative overflow-hidden w-full py-4 bg-amber-400 text-red-950 text-sm font-black rounded-2xl hover:bg-yellow-400 transition-all uppercase tracking-widest shadow-xl border-2 border-white/20 group/btn"
                             >
                               <span className="relative z-10 flex items-center justify-center gap-2">
-                                Đăng ký sử dụng
-                                <Bot className="w-3.5 h-3.5" />
+                                ĐĂNG KÝ NGAY
+                                <Sparkles className="w-4 h-4" />
                               </span>
                               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
                             </button>
@@ -547,14 +506,53 @@ export default function ProductDetailPage({
                                 e.stopPropagation();
                                 setFlippedCards(prev => ({ ...prev, platinum: !prev.platinum }));
                               }}
-                              className="w-full text-center text-[10px] text-yellow-200 font-bold hover:text-yellow-300"
+                              className="w-full text-center text-xs text-amber-500 font-black hover:text-amber-400 uppercase tracking-widest transition-colors"
+                            >
+                              Xem hệ sinh thái ➔
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Back Side */}
+                        <div className="absolute inset-0 backface-hidden rounded-[2.5rem] p-8 bg-[#300000] border-2 border-amber-400 rotate-y-180 flex flex-col shadow-2xl overflow-hidden group">
+                          <div className="absolute -top-10 -right-10 w-32 h-32 bg-amber-400/10 rounded-full blur-[60px]" />
+                          <h4 className="text-amber-400 font-black text-xs uppercase tracking-widest mb-6 flex items-center gap-3">
+                            <Sparkles className="w-4 h-4 fill-amber-400" />
+                            HỆ SINH THÁI PLATINUM:
+                          </h4>
+                          <div className="grid grid-cols-1 gap-4 mb-8">
+                            {featuresPlatinumStr.split("\n").filter((f: string) => f.trim()).map((feat: string, idx: number) => (
+                              <div key={idx} className="flex items-start gap-3 text-xs text-white/90 leading-tight">
+                                <CheckCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-400 drop-shadow-glow" />
+                                <span className="font-medium">{feat}</span>
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="mt-auto space-y-4">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const cart = [{ id: product.id, quantity: 1, packageType: "platinum" }];
+                                sessionStorage.setItem("cart", JSON.stringify(cart));
+                                router.push("/dat-hang");
+                              }}
+                              className="w-full py-4 bg-amber-400 text-red-950 text-sm font-black rounded-2xl hover:bg-yellow-400 transition-all uppercase tracking-widest shadow-xl border-2 border-white/20"
+                            >
+                              Đăng ký ngay
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setFlippedCards(prev => ({ ...prev, platinum: !prev.platinum }));
+                              }}
+                              className="w-full text-center text-xs text-amber-500/60 font-black hover:text-amber-400 uppercase tracking-widest transition-colors"
                             >
                               🠔 Quay lại
                             </button>
                           </div>
                         </div>
                       </div>
-                    </div>
                   </div>
 
 
@@ -682,6 +680,6 @@ export default function ProductDetailPage({
       </main>
 
       <Footer settings={{ site_phone: "0345 501 969" }} />
-    </div>
+    </div >
   );
 }

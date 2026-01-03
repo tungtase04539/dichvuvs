@@ -8,27 +8,33 @@ import { Gift, Users, MessageCircle, Star, ArrowRight, CheckCircle, Sparkles, Bo
 export default function QuaTangPage() {
   const gifts = [
     {
-      icon: "🧧",
-      title: "Lì Xì May Mắn",
-      description: "Nhận ngay voucher giảm giá từ 29K khi kích hoạt Trợ lý AI đầu năm",
+      logo: "https://freelogopng.com/images/all_img/1664035817capcut-logo-png.png",
+      title: "Capcut Pro",
+      duration: "1 THÁNG",
+      description: "Mở khóa toàn bộ tính năng và hiệu ứng cao cấp nhất của Capcut.",
       highlight: true,
     },
     {
-      icon: "🤖",
-      title: "Trải Nghiệm AI VIP",
-      description: "Dùng thử miễn phí các mẫu Trợ lý AI chuyên biệt cho doanh nghiệp",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
+      title: "ChatGPT Plus",
+      duration: "1 THÁNG / 1 NĂM",
+      description: "Trải nghiệm mô hình GPT-4o mới nhất với tốc độ phản hồi cực nhanh.",
     },
     {
-      icon: "📚",
-      title: "Bộ Template Tết",
-      description: "Kho kịch bản chăm sóc khách hàng tự động xuyên Tết",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg",
+      title: "Google Ultra",
+      duration: "45K CREDIT",
+      description: "Sử dụng veo3 và các tính năng AI đỉnh cao của Google.",
     },
     {
-      icon: "💎",
-      title: "Đặc Quyền Hội Viên",
-      description: "Hỗ trợ 1-1 cài đặt và tối ưu vận hành Trợ lý AI trọn đời",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/0/08/Canva_icon_2021.svg",
+      title: "Canva Pro Edu",
+      duration: "1 NĂM",
+      description: "Thiết kế không giới hạn với kho tài nguyên Pro khổng lồ.",
     },
   ];
+
+  const customerInitials = ["H", "M", "T", "A", "N", "V", "L"];
 
   return (
     <div className="min-h-screen bg-[#1a0101] overflow-x-hidden text-white">
@@ -75,9 +81,9 @@ export default function QuaTangPage() {
 
           <div className="mt-16 text-white font-bold flex flex-col items-center gap-4">
             <div className="flex -space-x-4">
-              {[1, 2, 3, 4, 5].map((i) => (
+              {customerInitials.map((initial, i) => (
                 <div key={i} className="w-12 h-12 rounded-full border-4 border-[#1a0101] bg-yellow-400 flex items-center justify-center text-red-900 font-bold shadow-xl">
-                  {String.fromCharCode(64 + i)}
+                  {initial}
                 </div>
               ))}
             </div>
@@ -100,14 +106,19 @@ export default function QuaTangPage() {
             {gifts.map((gift, index) => (
               <div
                 key={index}
-                className={`group p-10 rounded-[2.5rem] border-2 transition-all duration-500 hover:-translate-y-3 flex flex-col items-center text-center ${gift.highlight
+                className={`group p-10 rounded-[2.5rem] border-2 transition-all duration-500 hover:-translate-y-3 flex flex-col items-center text-center relative overflow-hidden ${gift.highlight
                   ? "bg-gradient-to-br from-yellow-400 to-amber-500 border-white/20 shadow-[0_20px_50px_rgba(250,204,21,0.2)]"
                   : "bg-[#2a0101]/60 border-yellow-400/10 hover:border-yellow-400/40"
                   }`}
               >
-                <div className="text-7xl mb-8 transform group-hover:scale-110 transition-transform duration-500">
-                  {gift.icon}
+                <div className="w-24 h-24 mb-8 transform group-hover:scale-110 transition-transform duration-500 flex items-center justify-center bg-white/10 rounded-3xl p-4 backdrop-blur-md">
+                  <img src={gift.logo} alt={gift.title} className="w-full h-full object-contain" />
                 </div>
+                {gift.duration && (
+                  <div className={`text-[10px] font-black tracking-widest uppercase mb-2 ${gift.highlight ? "text-red-900/60" : "text-yellow-400/60"}`}>
+                    {gift.duration}
+                  </div>
+                )}
                 <h3 className={`text-2xl font-black mb-4 uppercase leading-tight ${gift.highlight ? "text-red-950" : "text-white"}`}>
                   {gift.title}
                 </h3>

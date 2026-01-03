@@ -107,7 +107,7 @@ export default function QuaTangPage() {
                 key={index}
                 className="group p-10 rounded-[2.5rem] border-2 transition-all duration-500 hover:-translate-y-3 flex flex-col items-center text-center relative overflow-hidden bg-[#2a0101]/60 border-yellow-400/20 hover:border-yellow-400/60 shadow-[0_10px_40px_-15px_rgba(250,204,21,0.1)] hover:shadow-[0_20px_60px_-10px_rgba(250,204,21,0.2)]"
               >
-                <div className="w-24 h-24 mb-8 transform group-hover:scale-110 transition-transform duration-500 flex items-center justify-center bg-white/5 rounded-3xl p-4 backdrop-blur-md border border-white/10">
+                <div className="w-24 h-24 mb-8 transform group-hover:scale-110 transition-transform duration-500 flex items-center justify-center bg-white rounded-3xl p-4 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.3)] border-2 border-yellow-400/20 group-hover:border-yellow-400 group-hover:shadow-[0_15px_40px_-5px_rgba(251,191,36,0.3)]">
                   <img src={gift.logo} alt={gift.title} className="w-full h-full object-contain" />
                 </div>
                 {gift.duration && (

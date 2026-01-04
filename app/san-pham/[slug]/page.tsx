@@ -309,55 +309,111 @@ export default function ProductDetailPage({
                     </div>
                   )}
 
-                  {/* Package Selector */}
-                  <div className="grid grid-cols-1 gap-3">
+                  {/* 3D Package Selection Cards */}
+                  <div className="space-y-6">
                     {packages.map((pkg) => (
                       <div
                         key={pkg.id}
+                        className="relative h-[220px] preserve-3d group cursor-pointer"
                         onClick={() => setSelectedPackage(pkg.id as any)}
-                        className={cn(
-                          "group p-4 rounded-xl border-2 transition-all cursor-pointer",
-                          selectedPackage === pkg.id
-                            ? "bg-amber-400 border-amber-400 text-red-950 shadow-lg shadow-amber-400/20"
-                            : "bg-[#100000] border-white/5 text-white hover:border-amber-400/30"
-                        )}
                       >
-                        <div className="flex justify-between items-center">
-                          <div className="flex flex-col">
-                            <span className={cn(
-                              "text-[10px] font-black uppercase tracking-widest",
-                              selectedPackage === pkg.id ? "text-red-900/60" : "text-amber-500/60"
-                            )}>
-                              {pkg.name}
-                            </span>
-                            <span className="text-sm font-black whitespace-nowrap">
-                              {formatCurrency(pkg.price)}
-                            </span>
+                        <div className={cn(
+                          "absolute inset-0 transition-all duration-700 preserve-3d rounded-3xl border-2",
+                          flippedCards[pkg.id] ? "rotate-y-180" : "",
+                          selectedPackage === pkg.id
+                            ? (pkg.id === 'platinum' ? "border-cyan-400 animate-premium-glow-platinum shadow-[0_0_30px_rgba(34,211,238,0.2)]" : "border-amber-400 animate-premium-glow shadow-[0_0_30px_rgba(245,158,11,0.2)]")
+                            : "border-white/10"
+                        )}>
+                          {/* Front Side */}
+                          <div className={cn(
+                            "absolute inset-0 backface-hidden rounded-[1.4rem] p-6 flex flex-col justify-between overflow-hidden",
+                            pkg.id === 'standard' ? "bg-slate-900" : (pkg.id === 'gold' ? "bg-gradient-to-br from-amber-500/20 to-amber-900/40" : "bg-gradient-to-br from-cyan-500/20 to-cyan-900/40")
+                          )}>
+                            {/* Selected Checkmark */}
+                            {selectedPackage === pkg.id && (
+                              <div className="absolute top-4 right-4 z-20">
+                                <CheckCircle className={cn("w-6 h-6", pkg.id === 'platinum' ? "text-cyan-400" : "text-amber-400")} />
+                              </div>
+                            )}
+
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                {pkg.id === 'standard' ? <Zap className="w-4 h-4 text-slate-400" /> : (pkg.id === 'gold' ? <Star className="w-4 h-4 text-amber-400 fill-amber-400" /> : <Bot className="w-4 h-4 text-cyan-400" />)}
+                                <span className={cn("text-[10px] font-black uppercase tracking-widest", pkg.id === 'platinum' ? "text-cyan-400" : "text-amber-400")}>{pkg.name}</span>
+                              </div>
+                              <div className="text-3xl font-black mb-2">{formatCurrency(pkg.price)}</div>
+                              <p className="text-[11px] text-white/60 leading-tight line-clamp-2">
+                                {pkg.id === 'standard' ? descriptionStandard : (pkg.id === 'gold' ? descriptionGold : descriptionPlatinum)}
+                              </p>
+                            </div>
+
+                            <div className="space-y-3">
+                              <button
+                                className={cn(
+                                  "w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2",
+                                  selectedPackage === pkg.id
+                                    ? (pkg.id === 'platinum' ? "bg-cyan-400 text-slate-950" : "bg-amber-400 text-red-950")
+                                    : "bg-white/5 text-white hover:bg-white/10"
+                                )}
+                              >
+                                ĐĂNG KÝ SỬ DỤNG {pkg.id === 'gold' ? '★' : (pkg.id === 'platinum' ? '🤖' : '')}
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setFlippedCards(prev => ({ ...prev, [pkg.id]: true }));
+                                }}
+                                className="w-full text-[10px] text-amber-500/60 hover:text-amber-400 font-bold uppercase tracking-widest flex items-center justify-center gap-1 group/link"
+                              >
+                                Xem chi tiết ưu đãi
+                                <ArrowRight className="w-3 h-3 group-hover/link:translate-x-1 transition-transform" />
+                              </button>
+                            </div>
                           </div>
-                          {selectedPackage === pkg.id ? (
-                            <CheckCircle className="w-5 h-5 text-red-950" />
-                          ) : (
-                            <div className="w-5 h-5 rounded-full border border-white/10 group-hover:border-amber-400/30" />
-                          )}
+
+                          {/* Back Side */}
+                          <div className={cn(
+                            "absolute inset-0 backface-hidden rotate-y-180 rounded-[1.4rem] p-6 flex flex-col justify-between overflow-hidden",
+                            pkg.id === 'standard' ? "bg-slate-900" : (pkg.id === 'gold' ? "bg-gradient-to-br from-amber-600/30 to-red-950" : "bg-gradient-to-br from-cyan-600/30 to-slate-950")
+                          )}>
+                            <div className="space-y-3 overflow-y-auto max-h-[120px] pr-2 scrollbar-hide">
+                              <div className="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-2">Đặc quyền gói {pkg.name}</div>
+                              {pkg.features.map((f, i) => (
+                                <div key={i} className="flex items-start gap-2 text-[10px] text-white/80 leading-tight">
+                                  <CheckCircle className="w-3 h-3 text-green-400 mt-0.5 shrink-0" />
+                                  <span>{f}</span>
+                                </div>
+                              ))}
+                            </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setFlippedCards(prev => ({ ...prev, [pkg.id]: false }));
+                              }}
+                              className="w-full py-3 mt-2 bg-white/10 hover:bg-white/20 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
+                            >
+                              Quay lại
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
 
-                  {/* Purchase Button */}
+                  {/* Purchase Button - Proceed to checkout */}
                   <button
                     onClick={() => {
                       const cart = [{ id: product.id, quantity: 1, packageType: selectedPackage }];
                       sessionStorage.setItem("cart", JSON.stringify(cart));
                       router.push("/dat-hang");
                     }}
-                    className="w-full py-4 bg-amber-400 text-red-950 text-sm font-black rounded-xl hover:bg-yellow-400 transition-all uppercase tracking-widest shadow-xl flex items-center justify-center gap-2 group/btn relative overflow-hidden"
+                    className="w-full py-5 bg-gradient-to-r from-red-600 to-rose-600 text-white text-base font-black rounded-2xl hover:shadow-[0_0_30px_rgba(225,29,72,0.4)] transition-all uppercase tracking-[0.2em] shadow-xl flex items-center justify-center gap-3 group/confirm relative overflow-hidden"
                   >
-                    <span className="relative z-10 flex items-center gap-2">
-                      ĐĂNG KÝ NGAY
-                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    <span className="relative z-10 flex items-center gap-3">
+                      XÁC NHẬN ĐĂNG KÝ
+                      <ArrowRight className="w-6 h-6 group-hover/confirm:translate-x-2 transition-transform" />
                     </span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/confirm:animate-shimmer transition-transform" />
                   </button>
 
                   <div className="flex items-center justify-between">
@@ -366,12 +422,12 @@ export default function ProductDetailPage({
                         <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
                       ))}
                     </div>
-                    <span className="text-xs text-slate-500 ml-2">128 khách hàng đã tin dùng</span>
+                    <span className="text-xs text-slate-500 ml-2">1,248 khách hàng tin dùng</span>
                   </div>
 
-                  <div className="pt-6 border-t border-yellow-400/10 mt-6">
-                    <p className="text-[10px] text-yellow-500/40 italic text-center uppercase tracking-widest font-black leading-tight">
-                      Thanh toán an toàn qua ngân hàng tự động. Tài khoản bàn giao ngay lập tức.
+                  <div className="pt-6 border-t border-white/5 mt-6">
+                    <p className="text-[10px] text-white/20 italic text-center uppercase tracking-[0.2em] font-black leading-tight">
+                      Bàn giao tài khoản tự động ngay sau khi thanh toán
                     </p>
                   </div>
                 </div>

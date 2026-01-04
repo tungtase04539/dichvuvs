@@ -53,17 +53,17 @@ export default function GoiDichVuPage() {
         }
     };
 
-    const priceGold = globalSettings.price_gold ? parseFloat(globalSettings.price_gold) : 199000;
-    const pricePlatinum = globalSettings.price_platinum ? parseFloat(globalSettings.price_platinum) : 499000;
+    const priceGold = globalSettings.price_gold ? parseFloat(globalSettings.price_gold) : 600000;
+    const pricePlatinum = globalSettings.price_platinum ? parseFloat(globalSettings.price_platinum) : 1999999;
     const priceStandard = globalSettings.price_standard ? parseFloat(globalSettings.price_standard) : 29000;
 
-    const featuresGoldStr = globalSettings.features_gold || "Hỗ trợ ưu tiên\nUpdate 24/7\nTùy chỉnh chuyên sâu";
-    const featuresPlatinumStr = globalSettings.features_platinum || "Toàn bộ tính năng Premium\nBảo hành trọn đời\nHỗ trợ 1-1";
-    const featuresStandardStr = globalSettings.features_standard || "Sử dụng vĩnh viễn\nHỗ trợ cộng đồng\nUpdate bảo mật định kỳ";
+    const featuresGoldStr = globalSettings.features_gold || "Hỗ trợ 24/7\nTặng ChatGPT Plus 1 tháng\nTặng Capcut Pro 28 ngày\nTặng AI VIP\nTặng Tài liệu Marketing";
+    const featuresPlatinumStr = globalSettings.features_platinum || "Hỗ trợ 24/7\nTặng ChatGPT Plus 1 năm\nTặng Capcut Pro 60 ngày\nTặng Canva 1 năm\nTặng full hệ sinh thái AI";
+    const featuresStandardStr = globalSettings.features_standard || "Hỗ trợ 24/7\nCộng đồng hỗ trợ lớn mạnh";
 
-    const descriptionGold = globalSettings.description_gold || "Combo: Trợ lý AI + Thương hiệu & Quà tặng";
-    const descriptionPlatinum = globalSettings.description_platinum || "Full Option: Trợ lý AI + Hệ sinh thái đặc quyền";
-    const descriptionStandard = globalSettings.description_standard || "Gói cơ bản phù hợp cho cá nhân khởi đầu";
+    const descriptionGold = globalSettings.description_gold || "Combo 30 Trợ lý + ChatGPT plus 1 tháng + Capcut Pro 28 ngày";
+    const descriptionPlatinum = globalSettings.description_platinum || "Combo 30 Trợ lý + ChatGPT plus 1 năm + Capcut Pro 60 ngày + Canva 1 năm + ...";
+    const descriptionStandard = globalSettings.description_standard || "Hỗ trợ 24/7 , cộng đồng hỗ trợ lớn mạnh";
 
     const packages = [
         {

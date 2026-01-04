@@ -1,30 +1,57 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { CheckCircle, Zap, Crown, Award, ArrowRight, Star, Sparkles } from "lucide-react";
+import { CheckCircle, Zap, Crown, Award, ArrowRight, Star } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
 export default function GoiDichVuPage() {
     const [globalSettings, setGlobalSettings] = useState<Record<string, string>>({});
+    const [products, setProducts] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const router = useRouter();
 
     useEffect(() => {
-        const fetchSettings = async () => {
+        const loadData = async () => {
             try {
-                const res = await fetch("/api/admin/settings");
-                const data = await res.json();
-                if (data.settings) setGlobalSettings(data.settings);
+                const [settingsRes, productsRes] = await Promise.all([
+                    fetch("/api/admin/settings"),
+                    fetch("/api/products")
+                ]);
+                const settingsData = await settingsRes.json();
+                const productsData = await productsRes.json();
+
+                if (settingsData.settings) setGlobalSettings(settingsData.settings);
+                if (productsData.products) setProducts(productsData.products);
             } catch (error) {
-                console.error("Fetch settings error:", error);
+                console.error("Fetch data error:", error);
             } finally {
                 setIsLoading(false);
             }
         };
-        fetchSettings();
+        loadData();
     }, []);
+
+    const handlePurchase = (pkgId: string) => {
+        if (pkgId === "standard") {
+            router.push("/san-pham");
+            return;
+        }
+
+        // For Gold/Platinum, we need to pick a product to add to cart
+        const featuredProduct = products.find(p => p.featured) || products[0];
+
+        if (featuredProduct) {
+            const cart = [{ id: featuredProduct.id, quantity: 1, packageType: pkgId }];
+            sessionStorage.setItem("cart", JSON.stringify(cart));
+            router.push("/dat-hang");
+        } else {
+            // Fallback if no products exist
+            router.push("/san-pham");
+        }
+    };
 
     const priceGold = globalSettings.price_gold ? parseFloat(globalSettings.price_gold) : 199000;
     const pricePlatinum = globalSettings.price_platinum ? parseFloat(globalSettings.price_platinum) : 499000;
@@ -44,9 +71,8 @@ export default function GoiDichVuPage() {
             name: "TIÊU CHUẨN",
             price: priceStandard,
             description: descriptionStandard,
-            features: featuresStandardStr.split("\n").filter(f => f.trim()),
+            features: featuresStandardStr.split("\n").filter((f: string) => f.trim()),
             cta: "CHỌN TRỢ LÝ AI",
-            link: "/san-pham",
             icon: <Zap className="w-8 h-8 text-slate-400" />
         },
         {
@@ -54,9 +80,8 @@ export default function GoiDichVuPage() {
             name: "VÀNG (GOLD)",
             price: priceGold,
             description: descriptionGold,
-            features: featuresGoldStr.split("\n").filter(f => f.trim()),
+            features: featuresGoldStr.split("\n").filter((f: string) => f.trim()),
             cta: "MUA NGAY",
-            link: "/dat-hang",
             popular: true,
             icon: <Crown className="w-8 h-8 text-yellow-500" />
         },
@@ -65,9 +90,8 @@ export default function GoiDichVuPage() {
             name: "BẠCH KIM (PLATINUM)",
             price: pricePlatinum,
             description: descriptionPlatinum,
-            features: featuresPlatinumStr.split("\n").filter(f => f.trim()),
+            features: featuresPlatinumStr.split("\n").filter((f: string) => f.trim()),
             cta: "MUA NGAY",
-            link: "/dat-hang",
             icon: <Award className="w-8 h-8 text-cyan-400" />
         }
     ];
@@ -96,8 +120,8 @@ export default function GoiDichVuPage() {
                             <div
                                 key={pkg.id}
                                 className={`group relative p-10 rounded-[3rem] border-2 transition-all duration-500 hover:-translate-y-2 flex flex-col ${pkg.popular
-                                        ? "bg-[#250000] border-amber-400 shadow-[0_20px_80px_rgba(251,191,36,0.15)]"
-                                        : "bg-[#100000] border-white/5 hover:border-amber-400/30"
+                                    ? "bg-[#250000] border-amber-400 shadow-[0_20px_80px_rgba(251,191,36,0.15)]"
+                                    : "bg-[#100000] border-white/5 hover:border-amber-400/30"
                                     }`}
                             >
                                 {pkg.popular && (
@@ -130,11 +154,11 @@ export default function GoiDichVuPage() {
                                     </div>
                                 </div>
 
-                                <Link
-                                    href={pkg.link}
+                                <button
+                                    onClick={() => handlePurchase(pkg.id)}
                                     className={`mt-auto block w-full py-6 rounded-2xl text-center font-black uppercase tracking-widest transition-all text-sm relative overflow-hidden group/btn ${pkg.popular
-                                            ? "bg-amber-400 text-red-950 hover:bg-yellow-400 shadow-xl shadow-amber-400/20"
-                                            : "bg-white/5 text-white hover:bg-white/10 border border-white/10"
+                                        ? "bg-amber-400 text-red-950 hover:bg-yellow-400 shadow-xl shadow-amber-400/20"
+                                        : "bg-white/5 text-white hover:bg-white/10 border border-white/10"
                                         }`}
                                 >
                                     <span className="relative z-10 flex items-center justify-center gap-2">
@@ -142,7 +166,7 @@ export default function GoiDichVuPage() {
                                         <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
                                     </span>
                                     {pkg.popular && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />}
-                                </Link>
+                                </button>
                             </div>
                         ))}
                     </div>
@@ -165,17 +189,17 @@ export default function GoiDichVuPage() {
             <Footer settings={{}} />
 
             <style jsx>{`
-        .drop-shadow-glow {
-          filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.4));
-        }
-        @keyframes shimmer {
-          from { transform: translateX(-100%); }
-          to { transform: translateX(200%); }
-        }
-        .animate-shimmer {
-          animation: shimmer 2s infinite;
-        }
-      `}</style>
+                .drop-shadow-glow {
+                  filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.4));
+                }
+                @keyframes shimmer {
+                  from { transform: translateX(-100%); }
+                  to { transform: translateX(200%); }
+                }
+                .animate-shimmer {
+                  animation: shimmer 2s infinite;
+                }
+            `}</style>
         </div>
     );
 }

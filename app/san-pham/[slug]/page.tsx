@@ -252,6 +252,33 @@ export default function ProductDetailPage({
                   )}
                 </div>
               </div>
+
+              {/* Related Products - MOVED HERE */}
+              {relatedProducts.length > 0 && (
+                <div className="mt-16 bg-[#150000]/40 rounded-[2.5rem] p-8 border border-white/5 backdrop-blur-sm">
+                  <h2 className="text-2xl font-black text-white mb-8 uppercase tracking-tighter flex items-center gap-3">
+                    <div className="w-2 h-6 bg-amber-400 rounded-full" />
+                    Trợ lý AI liên quan
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {relatedProducts.map((item) => (
+                      <Link
+                        key={item.id}
+                        href={`/san-pham/${item.slug}`}
+                        className="group bg-[#2a0000]/60 p-5 rounded-2xl border border-white/5 hover:border-amber-400/30 transition-all hover:-translate-y-1 block"
+                      >
+                        <div className="w-12 h-12 bg-amber-400/10 rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">🤖</div>
+                        <h3 className="font-bold text-white mb-2 group-hover:text-amber-400 transition-colors line-clamp-1">
+                          {item.name}
+                        </h3>
+                        <p className="text-amber-400 font-black">
+                          {formatCurrency(item.price)}
+                        </p>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Sidebar */}
@@ -349,6 +376,38 @@ export default function ProductDetailPage({
                   </div>
                 </div>
 
+                {/* Consultation Card - MOVED HERE */}
+                <div className="mt-8">
+                  <div className="bg-gradient-to-br from-[#450a0a] to-[#2a0101] rounded-3xl p-8 text-white border border-amber-400/20 shadow-2xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                      <Bot className="w-20 h-20" />
+                    </div>
+
+                    <h3 className="text-xl font-black mb-3 text-amber-400 uppercase tracking-tighter leading-tight relative z-10">CẦN TƯ VẤN CHUYÊN SÂU?</h3>
+                    <p className="text-red-100/60 text-sm mb-6 leading-relaxed relative z-10">
+                      Liên hệ ngay với đội ngũ chuyên gia để được tư vấn giải pháp AI tối ưu nhất.
+                    </p>
+
+                    <div className="space-y-4 relative z-10">
+                      <a
+                        href="tel:0345501969"
+                        className="flex items-center justify-center gap-3 w-full py-4 bg-amber-400 text-red-950 rounded-xl font-black uppercase tracking-widest text-sm hover:bg-yellow-400 transition-all shadow-lg"
+                      >
+                        <Bot className="w-5 h-5" />
+                        0345 501 969
+                      </a>
+                      <a
+                        href="https://zalo.me/0345501969"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block text-center text-xs font-bold text-amber-500 hover:text-amber-400 uppercase tracking-[0.2em] underline underline-offset-4"
+                      >
+                        Hoặc Chat qua Zalo
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
                 <style jsx>{`
                 .preserve-3d {
                   transform-style: preserve-3d;
@@ -396,60 +455,6 @@ export default function ProductDetailPage({
                   animation: premium-glow-platinum 2s ease-in-out infinite;
                 }
               `}</style>
-
-
-
-              </div>
-            </div>
-
-            {/* Related Products */}
-            {relatedProducts.length > 0 && (
-              <div className="mt-16">
-                <h2 className="text-2xl font-bold text-white mb-8 uppercase">Trợ lý AI liên quan</h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {relatedProducts.map((item) => (
-                    <Link
-                      key={item.id}
-                      href={`/san-pham/${item.slug}`}
-                      className="group bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-sm hover:shadow-lg hover:border-primary-400/50 transition-all hover:-translate-y-1"
-                    >
-                      <div className="text-4xl mb-3">🤖</div>
-                      <h3 className="font-bold text-white mb-2 group-hover:text-primary-400 transition-colors">
-                        {item.name}
-                      </h3>
-                      <p className="text-primary-400 font-bold">
-                        {formatCurrency(item.price)}
-                      </p>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Contact Card - NOW AT BOTTOM */}
-            <div className="mt-20">
-              <div className="bg-gradient-cta rounded-3xl p-10 text-white border border-primary-400/20 text-center max-w-4xl mx-auto shadow-2xl">
-                <h3 className="text-3xl font-black mb-4 text-primary-400 uppercase tracking-tighter">CẦN TƯ VẤN CHUYÊN SÂU?</h3>
-                <p className="text-slate-300 text-lg mb-8 max-w-2xl mx-auto">
-                  Bạn chưa biết chọn gói nào? Liên hệ ngay với đội ngũ chuyên gia của chúng tôi để được tư vấn giải pháp AI tối ưu nhất cho doanh nghiệp của bạn.
-                </p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                  <a
-                    href="tel:0345501969"
-                    className="btn bg-primary-400 text-slate-900 hover:bg-primary-300 px-10 py-4 text-xl font-black uppercase shadow-xl shadow-primary-400/40 flex items-center gap-3 transition-all hover:scale-105"
-                  >
-                    <Bot className="w-6 h-6" />
-                    0345 501 969
-                  </a>
-                  <a
-                    href="https://zalo.me/0345501969"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary-400 hover:text-primary-300 font-bold uppercase tracking-widest text-sm underline underline-offset-4 transition-all"
-                  >
-                    Hoặc Chat qua Zalo
-                  </a>
-                </div>
               </div>
             </div>
           </div>
@@ -457,6 +462,6 @@ export default function ProductDetailPage({
       </main>
 
       <Footer settings={{ site_phone: "0345 501 969" }} />
-    </div >
+    </div>
   );
 }

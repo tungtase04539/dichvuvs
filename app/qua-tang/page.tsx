@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -254,8 +256,8 @@ export default function QuaTangPage() {
               <div
                 key={pkg.id}
                 className={`group relative p-8 rounded-[2.5rem] border-2 transition-all duration-500 hover:-translate-y-2 flex flex-col ${pkg.popular
-                    ? "bg-[#250000] border-yellow-400 shadow-[0_20px_50px_rgba(250,204,21,0.2)]"
-                    : "bg-[#100000] border-white/5 hover:border-yellow-400/30"
+                  ? "bg-[#250000] border-yellow-400 shadow-[0_20px_50px_rgba(250,204,21,0.2)]"
+                  : "bg-[#100000] border-white/5 hover:border-yellow-400/30"
                   }`}
               >
                 {pkg.popular && (
@@ -288,8 +290,8 @@ export default function QuaTangPage() {
                 <Link
                   href={pkg.link}
                   className={`block w-full py-5 rounded-2xl text-center font-black uppercase tracking-widest transition-all ${pkg.popular
-                      ? "bg-yellow-400 text-red-950 hover:bg-yellow-300 shadow-lg shadow-yellow-400/20"
-                      : "bg-white/5 text-white hover:bg-white/10 border border-white/10"
+                    ? "bg-yellow-400 text-red-950 hover:bg-yellow-300 shadow-lg shadow-yellow-400/20"
+                    : "bg-white/5 text-white hover:bg-white/10 border border-white/10"
                     }`}
                 >
                   {pkg.cta}

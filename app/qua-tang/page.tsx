@@ -1,13 +1,29 @@
-"use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Gift, Users, MessageCircle, Star, ArrowRight, CheckCircle, Sparkles, Bot } from "lucide-react";
+import { Gift, Users, MessageCircle, Star, ArrowRight, CheckCircle, Sparkles, Bot, Zap, Crown, Award } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
 
 export default function QuaTangPage() {
   const [flippedCards, setFlippedCards] = useState<Record<number, boolean>>({});
+  const [globalSettings, setGlobalSettings] = useState<Record<string, string>>({});
+  const [isLoadingSettings, setIsLoadingSettings] = useState(true);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch("/api/admin/settings");
+        const data = await res.json();
+        if (data.settings) setGlobalSettings(data.settings);
+      } catch (error) {
+        console.error("Fetch settings error:", error);
+      } finally {
+        setIsLoadingSettings(false);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   const gifts = [
     {
@@ -58,6 +74,45 @@ export default function QuaTangPage() {
         "Join vào Group Design độc quyền"
       ]
     },
+  ];
+
+  const priceGold = globalSettings.price_gold ? parseFloat(globalSettings.price_gold) : 199000;
+  const pricePlatinum = globalSettings.price_platinum ? parseFloat(globalSettings.price_platinum) : 499000;
+  const priceStandard = globalSettings.price_standard ? parseFloat(globalSettings.price_standard) : 29000;
+
+  const featuresGoldStr = globalSettings.features_gold || "Hỗ trợ ưu tiên\nUpdate 24/7\nTùy chỉnh chuyên sâu";
+  const featuresPlatinumStr = globalSettings.features_platinum || "Toàn bộ tính năng Premium\nBảo hành trọn đời\nHỗ trợ 1-1";
+  const featuresStandardStr = globalSettings.features_standard || "Sử dụng vĩnh viễn\nHỗ trợ cộng đồng\nUpdate bảo mật định kỳ";
+
+  const packages = [
+    {
+      id: "standard",
+      name: "TIÊU CHUẨN",
+      price: priceStandard,
+      features: featuresStandardStr.split("\n").filter(f => f.trim()),
+      cta: "CHỌN TRỢ LÝ AI",
+      link: "/san-pham",
+      icon: <Zap className="w-8 h-8 text-slate-400" />
+    },
+    {
+      id: "gold",
+      name: "VÀNG (GOLD)",
+      price: priceGold,
+      features: featuresGoldStr.split("\n").filter(f => f.trim()),
+      cta: "MUA NGAY",
+      link: "/dat-hang",
+      popular: true,
+      icon: <Crown className="w-8 h-8 text-yellow-500" />
+    },
+    {
+      id: "platinum",
+      name: "BẠCH KIM (PLATINUM)",
+      price: pricePlatinum,
+      features: featuresPlatinumStr.split("\n").filter(f => f.trim()),
+      cta: "MUA NGAY",
+      link: "/dat-hang",
+      icon: <Award className="w-8 h-8 text-cyan-400" />
+    }
   ];
 
   const customerInitials = ["H", "M", "T", "A", "N", "V", "L"];
@@ -178,6 +233,67 @@ export default function QuaTangPage() {
                     </button>
                   </div>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Packages Section */}
+      <section className="py-24 relative overflow-hidden bg-gradient-to-b from-[#2a0101]/40 to-transparent">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter">
+              GÓI DỊCH VỤ <span className="text-yellow-400">TRỢ LÝ AI</span>
+            </h2>
+            <p className="text-red-100/60 mt-4 font-medium uppercase tracking-widest text-sm md:text-base">Nâng tầm hiệu quả công việc với các đặc quyền VIP</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {packages.map((pkg) => (
+              <div
+                key={pkg.id}
+                className={`group relative p-8 rounded-[2.5rem] border-2 transition-all duration-500 hover:-translate-y-2 flex flex-col ${pkg.popular
+                    ? "bg-[#250000] border-yellow-400 shadow-[0_20px_50px_rgba(250,204,21,0.2)]"
+                    : "bg-[#100000] border-white/5 hover:border-yellow-400/30"
+                  }`}
+              >
+                {pkg.popular && (
+                  <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-yellow-400 text-red-950 px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest shadow-xl whitespace-nowrap z-20">
+                    Phổ biến nhất
+                  </div>
+                )}
+
+                <div className="mb-8 flex items-center justify-between">
+                  <div className={`p-4 rounded-2xl ${pkg.popular ? "bg-yellow-400/10" : "bg-white/5"}`}>
+                    {pkg.icon}
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs font-bold text-red-200/40 uppercase tracking-widest mb-1">{pkg.name}</div>
+                    <div className="text-3xl font-black text-yellow-400">
+                      {formatCurrency(pkg.price)}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4 mb-10 flex-1">
+                  {pkg.features.map((feature, i) => (
+                    <div key={i} className="flex items-center gap-3 text-sm text-red-50/80">
+                      <CheckCircle className={`w-5 h-5 shrink-0 ${pkg.popular ? "text-yellow-400" : "text-yellow-400/40"}`} />
+                      <span className="font-medium leading-tight">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <Link
+                  href={pkg.link}
+                  className={`block w-full py-5 rounded-2xl text-center font-black uppercase tracking-widest transition-all ${pkg.popular
+                      ? "bg-yellow-400 text-red-950 hover:bg-yellow-300 shadow-lg shadow-yellow-400/20"
+                      : "bg-white/5 text-white hover:bg-white/10 border border-white/10"
+                    }`}
+                >
+                  {pkg.cta}
+                </Link>
               </div>
             ))}
           </div>

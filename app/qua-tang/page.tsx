@@ -151,7 +151,7 @@ export default function QuaTangPage() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
             <a
-              href="https://zalo.me/0345501969"
+              href="https://zalo.me/g/ubarcp690"
               target="_blank"
               rel="noopener noreferrer"
               className="group relative inline-flex items-center gap-5 px-14 py-7 bg-yellow-400 text-red-950 font-black rounded-[2.5rem] hover:bg-yellow-300 transition-all duration-500 shadow-[0_25px_60px_-15px_rgba(250,204,21,0.3)] hover:scale-105 active:scale-95 text-2xl uppercase tracking-wider"
@@ -271,7 +271,7 @@ export default function QuaTangPage() {
             KHAI XUÂN <span className="text-yellow-400">RẠNG RỠ</span>
           </h2>
           <a
-            href="https://zalo.me/0345501969"
+            href="https://zalo.me/g/ubarcp690"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block px-16 py-8 bg-yellow-400 text-red-950 font-black text-3xl rounded-[2.5rem] shadow-[0_30px_60px_-10px_rgba(250,204,21,0.4)] hover:bg-yellow-300 transition-all uppercase hover:scale-105 active:scale-95"

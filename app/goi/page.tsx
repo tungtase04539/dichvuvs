@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CheckCircle, Zap, Crown, Award, ArrowRight, Star } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 
 export default function GoiDichVuPage() {
     const [globalSettings, setGlobalSettings] = useState<Record<string, string>>({});
@@ -119,54 +119,76 @@ export default function GoiDichVuPage() {
                         {packages.map((pkg) => (
                             <div
                                 key={pkg.id}
-                                className={`group relative p-10 rounded-[3rem] border-2 transition-all duration-500 hover:-translate-y-2 flex flex-col ${pkg.popular
-                                    ? "bg-[#250000] border-amber-400 shadow-[0_20px_80px_rgba(251,191,36,0.15)]"
-                                    : "bg-[#100000] border-white/5 hover:border-amber-400/30"
-                                    }`}
+                                onClick={() => handlePurchase(pkg.id)}
+                                className={cn(
+                                    "group relative p-10 rounded-[3rem] border-2 transition-all duration-500 hover:-translate-y-2 flex flex-col cursor-pointer",
+                                    pkg.id === "platinum"
+                                        ? "bg-[#000814] border-cyan-400/50 shadow-[0_20px_80px_rgba(34,211,238,0.25)]"
+                                        : pkg.popular
+                                            ? "bg-[#250000] border-amber-400/50 shadow-[0_20px_80px_rgba(251,191,36,0.15)]"
+                                            : "bg-[#100000] border-white/5 hover:border-amber-400/30",
+                                    (pkg.id === "platinum" || pkg.popular) && "before:absolute before:inset-[-3px] before:rounded-[3.2rem] before:pointer-events-none before:blur-[1px] before:z-[-1] before:content-['']",
+                                    pkg.id === "platinum" && "before:bg-gradient-to-r before:from-slate-200 before:via-cyan-400 before:to-slate-200 before:animate-border-sparkle-platinum before:opacity-100",
+                                    pkg.popular && "before:bg-gradient-to-r before:from-red-500 before:via-amber-400 before:to-red-500 before:animate-border-sparkle before:opacity-80"
+                                )}
                             >
                                 {pkg.popular && (
                                     <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-amber-400 text-red-950 px-8 py-2.5 rounded-full text-xs font-black uppercase tracking-widest shadow-2xl whitespace-nowrap z-20 border-2 border-white/20">
                                         Phổ biến nhất
                                     </div>
                                 )}
-
-                                <div className="mb-10 flex items-center justify-between">
-                                    <div className={`p-5 rounded-2xl ${pkg.popular ? "bg-amber-400/10" : "bg-white/5"}`}>
-                                        {pkg.icon}
+                                {pkg.id === "platinum" && (
+                                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-cyan-400 text-slate-950 px-8 py-2.5 rounded-full text-xs font-black uppercase tracking-widest shadow-2xl whitespace-nowrap z-20 border-2 border-white/20">
+                                        VIP nhất
                                     </div>
-                                    <div className="text-right">
-                                        <div className="text-xs font-bold text-amber-500/40 uppercase tracking-widest mb-1">{pkg.name}</div>
-                                        <div className="text-4xl font-black text-white">
-                                            {formatCurrency(pkg.price)}
+                                )}
+
+                                <div className="relative z-10 flex flex-col h-full">
+                                    <div className="mb-10 flex items-center justify-between">
+                                        <div className={cn("p-5 rounded-2xl", pkg.id === "platinum" ? "bg-cyan-400/10" : pkg.popular ? "bg-amber-400/10" : "bg-white/5")}>
+                                            {pkg.icon}
+                                        </div>
+                                        <div className="text-right">
+                                            <div className={cn("text-xs font-bold uppercase tracking-widest mb-1", pkg.id === "platinum" ? "text-cyan-400/60" : "text-amber-500/40")}>{pkg.name}</div>
+                                            <div className="text-4xl font-black text-white">
+                                                {formatCurrency(pkg.price)}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className="mb-10">
-                                    <p className="text-red-50/80 font-bold mb-8 leading-tight min-h-[3rem]">{pkg.description}</p>
-                                    <div className="space-y-5">
-                                        {pkg.features.map((feature, i) => (
-                                            <div key={i} className="flex items-start gap-4 text-sm text-red-50/60 leading-tight">
-                                                <CheckCircle className={`w-6 h-6 shrink-0 mt-[-2px] ${pkg.popular ? "text-amber-400" : "text-amber-400/30"}`} />
-                                                <span className="font-medium">{feature}</span>
-                                            </div>
-                                        ))}
+                                    <div className="mb-10">
+                                        <p className="text-red-50/80 font-bold mb-8 leading-tight min-h-[3rem]">{pkg.description}</p>
+                                        <div className="space-y-5">
+                                            {pkg.features.map((feature, i) => (
+                                                <div key={i} className="flex items-start gap-4 text-sm text-red-50/60 leading-tight">
+                                                    <CheckCircle className={cn("w-6 h-6 shrink-0 mt-[-2px]", pkg.id === "platinum" ? "text-cyan-400" : "text-amber-400", !pkg.popular && pkg.id !== "platinum" && "opacity-30")} />
+                                                    <span className="font-medium">{feature}</span>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
 
-                                <button
-                                    onClick={() => handlePurchase(pkg.id)}
-                                    className={`mt-auto block w-full py-6 rounded-2xl text-center font-black uppercase tracking-widest transition-all text-sm relative overflow-hidden group/btn ${pkg.popular
-                                        ? "bg-amber-400 text-red-950 hover:bg-yellow-400 shadow-xl shadow-amber-400/20"
-                                        : "bg-white/5 text-white hover:bg-white/10 border border-white/10"
-                                        }`}
-                                >
-                                    <span className="relative z-10 flex items-center justify-center gap-2">
-                                        {pkg.cta}
-                                        <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-                                    </span>
-                                    {pkg.popular && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />}
-                                </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handlePurchase(pkg.id);
+                                        }}
+                                        className={cn(
+                                            "mt-auto block w-full py-6 rounded-2xl text-center font-black uppercase tracking-widest transition-all text-sm relative overflow-hidden group/btn",
+                                            pkg.id === "platinum"
+                                                ? "bg-cyan-400 text-slate-950 hover:bg-cyan-300 shadow-xl shadow-cyan-400/20"
+                                                : pkg.popular
+                                                    ? "bg-amber-400 text-red-950 hover:bg-yellow-400 shadow-xl shadow-amber-400/20"
+                                                    : "bg-white/5 text-white hover:bg-white/10 border border-white/10"
+                                        )}
+                                    >
+                                        <span className="relative z-10 flex items-center justify-center gap-2">
+                                            {pkg.cta}
+                                            <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                                        </span>
+                                        {(pkg.id === "platinum" || pkg.popular) && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />}
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -195,6 +217,24 @@ export default function GoiDichVuPage() {
                 @keyframes shimmer {
                   from { transform: translateX(-100%); }
                   to { transform: translateX(200%); }
+                }
+                @keyframes border-sparkle {
+                  0% { background-position: 0% 50%; }
+                  50% { background-position: 100% 100%; }
+                  100% { background-position: 0% 50%; }
+                }
+                @keyframes border-sparkle-platinum {
+                  0% { background-position: 0% 50%; }
+                  50% { background-position: 100% 100%; }
+                  100% { background-position: 0% 50%; }
+                }
+                .animate-border-sparkle {
+                  animation: border-sparkle 4s ease infinite;
+                  background-size: 200% 200%;
+                }
+                .animate-border-sparkle-platinum {
+                  animation: border-sparkle-platinum 3s linear infinite;
+                  background-size: 200% 200%;
                 }
                 .animate-shimmer {
                   animation: shimmer 2s infinite;

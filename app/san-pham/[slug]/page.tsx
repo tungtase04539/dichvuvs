@@ -149,6 +149,12 @@ export default function ProductDetailPage({
     },
   ];
 
+  const handleRegister = (pkgId: string) => {
+    const cart = [{ id: product.id, quantity: 1, packageType: pkgId }];
+    sessionStorage.setItem("cart", JSON.stringify(cart));
+    router.push("/dat-hang");
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0000] text-white selection:bg-amber-400 selection:text-red-950">
       <Header settings={{ site_phone: "0345 501 969" }} />
@@ -311,23 +317,25 @@ export default function ProductDetailPage({
 
                   {/* 3D Package Selection Cards */}
                   <div className="space-y-6">
-                    {packages.map((pkg) => (
+                    {packages.map((pkg: any) => (
                       <div
                         key={pkg.id}
-                        className="relative h-[220px] preserve-3d group cursor-pointer"
-                        onClick={() => setSelectedPackage(pkg.id as any)}
+                        className="relative h-[250px] preserve-3d group cursor-pointer"
+                        onClick={() => setSelectedPackage(pkg.id as "standard" | "gold" | "platinum")}
                       >
                         <div className={cn(
                           "absolute inset-0 transition-all duration-700 preserve-3d rounded-3xl border-2",
                           flippedCards[pkg.id] ? "rotate-y-180" : "",
                           selectedPackage === pkg.id
-                            ? (pkg.id === 'platinum' ? "border-cyan-400 animate-premium-glow-platinum shadow-[0_0_30px_rgba(34,211,238,0.2)]" : "border-amber-400 animate-premium-glow shadow-[0_0_30px_rgba(245,158,11,0.2)]")
-                            : "border-white/10"
+                            ? (pkg.id === 'platinum' ? "border-cyan-400 animate-premium-glow-platinum shadow-[0_0_30px_rgba(34,211,238,0.3)]" : "border-amber-400 animate-premium-glow shadow-[0_0_30px_rgba(245,158,11,0.3)]")
+                            : "border-white/10",
+                          pkg.id === 'gold' && "before:absolute before:inset-[-3px] before:rounded-3xl before:bg-gradient-to-r before:from-red-500 before:via-amber-400 before:to-red-500 before:animate-border-sparkle before:pointer-events-none before:opacity-80 before:blur-[1px] before:content-['']",
+                          pkg.id === 'platinum' && "before:absolute before:inset-[-3px] before:rounded-3xl before:bg-gradient-to-r before:from-cyan-500 before:via-white before:to-blue-500 before:animate-border-sparkle-platinum before:pointer-events-none before:opacity-90 before:blur-[1px] before:content-['']"
                         )}>
                           {/* Front Side */}
                           <div className={cn(
                             "absolute inset-0 backface-hidden rounded-[1.4rem] p-6 flex flex-col justify-between overflow-hidden",
-                            pkg.id === 'standard' ? "bg-slate-900" : (pkg.id === 'gold' ? "bg-gradient-to-br from-amber-500/20 to-amber-900/40" : "bg-gradient-to-br from-cyan-500/20 to-cyan-900/40")
+                            pkg.id === 'standard' ? "bg-slate-900" : (pkg.id === 'gold' ? "bg-gradient-to-br from-[#450a0a] to-[#1a0101]" : "bg-gradient-to-br from-[#083344] to-[#01161e]")
                           )}>
                             {/* Selected Checkmark */}
                             {selectedPackage === pkg.id && (
@@ -341,29 +349,35 @@ export default function ProductDetailPage({
                                 {pkg.id === 'standard' ? <Zap className="w-4 h-4 text-slate-400" /> : (pkg.id === 'gold' ? <Star className="w-4 h-4 text-amber-400 fill-amber-400" /> : <Bot className="w-4 h-4 text-cyan-400" />)}
                                 <span className={cn("text-[10px] font-black uppercase tracking-widest", pkg.id === 'platinum' ? "text-cyan-400" : "text-amber-400")}>{pkg.name}</span>
                               </div>
-                              <div className="text-3xl font-black mb-2">{formatCurrency(pkg.price)}</div>
-                              <p className="text-[11px] text-white/60 leading-tight line-clamp-2">
-                                {pkg.id === 'standard' ? descriptionStandard : (pkg.id === 'gold' ? descriptionGold : descriptionPlatinum)}
+                              <div className="text-3xl font-black mb-2 flex items-baseline gap-1">
+                                <span className="text-2xl opacity-50">₫</span>
+                                {formatCurrency(pkg.price).replace('₫', '')}
+                              </div>
+                              <p className="text-[11px] text-white/70 leading-tight line-clamp-2 italic">
+                                "{pkg.id === 'standard' ? descriptionStandard : (pkg.id === 'gold' ? descriptionGold : descriptionPlatinum)}"
                               </p>
                             </div>
 
                             <div className="space-y-3">
                               <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRegister(pkg.id);
+                                }}
                                 className={cn(
-                                  "w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2",
-                                  selectedPackage === pkg.id
-                                    ? (pkg.id === 'platinum' ? "bg-cyan-400 text-slate-950" : "bg-amber-400 text-red-950")
-                                    : "bg-white/5 text-white hover:bg-white/10"
+                                  "w-full py-3.5 rounded-xl text-xs font-black uppercase tracking-[0.1em] transition-all flex items-center justify-center gap-2 relative overflow-hidden group/btn shadow-xl active:scale-95",
+                                  pkg.id === 'platinum' ? "bg-cyan-400 text-slate-950" : "bg-amber-400 text-red-950"
                                 )}
                               >
-                                ĐĂNG KÝ SỬ DỤNG {pkg.id === 'gold' ? '★' : (pkg.id === 'platinum' ? '🤖' : '')}
+                                <span className="relative z-10">ĐĂNG KÝ SỬ DỤNG {pkg.id === 'gold' ? '★' : (pkg.id === 'platinum' ? '🤖' : '')}</span>
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />
                               </button>
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setFlippedCards(prev => ({ ...prev, [pkg.id]: true }));
                                 }}
-                                className="w-full text-[10px] text-amber-500/60 hover:text-amber-400 font-bold uppercase tracking-widest flex items-center justify-center gap-1 group/link"
+                                className="w-full text-[10px] text-amber-500/80 hover:text-amber-400 font-bold uppercase tracking-widest flex items-center justify-center gap-1 group/link transition-colors"
                               >
                                 Xem chi tiết ưu đãi
                                 <ArrowRight className="w-3 h-3 group-hover/link:translate-x-1 transition-transform" />
@@ -374,26 +388,40 @@ export default function ProductDetailPage({
                           {/* Back Side */}
                           <div className={cn(
                             "absolute inset-0 backface-hidden rotate-y-180 rounded-[1.4rem] p-6 flex flex-col justify-between overflow-hidden",
-                            pkg.id === 'standard' ? "bg-slate-900" : (pkg.id === 'gold' ? "bg-gradient-to-br from-amber-600/30 to-red-950" : "bg-gradient-to-br from-cyan-600/30 to-slate-950")
+                            pkg.id === 'standard' ? "bg-slate-900" : (pkg.id === 'gold' ? "bg-gradient-to-br from-red-950 to-[#0a0000]" : "bg-gradient-to-br from-cyan-950 to-[#000a0a]")
                           )}>
-                            <div className="space-y-3 overflow-y-auto max-h-[120px] pr-2 scrollbar-hide">
-                              <div className="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-2">Đặc quyền gói {pkg.name}</div>
-                              {pkg.features.map((f, i) => (
-                                <div key={i} className="flex items-start gap-2 text-[10px] text-white/80 leading-tight">
-                                  <CheckCircle className="w-3 h-3 text-green-400 mt-0.5 shrink-0" />
-                                  <span>{f}</span>
-                                </div>
-                              ))}
+                            <div className="space-y-3 pr-1">
+                              <div className="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-2 border-b border-white/10 pb-2">Đặc quyền gói {pkg.name}</div>
+                              <div className="space-y-2.5 overflow-y-auto max-h-[120px] scrollbar-hide">
+                                {pkg.features.map((f: string, i: number) => (
+                                  <div key={i} className="flex items-start gap-2 text-[10px] text-white/90 leading-tight">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 mt-1 shrink-0 shadow-[0_0_5px_rgba(74,222,128,0.5)]" />
+                                    <span>{f}</span>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setFlippedCards(prev => ({ ...prev, [pkg.id]: false }));
-                              }}
-                              className="w-full py-3 mt-2 bg-white/10 hover:bg-white/20 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
-                            >
-                              Quay lại
-                            </button>
+
+                            <div className="space-y-3 mt-4 pt-4 border-t border-white/5">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRegister(pkg.id);
+                                }}
+                                className="w-full py-3 bg-amber-400 text-red-950 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-lg flex items-center justify-center"
+                              >
+                                ĐĂNG KÝ NGAY !
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setFlippedCards(prev => ({ ...prev, [pkg.id]: false }));
+                                }}
+                                className="w-full py-2 bg-white/5 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all border border-white/10 text-white/60 hover:text-white"
+                              >
+                                Quay lại
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -402,12 +430,8 @@ export default function ProductDetailPage({
 
                   {/* Purchase Button - Proceed to checkout */}
                   <button
-                    onClick={() => {
-                      const cart = [{ id: product.id, quantity: 1, packageType: selectedPackage }];
-                      sessionStorage.setItem("cart", JSON.stringify(cart));
-                      router.push("/dat-hang");
-                    }}
-                    className="w-full py-5 bg-gradient-to-r from-red-600 to-rose-600 text-white text-base font-black rounded-2xl hover:shadow-[0_0_30px_rgba(225,29,72,0.4)] transition-all uppercase tracking-[0.2em] shadow-xl flex items-center justify-center gap-3 group/confirm relative overflow-hidden"
+                    onClick={() => handleRegister(selectedPackage)}
+                    className="w-full py-5 bg-gradient-to-r from-red-600 to-rose-600 text-white text-base font-black rounded-2xl hover:shadow-[0_0_30px_rgba(225,29,72,0.5)] transition-all uppercase tracking-[0.2em] shadow-xl flex items-center justify-center gap-3 group/confirm relative overflow-hidden active:scale-[0.98]"
                   >
                     <span className="relative z-10 flex items-center gap-3">
                       XÁC NHẬN ĐĂNG KÝ
@@ -490,8 +514,17 @@ export default function ProductDetailPage({
                   50% { background-position: 100% 100%; }
                   100% { background-position: 0% 50%; }
                 }
+                @keyframes border-sparkle-platinum {
+                  0% { background-position: 0% 50%; }
+                  50% { background-position: 100% 100%; }
+                  100% { background-position: 0% 50%; }
+                }
                 .animate-border-sparkle {
                   animation: border-sparkle 4s ease infinite;
+                }
+                .animate-border-sparkle-platinum {
+                  animation: border-sparkle-platinum 3s linear infinite;
+                  background-size: 200% 200%;
                 }
                 .drop-shadow-glow {
                   filter: drop-shadow(0 0 8px currentColor);

@@ -127,15 +127,15 @@ export default function GoiDichVuPage() {
                                     key={pkg.id}
                                     onClick={() => handlePurchase(pkg.id)}
                                     className={cn(
-                                        "group relative p-10 rounded-[3rem] border-2 transition-all duration-500 hover:-translate-y-2 flex flex-col cursor-pointer",
+                                        "group relative isolate p-10 rounded-[3rem] border-2 transition-all duration-500 hover:-translate-y-2 flex flex-col cursor-pointer",
                                         pkg.id === "platinum"
-                                            ? "bg-gradient-to-br from-[#0c1622] to-[#000814] border-cyan-400/40 shadow-[0_0_50px_rgba(34,211,238,0.15)]"
+                                            ? "bg-gradient-to-br from-[#0c1622] to-[#000814] border-cyan-400/40 shadow-[0_0_50px_rgba(34,211,238,0.15)] hover:shadow-[0_0_80px_rgba(34,211,238,0.25)]"
                                             : pkg.popular
-                                                ? "bg-gradient-to-br from-[#1a0101] to-[#0a0000] border-amber-400/40 shadow-[0_0_50px_rgba(251,191,36,0.15)]"
+                                                ? "bg-gradient-to-br from-[#1a0101] to-[#0a0000] border-amber-400/40 shadow-[0_0_50px_rgba(251,191,36,0.15)] hover:shadow-[0_0_80px_rgba(251,191,36,0.25)]"
                                                 : "bg-[#100000] border-white/5 hover:border-amber-400/30",
                                         (pkg.id === "platinum" || pkg.popular) && "before:absolute before:inset-[-3px] before:rounded-[3.2rem] before:pointer-events-none before:blur-[2px] before:z-[-1] before:content-['']",
-                                        pkg.id === "platinum" && "before:bg-gradient-to-r before:from-slate-400 before:via-cyan-400 before:to-slate-400 before:animate-border-sparkle-platinum before:opacity-100",
-                                        pkg.popular && "before:bg-gradient-to-r before:from-red-600 before:via-amber-400 before:to-red-600 before:animate-border-sparkle before:opacity-100"
+                                        pkg.id === "platinum" && "before:bg-gradient-to-r before:from-slate-400 before:via-cyan-400 before:to-slate-400 before:animate-border-sparkle-platinum before:opacity-60 group-hover:before:opacity-100",
+                                        pkg.popular && "before:bg-gradient-to-r before:from-red-600 before:via-amber-400 before:to-red-600 before:animate-border-sparkle before:opacity-60 group-hover:before:opacity-100"
                                     )}
                                 >
                                     {pkg.popular && (

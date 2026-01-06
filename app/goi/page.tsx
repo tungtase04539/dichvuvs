@@ -127,38 +127,38 @@ export default function GoiDichVuPage() {
                                     key={pkg.id}
                                     onClick={() => handlePurchase(pkg.id)}
                                     className={cn(
-                                        "group relative isolate p-10 rounded-[3rem] border-2 transition-all duration-500 hover:-translate-y-2 flex flex-col cursor-pointer overflow-hidden",
+                                        "group relative isolate p-10 rounded-[3rem] border-4 transition-all duration-500 hover:-translate-y-2 flex flex-col cursor-pointer overflow-hidden",
                                         pkg.id === "platinum"
-                                            ? "bg-gradient-to-br from-[#020617] via-[#000000] to-[#010208] border-slate-100/30 shadow-[0_0_60px_rgba(148,163,184,0.15)] hover:shadow-[0_0_100px_rgba(148,163,184,0.25)]"
+                                            ? "bg-gradient-to-br from-[#a81a1a] via-[#450a0a] to-[#000000] border-white/60 shadow-[0_0_80px_rgba(255,255,255,0.2)] hover:shadow-[0_0_120px_rgba(255,255,255,0.35)]"
                                             : pkg.popular
-                                                ? "bg-gradient-to-br from-[#0c0a09] via-[#1c1917] to-[#000000] border-amber-500/20 shadow-[0_0_60px_rgba(251,191,36,0.1)] hover:shadow-[0_0_100px_rgba(251,191,36,0.15)]"
-                                                : "bg-[#100000] border-white/5 hover:border-amber-400/30",
+                                                ? "bg-gradient-to-br from-[#991b1b] via-[#4c0505] to-[#1a0000] border-amber-400/70 shadow-[0_0_80px_rgba(251,191,36,0.2)] hover:shadow-[0_0_120px_rgba(251,191,36,0.3)]"
+                                                : "bg-[#2d0a0a] border-white/20 hover:border-red-500/50 shadow-[0_0_40px_rgba(0,0,0,0.5)] hover:shadow-[0_0_50px_rgba(239,68,68,0.2)]",
                                         (pkg.id === "platinum" || pkg.popular) && "before:absolute before:inset-[-3px] before:rounded-[3.2rem] before:pointer-events-none before:blur-[2px] before:z-[-1] before:content-['']",
-                                        pkg.id === "platinum" && "before:bg-gradient-to-r before:from-slate-600 before:via-white before:to-slate-600 before:animate-border-sparkle-platinum before:opacity-80 group-hover:before:opacity-100",
-                                        pkg.popular && "before:bg-gradient-to-r before:from-stone-600 before:via-amber-400/60 before:to-stone-600 before:animate-border-sparkle before:opacity-60 group-hover:before:opacity-100"
+                                        pkg.id === "platinum" && "before:bg-gradient-to-r before:from-slate-400 before:via-white before:to-slate-400 before:animate-border-sparkle-platinum before:opacity-90 group-hover:before:opacity-100",
+                                        pkg.popular && "before:bg-gradient-to-r before:from-orange-600 before:via-amber-300 before:to-orange-600 before:animate-border-sparkle before:opacity-90 group-hover:before:opacity-100"
                                     )}
                                 >
                                     {/* Background Pattern */}
-                                    <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] mix-blend-overlay" />
-                                    <div className="absolute inset-0 bg-gradient-to-tr from-white/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                                    <div className="absolute inset-0 opacity-[0.04] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] mix-blend-overlay" />
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
                                     {pkg.popular && (
-                                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-amber-400/90 text-stone-950 px-8 py-2.5 rounded-full text-xs font-black uppercase tracking-widest shadow-2xl whitespace-nowrap z-20 border-2 border-white/10">
+                                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-amber-600 text-red-950 px-8 py-2.5 rounded-full text-xs font-black uppercase tracking-widest shadow-2xl whitespace-nowrap z-20 border-2 border-white/30">
                                             Phổ biến nhất
                                         </div>
                                     )}
                                     {pkg.id === "platinum" && (
-                                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-white text-slate-950 px-8 py-2.5 rounded-full text-xs font-black uppercase tracking-widest shadow-2xl whitespace-nowrap z-20 border-2 border-slate-200">
+                                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-white text-red-900 px-8 py-2.5 rounded-full text-xs font-black uppercase tracking-widest shadow-2xl whitespace-nowrap z-20 border-2 border-red-200">
                                             VIP nhất
                                         </div>
                                     )}
 
                                     <div className="relative z-10 flex flex-col h-full">
                                         <div className="mb-10 flex items-center justify-between">
-                                            <div className={cn("p-5 rounded-2xl", pkg.id === "platinum" ? "bg-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]" : pkg.popular ? "bg-amber-400/5 shadow-[0_0_20px_rgba(251,191,36,0.05)]" : "bg-white/5")}>
+                                            <div className={cn("p-5 rounded-2xl", pkg.id === "platinum" ? "bg-white/20 shadow-[0_0_30px_rgba(255,255,255,0.15)]" : pkg.popular ? "bg-amber-400/20 shadow-[0_0_30px_rgba(251,191,36,0.15)]" : "bg-white/10")}>
                                                 {pkg.icon}
                                             </div>
                                             <div className="text-right">
-                                                <div className={cn("text-xs font-black uppercase tracking-[0.2em] mb-2", pkg.id === "platinum" ? "text-slate-300" : "text-amber-500/40")}>{pkg.name}</div>
+                                                <div className={cn("text-xs font-black uppercase tracking-[0.2em] mb-2", pkg.id === "platinum" ? "text-slate-100" : "text-amber-400/80")}>{pkg.name}</div>
                                                 <div className="flex items-baseline justify-end gap-1">
                                                     <span className="text-5xl font-black text-white tracking-tighter">
                                                         {pkg.price.toLocaleString("vi-VN")}

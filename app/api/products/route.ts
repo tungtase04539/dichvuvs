@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
     // Get query params
     const { searchParams } = new URL(request.url);
     const categorySlug = searchParams.get("category");
+    const isTrialParam = searchParams.get("isTrial");
 
     console.log("API /products called with category:", categorySlug || "all");
 
@@ -68,9 +69,40 @@ export async function GET(request: NextRequest) {
       query = query.eq("categoryId", category.id);
     }
 
-    const { data: products, error } = await query
-      .order("featured", { ascending: false })
-      .order("name", { ascending: true });
+    // Filter by isTrial if provided
+    if (isTrialParam === "true") {
+      console.log("Filtering by isTrial: true");
+      try {
+        query = query.eq("isTrial", true);
+      } catch (e) {
+        console.warn("isTrial filter failed, column might be missing:", e);
+      }
+    }
+
+    let result;
+    try {
+      result = await query
+        .order("featured", { ascending: false })
+        .order("name", { ascending: true });
+    } catch (e: any) {
+      console.error("Query failed:", e);
+      // If it's a missing column error for isTrial, try again without it
+      if (isTrialParam === "true" && (e.message?.includes("isTrial") || e.details?.includes("isTrial"))) {
+        console.log("Retrying query without isTrial filter...");
+        const fallbackQuery = supabase
+          .from("Service")
+          .select("*")
+          .eq("active", true)
+          .order("featured", { ascending: false })
+          .order("name", { ascending: true });
+        result = await fallbackQuery;
+        // manually filter in memory if needed, but for now just return empty or all
+        return NextResponse.json({ products: [] });
+      }
+      throw e;
+    }
+
+    const { data: products, error } = result;
 
     if (error) {
       console.error("Get products error:", error);

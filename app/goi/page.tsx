@@ -200,6 +200,18 @@ export default function GoiDichVuPage() {
                                             </span>
                                             {(pkg.id === "platinum" || pkg.popular) && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover/btn:animate-shimmer transition-transform" />}
                                         </button>
+
+                                        {/* Free Trial Link */}
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                router.push("/dung-thu");
+                                            }}
+                                            className="mt-4 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-amber-400/40 hover:text-amber-400 transition-colors py-2"
+                                        >
+                                            <Star className="w-3 h-3" />
+                                            Dùng thử miễn phí
+                                        </button>
                                     </div>
                                 </div>
                             ))}

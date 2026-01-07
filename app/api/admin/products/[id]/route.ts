@@ -49,7 +49,8 @@ export async function PUT(
       name, slug, description, longDescription, price, image, videoUrl,
       categoryId, featured, active, chatbotLink,
       priceGold, pricePlatinum, featuresGold, featuresPlatinum,
-      chatbotLinkGold, chatbotLinkPlatinum
+      chatbotLinkGold, chatbotLinkPlatinum,
+      isTrial, trialCode
     } = body;
 
     if (!name || !slug || !price) {
@@ -94,6 +95,8 @@ export async function PUT(
         featuresPlatinum: featuresPlatinum || null,
         chatbotLinkGold: chatbotLinkGold || null,
         chatbotLinkPlatinum: chatbotLinkPlatinum || null,
+        isTrial: isTrial === true,
+        trialCode: trialCode || null,
         updatedAt: new Date().toISOString(),
       })
       .eq("id", params.id)

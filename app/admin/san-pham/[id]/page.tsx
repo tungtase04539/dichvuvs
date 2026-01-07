@@ -46,6 +46,8 @@ export default function EditProductPage() {
     featured: false,
     active: true,
     chatbotLink: "",
+    isTrial: false,
+    trialCode: "",
   });
 
   // Load categories
@@ -84,6 +86,8 @@ export default function EditProductPage() {
             featured: data.product.featured || false,
             active: data.product.active !== false,
             chatbotLink: data.product.chatbotLink || "",
+            isTrial: data.product.isTrial === true,
+            trialCode: data.product.trialCode || "",
           });
         } else {
           setError("Không tìm thấy sản phẩm");
@@ -302,7 +306,40 @@ export default function EditProductPage() {
               />
               <span className="text-sm text-slate-700">Hiển thị</span>
             </label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.isTrial}
+                onChange={(e) => setFormData({ ...formData, isTrial: e.target.checked })}
+                className="w-4 h-4 rounded border-slate-300 text-orange-500 focus:ring-orange-500"
+              />
+              <span className="text-sm text-slate-700 font-bold text-orange-600">Dùng thử miễn phí</span>
+            </label>
           </div>
+
+          {/* Trial Code (only show if isTrial is checked) */}
+          {formData.isTrial && (
+            <div className="p-4 bg-orange-50 border border-orange-100 rounded-lg space-y-4">
+              <h4 className="text-sm font-bold text-orange-800 uppercase tracking-wider">Thông tin dùng thử</h4>
+              <div>
+                <label className="block text-sm font-medium text-orange-700 mb-2">
+                  Mã xác minh dùng thử <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.trialCode}
+                  onChange={(e) => setFormData({ ...formData, trialCode: e.target.value })}
+                  required={formData.isTrial}
+                  className="w-full px-4 py-2.5 border border-orange-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 font-mono"
+                  placeholder="VD: TRY-FREE-2026"
+                />
+                <p className="text-xs text-orange-600 mt-2">
+                  Mã này sẽ hiển thị khi khách hàng nhấn vào trợ lý ở trang dùng thử
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Error */}
           {error && (

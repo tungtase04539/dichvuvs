@@ -91,13 +91,15 @@ model Service {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   chatbotLink     String? // Link chatbot mac dinh cho san pham nay
-  
+  isTrial         Boolean  @default(false)
+  trialCode       String? // Ma xac minh dung thu
+
   // Custom Packages (Gold & Platinum)
-  priceGold        Float?
-  pricePlatinum    Float?
-  featuresGold     String? // JSON string of perks
-  featuresPlatinum String? // JSON string of perks
-  chatbotLinkGold  String? // Dedicated link for Gold package
+  priceGold           Float?
+  pricePlatinum       Float?
+  featuresGold        String? // JSON string of perks
+  featuresPlatinum    String? // JSON string of perks
+  chatbotLinkGold     String? // Dedicated link for Gold package
   chatbotLinkPlatinum String? // Dedicated link for Platinum package
 
   // Category
@@ -136,10 +138,10 @@ model Order {
   totalPrice Float
 
   // Status
-  status      String  @default("pending")
+  status           String  @default("pending")
   orderPackageType String?
-  chatbotLink String?
-  notes       String?
+  chatbotLink      String?
+  notes            String?
 
   // Assignment
   assignedToId String?

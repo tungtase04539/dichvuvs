@@ -44,7 +44,8 @@ export async function POST(request: NextRequest) {
       name, slug, description, longDescription, price, image, videoUrl,
       categoryId, featured, active, chatbotLink,
       priceGold, pricePlatinum, featuresGold, featuresPlatinum,
-      chatbotLinkGold, chatbotLinkPlatinum
+      chatbotLinkGold, chatbotLinkPlatinum,
+      isTrial, trialCode
     } = body;
 
     if (!name || !slug || !price) {
@@ -91,6 +92,8 @@ export async function POST(request: NextRequest) {
         featuresPlatinum: featuresPlatinum || null,
         chatbotLinkGold: chatbotLinkGold || null,
         chatbotLinkPlatinum: chatbotLinkPlatinum || null,
+        isTrial: isTrial === true,
+        trialCode: trialCode || null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       })

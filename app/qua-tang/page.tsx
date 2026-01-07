@@ -241,6 +241,92 @@ export default function QuaTangPage() {
         </div>
       </section>
 
+      {/* CTV/Partner Benefits Section */}
+      <section className="py-24 bg-gradient-to-b from-[#2a0101]/40 to-[#1a0101] relative">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-400/10 text-yellow-400 rounded-full text-xs font-black mb-6 border border-yellow-400/20 uppercase tracking-widest">
+              <Star className="w-4 h-4" />
+              Dành cho CTV/Đại Lý/Đối tác
+            </div>
+            <h2 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">
+              ĐẶC QUYỀN <span className="text-yellow-400">ĐỘC QUYỀN</span>
+            </h2>
+            <div className="h-1.5 w-32 bg-yellow-400 mx-auto mt-6 rounded-full"></div>
+          </div>
+
+          <div className="max-w-4xl mx-auto space-y-6">
+            {[
+              {
+                number: 1,
+                title: "Bí quyết học AI miễn phí cùng các chuyên gia nổi tiếng nhất",
+                icon: "🎓"
+              },
+              {
+                number: 2,
+                title: 'Khóa học "Bình dân học vụ AI từ con số 0"',
+                icon: "📚"
+              },
+              {
+                number: 3,
+                title: "Hướng dẫn cách sử dụng trợ lý AI - do Tiến Dũng AI lập trình",
+                icon: "🤖"
+              },
+              {
+                number: 4,
+                title: "Tặng siêu trợ lý AI - App tạo ảnh Hot trend (Tết..)",
+                icon: "🎨"
+              },
+              {
+                number: 5,
+                title: "Tặng TK Canva Edu 1 năm & Hướng dẫn bí kíp kiếm tiền ko giới hạn từ con số 0 với AI",
+                subtitle: "Khi đăng ký trở thành CTV/Đại Lý/Đối tác",
+                icon: "💰"
+              }
+            ].map((item, index) => (
+              <div
+                key={index}
+                className="group flex items-start gap-6 p-6 bg-[#2a0101]/60 rounded-2xl border border-yellow-400/10 hover:border-yellow-400/40 transition-all hover:bg-[#2a0101]/80"
+              >
+                <div className="w-14 h-14 rounded-xl bg-yellow-400 text-red-900 flex items-center justify-center text-2xl font-black shadow-lg shrink-0 group-hover:scale-110 transition-transform">
+                  {item.number}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{item.icon}</span>
+                    <h3 className="text-lg md:text-xl font-bold text-white group-hover:text-yellow-400 transition-colors">
+                      {item.title}
+                    </h3>
+                  </div>
+                  {item.subtitle && (
+                    <p className="text-yellow-400/60 text-sm font-medium mt-2 ml-9">
+                      {item.subtitle}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Zalo Group CTA */}
+          <div className="mt-16 text-center">
+            <div className="inline-flex flex-col items-center gap-4 p-8 bg-yellow-400/5 rounded-3xl border border-yellow-400/20">
+              <p className="text-yellow-400/80 font-bold uppercase tracking-widest text-sm">Nhóm Zalo hỗ trợ</p>
+              <a
+                href="https://zalo.me/g/ubarcp690"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-yellow-400 text-red-950 font-black rounded-2xl hover:bg-yellow-300 transition-all shadow-lg hover:scale-105 active:scale-95 uppercase tracking-wider"
+              >
+                <MessageCircle className="w-5 h-5" />
+                Tham gia ngay
+              </a>
+              <code className="text-yellow-400/60 text-xs font-mono">zalo.me/g/ubarcp690</code>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Instructions */}
       <section className="py-32 relative overflow-hidden">
         <div className="container mx-auto px-4 text-center">

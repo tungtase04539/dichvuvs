@@ -1,205 +1,244 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Clock, CheckCircle, ArrowRight, Zap, Shield, Bot, Loader2, Sparkles, MessageCircle } from "lucide-react";
+import { Bot, Star, Sparkles, MessageCircle, Copy, Check, ArrowLeft, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
 
-export default function DungThuPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    business: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  image: string | null;
+  isTrial: boolean;
+  trialCode: string | null;
+  chatbotLink: string | null;
+}
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    setSubmitted(true);
+export default function FreeTrialPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadTrialProducts = async () => {
+      try {
+        const res = await fetch("/api/products?isTrial=true");
+        const data = await res.json();
+        if (data.products) {
+          setProducts(data.products);
+        }
+      } catch (error) {
+        console.error("Load trial products error:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadTrialProducts();
+  }, []);
+
+  const handleFlip = (id: string) => {
+    setFlippedCards(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const features = [
-    "Trải nghiệm Full tính năng AI",
-    "Tích hợp Đa kênh Facebook/Zalo",
-    "Setup kịch bản theo yêu cầu",
-    "Không tốn phí - Không cần thẻ",
-    "Hỗ trợ cài đặt từ chuyên gia",
-    "Bảo mật dữ liệu tuyệt đối",
-  ];
+  const handleCopy = (code: string, id: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   return (
-    <div className="min-h-screen bg-[#f59e0b] text-slate-900 overflow-x-hidden font-sans">
-      <Header settings={{}} />
+    <div className="min-h-screen bg-[#0a0000] text-white selection:bg-amber-400 selection:text-red-950 overflow-x-hidden">
+      <Header settings={{ site_phone: "0345 501 969" }} />
 
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-24 flex flex-col items-center justify-center text-center overflow-hidden">
-        {/* Background Sparkles */}
-        <div className="absolute inset-0 pointer-events-none">
-          <Sparkles className="absolute top-20 left-10 w-32 h-32 opacity-10 animate-pulse" />
-          <Sparkles className="absolute bottom-20 right-10 w-48 h-48 opacity-10 animate-pulse" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/20 rounded-full blur-[150px]" />
-        </div>
+      <main className="pt-32 pb-24">
+        {/* Hero Section */}
+        <section className="container mx-auto px-4 text-center mb-20 relative">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-amber-500/10 blur-[120px] rounded-full pointer-events-none" />
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-16 items-center text-left">
-            <div>
-              <div className="inline-flex items-center gap-2 px-6 py-2 bg-slate-900 text-yellow-400 rounded-full text-sm font-black uppercase tracking-[0.2em] mb-8 shadow-xl">
-                <Zap className="w-5 h-5 fill-current" />
-                CƠ HỘI DUY NHẤT 0Đ
-              </div>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-400/10 text-amber-400 rounded-full text-sm font-bold mb-6 border border-amber-400/20 uppercase tracking-widest relative z-10">
+            <Sparkles className="w-4 h-4 animate-pulse" />
+            Trải nghiệm không giới hạn
+          </div>
 
-              <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-8 leading-[1.1] uppercase">
-                TRẢI NGHIỆM <br />
-                <span className="text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.2)]">MIỄN PHÍ</span> <br />
-                TRỢ LÝ AI CHUYÊN GIA
-              </h1>
+          <h1 className="text-4xl md:text-7xl font-black text-white mb-8 uppercase tracking-tighter leading-none relative z-10">
+            DÙNG THỬ <span className="text-amber-400 drop-shadow-glow">MIỄN PHÍ</span>
+          </h1>
 
-              <p className="text-xl md:text-2xl text-slate-800/80 mb-10 max-w-xl font-semibold leading-relaxed">
-                Đừng bỏ lỡ cơ hội bứt phá doanh thu. Đăng ký ngay để nhận 3 ngày dùng thử Trợ lý AI đỉnh cao hoàn toàn không mất phí!
-              </p>
+          <p className="text-xl text-red-100/60 max-w-2xl mx-auto font-medium leading-relaxed relative z-10">
+            Khám phá sức mạnh của các trợ lý AI hàng đầu hoàn toàn miễn phí.
+            Chọn trợ lý bạn muốn và bắt đầu ngay hôm nay!
+          </p>
+        </section>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
-                {features.map((feature, index) => (
-                  <div key={index} className="flex items-center gap-3 text-slate-900 font-bold group">
-                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <CheckCircle className="w-5 h-5 text-green-600" />
-                    </div>
-                    <span className="text-lg">{feature}</span>
-                  </div>
-                ))}
-              </div>
+        {/* Content Section */}
+        <section className="container mx-auto px-4 relative z-10">
+          <Link
+            href="/san-pham"
+            className="inline-flex items-center gap-2 text-amber-400/60 hover:text-amber-400 font-bold uppercase tracking-widest text-xs mb-12 transition-colors group"
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            Xem tất cả sản phẩm
+          </Link>
+
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 className="w-12 h-12 animate-spin text-amber-400 mb-4" />
+              <p className="text-amber-400/60 font-black uppercase tracking-widest text-xs">Đang tải trợ lý...</p>
             </div>
+          ) : products.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {products.map((product) => (
+                <div
+                  key={product.id}
+                  className={cn(
+                    "relative h-[450px] preserve-3d transition-all duration-700 cursor-pointer",
+                    flippedCards[product.id] ? "flipped" : ""
+                  )}
+                  onClick={() => handleFlip(product.id)}
+                >
+                  {/* Front Face */}
+                  <div className="absolute inset-0 backface-hidden group p-8 rounded-[2.5rem] border-2 border-white/10 bg-zinc-900 overflow-hidden flex flex-col hover:border-amber-400/50 transition-colors shadow-2xl shadow-black/60">
+                    <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] mix-blend-overlay" />
 
-            {/* Premium Registration Card */}
-            <div className="relative group">
-              <div className="absolute -inset-4 bg-white/30 rounded-[3rem] blur-2xl group-hover:blur-3xl transition-all" />
-              <div className="relative bg-white rounded-[2.5rem] p-10 shadow-2xl border border-white/50">
-                {submitted ? (
-                  <div className="text-center py-12">
-                    <div className="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-8 animate-bounce">
-                      <CheckCircle className="w-12 h-12 text-green-600" />
+                    {/* Image/Icon */}
+                    <div className="relative aspect-video rounded-2xl overflow-hidden mb-6 bg-black flex items-center justify-center border border-white/5">
+                      {product.image ? (
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      ) : (
+                        <span className="text-6xl group-hover:scale-110 transition-transform duration-500">🤖</span>
+                      )}
+                      <div className="absolute top-3 right-3 bg-amber-400 text-black px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-lg">
+                        FREE TRIAL
+                      </div>
                     </div>
-                    <h3 className="text-3xl font-black text-slate-900 mb-6 uppercase">ĐĂNG KÝ THÀNH CÔNG!</h3>
-                    <p className="text-slate-500 text-lg mb-8 leading-relaxed">
-                      Chuyên gia của chúng tôi sẽ liên hệ với bạn trong vòng 24h để bàn giao Trợ lý AI.
-                    </p>
-                    <a
-                      href="https://zalo.me/g/ubarcp690"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-3 px-8 py-4 bg-yellow-400 text-slate-900 font-black rounded-2xl hover:bg-slate-900 hover:text-white transition-all shadow-xl uppercase tracking-wider"
-                    >
-                      <MessageCircle className="w-6 h-6" />
-                      NHẬN HỖ TRỢ QUA ZALO
-                    </a>
-                  </div>
-                ) : (
-                  <>
-                    <h3 className="text-2xl font-black text-slate-900 mb-8 uppercase text-center tracking-widest">
-                      Form Đăng Ký 0đ
-                      <div className="h-1.5 w-20 bg-yellow-400 mx-auto mt-2 rounded-full" />
+
+                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-amber-400 transition-colors">
+                      {product.name}
                     </h3>
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      <div className="space-y-1.5">
-                        <label className="text-sm font-black text-slate-500 ml-2 uppercase tracking-tighter">Họ và tên *</label>
-                        <input
-                          type="text"
-                          required
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-yellow-400 focus:bg-white outline-none transition-all font-bold text-lg"
-                          placeholder="Nguyễn Văn A"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-sm font-black text-slate-500 ml-2 uppercase tracking-tighter">Số điện thoại *</label>
-                        <input
-                          type="tel"
-                          required
-                          value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-yellow-400 focus:bg-white outline-none transition-all font-bold text-lg"
-                          placeholder="0912 345 678"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-sm font-black text-slate-500 ml-2 uppercase tracking-tighter">Email</label>
-                        <input
-                          type="email"
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-yellow-400 focus:bg-white outline-none transition-all font-bold text-lg"
-                          placeholder="your@email.com"
-                        />
-                      </div>
-                      <div className="pt-4">
-                        <button
-                          type="submit"
-                          disabled={isSubmitting}
-                          className="w-full py-5 bg-slate-900 text-white font-black text-xl rounded-[1.5rem] hover:bg-yellow-400 hover:text-slate-900 transition-all shadow-xl flex items-center justify-center gap-4 uppercase active:scale-95"
-                        >
-                          {isSubmitting ? (
-                            <Loader2 className="w-7 h-7 animate-spin" />
-                          ) : (
-                            <>
-                              <Zap className="w-6 h-6" />
-                              Bắt đầu dùng thử ngay
-                            </>
-                          )}
-                        </button>
-                      </div>
-                      <p className="text-center text-xs text-slate-400 font-medium">Bảo mật thông tin khách hàng 100%</p>
-                    </form>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Trust Elements */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-around gap-12 text-center md:text-left">
-            <div className="flex items-center gap-6">
-              <div className="w-20 h-20 rounded-3xl bg-yellow-100 flex items-center justify-center">
-                <Shield className="w-10 h-10 text-yellow-600" />
-              </div>
-              <div>
-                <h4 className="text-2xl font-black text-slate-900">An Toàn Tuyệt Đối</h4>
-                <p className="text-slate-500 font-medium font-semibold">Tự động hủy sau 3 ngày dùng thử</p>
-              </div>
+                    <p className="text-red-100/40 text-sm line-clamp-3 mb-6 font-medium leading-relaxed italic">
+                      {product.description}
+                    </p>
+
+                    <div className="mt-auto">
+                      <div className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-center text-xs font-black uppercase tracking-widest text-white group-hover:bg-amber-400 group-hover:text-black transition-all">
+                        Trải nghiệm ngay
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Back Face */}
+                  <div className="absolute inset-0 backface-hidden rotate-y-180 p-8 rounded-[2.5rem] border-2 border-amber-400 bg-black shadow-[0_0_50px_rgba(251,191,36,0.2)] flex flex-col items-center justify-center text-center">
+                    <div className="absolute inset-0 opacity-[0.05] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] mix-blend-overlay" />
+
+                    <Bot className="w-12 h-12 text-amber-400 mb-6 animate-float" />
+
+                    <h4 className="text-amber-400 font-black text-sm uppercase tracking-[0.2em] mb-8 border-b border-amber-400/20 pb-4 w-full">
+                      THÔNG TIN TRUY CẬP
+                    </h4>
+
+                    <div className="w-full space-y-6">
+                      {/* Link Button */}
+                      <a
+                        href={product.chatbotLink || "https://t.me/your_bot"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center justify-center gap-3 w-full py-5 bg-amber-400 text-black rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-amber-400/20 hover:scale-[1.02] active:scale-95 transition-all text-sm"
+                      >
+                        <MessageCircle className="w-5 h-5" />
+                        Mở Trợ Lý AI
+                      </a>
+
+                      {/* verification code */}
+                      {product.trialCode && (
+                        <div className="space-y-2">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-amber-400/60 text-left px-2">Mã xác minh</p>
+                          <div className="relative group/copy">
+                            <div className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl font-mono text-amber-400 text-lg flex items-center justify-center gap-3">
+                              {product.trialCode}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCopy(product.trialCode || "", product.id);
+                                }}
+                                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                              >
+                                {copiedId === product.id ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                              </button>
+                            </div>
+                            {copiedId === product.id && (
+                              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-bold text-green-400 uppercase tracking-widest">
+                                Đã sao chép!
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <p className="mt-8 text-[10px] text-red-100/40 font-bold uppercase tracking-widest italic animate-pulse">
+                      Số lượng người dùng cùng lúc có hạn!
+                    </p>
+
+                    <button className="mt-8 text-xs text-amber-400/40 font-black uppercase tracking-widest hover:text-amber-400 transition-colors">
+                      🠔 Quay lại
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="flex items-center gap-6">
-              <div className="w-20 h-20 rounded-3xl bg-blue-100 flex items-center justify-center">
-                <Bot className="w-10 h-10 text-blue-600" />
-              </div>
-              <div>
-                <h4 className="text-2xl font-black text-slate-900">Full Tính Năng</h4>
-                <p className="text-slate-500 font-medium font-semibold">Công nghệ AI tiên tiến hàng đầu</p>
-              </div>
+          ) : (
+            <div className="text-center py-20 bg-white/5 rounded-[3rem] border-2 border-dashed border-white/10">
+              <Bot className="w-20 h-20 text-white/20 mx-auto mb-6" />
+              <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-tight">Chưa có trợ lý dùng thử</h3>
+              <p className="text-red-100/40 max-w-md mx-auto mb-8 font-medium italic">
+                Chúng tôi đang cập nhật các trợ lý AI mới nhất. Vui lòng quay lại sau!
+              </p>
+              <Link href="/san-pham" className="px-10 py-4 bg-amber-400 text-black font-black uppercase rounded-2xl hover:bg-amber-300 transition-all shadow-xl shadow-amber-400/20 active:scale-95 inline-block">
+                Xem tất cả trợ lý
+              </Link>
             </div>
-            <div className="flex items-center gap-6">
-              <div className="w-20 h-20 rounded-3xl bg-green-100 flex items-center justify-center">
-                <Clock className="w-10 h-10 text-green-600" />
-              </div>
-              <div>
-                <h4 className="text-2xl font-black text-slate-900">Setup Trong 24h</h4>
-                <p className="text-slate-500 font-medium font-semibold">Liên hệ nhanh chóng qua Zalo</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+          )}
+        </section>
+      </main>
 
       <Footer settings={{}} />
+
+      <style jsx>{`
+        .preserve-3d {
+          transform-style: preserve-3d;
+          perspective: 1200px;
+        }
+        .backface-hidden {
+          backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+          transform: rotateY(180deg);
+        }
+        .flipped {
+          transform: rotateY(180deg);
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+        .drop-shadow-glow {
+          filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.4));
+        }
+      `}</style>
     </div>
   );
 }
-

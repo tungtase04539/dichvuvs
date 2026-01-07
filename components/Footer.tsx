@@ -120,8 +120,8 @@ export default function Footer({ settings }: FooterProps) {
                 </div>
                 <div>
                   <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none mb-1">EMAIL</p>
-                  <a href="mailto:support@chatbotvn.com" className="font-bold text-white hover:text-yellow-400">
-                    support@chatbotvn.com
+                  <a href="mailto:ZZA010100@GMAIL.COM" className="font-bold text-white hover:text-yellow-400">
+                    ZZA010100@GMAIL.COM
                   </a>
                 </div>
               </li>

@@ -168,10 +168,19 @@ function HomePageContent() {
               SÀN TRỢ LÝ AI <br />
               <span className="text-amber-400 drop-shadow-[0_0_20px_rgba(251,191,36,0.6)]">SIÊU THÔNG MINH</span>
             </h1>
-            <p className="text-xl md:text-2xl text-red-50 max-w-2xl mx-auto font-bold mb-12 drop-shadow-md">
+            <p className="text-xl md:text-2xl text-red-50 max-w-2xl mx-auto font-bold mb-8 drop-shadow-md">
               Khai xuân rạng rỡ với Trợ lý AI tối ưu cho doanh nghiệp.
               Giá cực lộc chỉ từ <span className="text-amber-400 bg-red-950/50 px-3 py-1 rounded-lg">29K/tháng</span>!
             </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+              <Link
+                href="/dung-thu"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-amber-400/10 text-amber-400 border-2 border-amber-400/40 font-black rounded-2xl hover:bg-amber-400 hover:text-red-950 transition-all uppercase tracking-widest text-sm shadow-lg hover:scale-105 active:scale-95"
+              >
+                <Sparkles className="w-5 h-5" />
+                DÙNG THỬ MIỄN PHÍ
+              </Link>
+            </div>
           </div>
 
           <div className="bg-[#200000]/80 rounded-[3rem] p-8 md:p-12 border border-amber-400/20 backdrop-blur-2xl shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] relative">

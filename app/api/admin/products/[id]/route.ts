@@ -129,6 +129,39 @@ export async function PUT(
       error = retryError;
     }
 
+    // Resilience: if isTrial or trialCode columns are missing, retry without them
+    if (error && (error.message?.includes("isTrial") || error.message?.includes("trialCode"))) {
+      console.warn("Retrying update without isTrial/trialCode due to missing columns");
+      const { data: retryProduct, error: retryError } = await adminSupabase
+        .from("Service")
+        .update({
+          name,
+          slug,
+          description: description || null,
+          longDescription: longDescription || null,
+          price: parseFloat(price),
+          image: image || null,
+          videoUrl: videoUrl || null,
+          categoryId: categoryId || null,
+          featured: featured || false,
+          active: active !== false,
+          chatbotLink: chatbotLink || null,
+          priceGold: priceGold ? parseFloat(priceGold) : null,
+          pricePlatinum: pricePlatinum ? parseFloat(pricePlatinum) : null,
+          featuresGold: featuresGold || null,
+          featuresPlatinum: featuresPlatinum || null,
+          chatbotLinkGold: chatbotLinkGold || null,
+          chatbotLinkPlatinum: chatbotLinkPlatinum || null,
+          updatedAt: new Date().toISOString(),
+        })
+        .eq("id", params.id)
+        .select()
+        .single();
+
+      product = retryProduct;
+      error = retryError;
+    }
+
     if (error) {
       console.error("Update product error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });

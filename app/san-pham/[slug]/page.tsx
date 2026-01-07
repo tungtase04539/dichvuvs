@@ -350,8 +350,8 @@ export default function ProductDetailPage({
                                 <span className={cn("text-[10px] font-black uppercase tracking-widest", pkg.id === 'platinum' ? "text-cyan-400" : "text-amber-400")}>{pkg.name}</span>
                               </div>
                               <div className="text-3xl font-black mb-2 flex items-baseline gap-1">
-                                <span className="text-2xl opacity-50">₫</span>
-                                {formatCurrency(pkg.price).replace('₫', '')}
+                                {formatCurrency(pkg.price).replace('₫', '').replace(' đ', '')}
+                                <span className="text-2xl opacity-50">đ</span>
                               </div>
                               <p className="text-[11px] text-white/70 leading-tight line-clamp-2 italic">
                                 "{pkg.id === 'standard' ? descriptionStandard : (pkg.id === 'gold' ? descriptionGold : descriptionPlatinum)}"

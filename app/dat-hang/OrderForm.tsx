@@ -169,6 +169,9 @@ export default function OrderForm() {
       price = globalSettings.price_platinum ? parseFloat(globalSettings.price_platinum) : (item.product.pricePlatinum || price * 2.5);
     } else if (item.packageType === "standard") {
       price = globalSettings.price_standard ? parseFloat(globalSettings.price_standard) : price;
+    } else if (item.packageType === "single") {
+      // "single" uses the product's original price, no override
+      price = item.product.price;
     }
     return sum + price * item.quantity;
   }, 0);
@@ -344,11 +347,13 @@ export default function OrderForm() {
                         <h3 className="font-bold text-slate-900 truncate">{item.product.name}</h3>
                         <span className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase border ${item.packageType === 'gold' ? 'bg-amber-500/10 text-amber-600 border-amber-200' :
                           item.packageType === 'platinum' ? 'bg-cyan-500/10 text-cyan-600 border-cyan-200' :
-                            'bg-slate-100 text-slate-500 border-slate-200'
+                            item.packageType === 'single' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-200' :
+                              'bg-slate-100 text-slate-500 border-slate-200'
                           }`}>
-                          GÓI {item.packageType === 'gold' ? 'VÀNG (GOLD)' :
-                            item.packageType === 'platinum' ? 'BẠCH KIM (PLATINUM)' :
-                              'TIÊU CHUẨN'}
+                          {item.packageType === 'gold' ? 'GÓI VÀNG' :
+                            item.packageType === 'platinum' ? 'GÓI BẠCH KIM' :
+                              item.packageType === 'single' ? 'MUA RIÊNG' :
+                                'GÓI TIÊU CHUẨN'}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 mt-1">
@@ -356,7 +361,8 @@ export default function OrderForm() {
                           {formatCurrency(
                             item.packageType === 'gold' ? (globalSettings.price_gold ? parseFloat(globalSettings.price_gold) : (item.product.priceGold || item.product.price * 1.5)) :
                               item.packageType === 'platinum' ? (globalSettings.price_platinum ? parseFloat(globalSettings.price_platinum) : (item.product.pricePlatinum || item.product.price * 2.5)) :
-                                (globalSettings.price_standard ? parseFloat(globalSettings.price_standard) : item.product.price)
+                                item.packageType === 'single' ? item.product.price :
+                                  (globalSettings.price_standard ? parseFloat(globalSettings.price_standard) : item.product.price)
                           )}
                         </span>
                         <span className="text-slate-300">/tháng</span>

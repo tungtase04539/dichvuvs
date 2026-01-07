@@ -32,7 +32,7 @@ export default function ProductDetailPage({
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedPackage, setSelectedPackage] = useState<"standard" | "gold" | "platinum">("standard");
+  const [selectedPackage, setSelectedPackage] = useState<"single" | "standard" | "gold" | "platinum">("single");
   const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
   const [globalSettings, setGlobalSettings] = useState<Record<string, string>>({});
   const router = useRouter();
@@ -125,6 +125,13 @@ export default function ProductDetailPage({
   const descriptionStandard = globalSettings.description_standard || "Hỗ trợ 24/7 , cộng đồng hỗ trợ lớn mạnh";
 
   const packages = [
+    {
+      id: "single",
+      name: "MUA RIÊNG",
+      price: product.price,
+      features: ["Chỉ mua riêng trợ lý này", "Hỗ trợ 24/7", "Không kèm combo"],
+      color: "emerald",
+    },
     {
       id: "standard",
       name: "TIÊU CHUẨN",

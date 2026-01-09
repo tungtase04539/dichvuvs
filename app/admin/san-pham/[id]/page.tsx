@@ -108,12 +108,6 @@ export default function EditProductPage() {
     setIsSubmitting(true);
 
     try {
-      // Debug: log what we're sending
-      console.log("=== FORM SUBMIT DEBUG ===");
-      console.log("formData.isTrial:", formData.isTrial);
-      console.log("formData.trialCode:", formData.trialCode);
-      console.log("Full formData:", JSON.stringify(formData, null, 2));
-      
       const res = await fetch(`/api/admin/products/${productId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },

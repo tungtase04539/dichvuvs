@@ -53,15 +53,8 @@ export async function PUT(
       isTrial, trialCode
     } = body;
 
-    // Debug logging for trial fields
-    console.log("=== PRODUCT UPDATE DEBUG ===");
-    console.log("Product ID:", params.id);
-    console.log("isTrial received:", isTrial, "type:", typeof isTrial);
-    console.log("trialCode received:", trialCode);
-    console.log("isTrial === true:", isTrial === true);
-    console.log("Full body:", JSON.stringify(body, null, 2));
-
     if (!name || !slug || !price) {
+
       return NextResponse.json(
         { error: "Vui lòng nhập đầy đủ thông tin" },
         { status: 400 }
@@ -111,13 +104,8 @@ export async function PUT(
       .select()
       .single();
 
-    // Debug: Log update result
-    console.log("=== UPDATE RESULT ===");
-    console.log("Error:", error);
-    console.log("Product isTrial after update:", product?.isTrial);
-    console.log("Product trialCode after update:", product?.trialCode);
-
     // Resilience: if chatbotLink column is missing, retry without it
+
     if (error && error.message?.includes("chatbotLink") && (error.message?.includes("column") || error.message?.includes("cache"))) {
       console.warn("Retrying update without chatbotLink due to missing column");
       const { data: retryProduct, error: retryError } = await adminSupabase

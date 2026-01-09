@@ -185,6 +185,9 @@ export default function ProductDetailPage({
             <span className="uppercase tracking-widest text-sm">Quay lại danh sách</span>
           </Link>
           <div className="flex flex-col gap-6 max-w-4xl">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white uppercase tracking-tighter leading-tight drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+              {product.name}
+            </h1>
             <p className="text-red-50/90 text-xl leading-relaxed font-bold drop-shadow-md">
               {product.description}
             </p>

@@ -133,6 +133,8 @@ export async function PUT(
           categoryId: categoryId || null,
           featured: featured || false,
           active: active !== false,
+          isTrial: isTrial === true,
+          trialCode: trialCode || null,
           updatedAt: new Date().toISOString(),
         })
         .eq("id", params.id)
@@ -142,6 +144,7 @@ export async function PUT(
       product = retryProduct;
       error = retryError;
     }
+
 
     // Resilience: if isTrial or trialCode columns are missing, retry without them
     if (error && (error.message?.includes("isTrial") || error.message?.includes("trialCode"))) {

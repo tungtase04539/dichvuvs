@@ -107,6 +107,13 @@ export default function CustomerDashboard() {
           return;
         }
 
+        // Redirect CTV/Agent to CTV dashboard
+        if (["collaborator", "ctv", "agent", "master_agent"].includes(userData.user.role)) {
+          console.log("[Dashboard] CTV/Agent detected, redirecting to /admin/ctv-dashboard");
+          router.replace("/admin/ctv-dashboard");
+          return;
+        }
+
         // Fetch customer orders
         const ordersRes = await fetch("/api/customer/orders");
         if (ordersRes.ok) {

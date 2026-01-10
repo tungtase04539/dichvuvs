@@ -48,7 +48,6 @@ export default async function AdminProductsPage() {
   const isAgent = session?.role === "agent";
   const isDistributor = session?.role === "distributor" || session?.role === "master_agent";
   const canUseRefLink = isCTV || isSeniorCTV || isAgent || isDistributor;
-  const canEditVideo = isSeniorCTV || isAdmin; // CTV cao cấp và Admin đều được sửa video
 
   // Get referral code for CTV/Agent/Distributor
   let refCode = "";
@@ -160,12 +159,16 @@ export default async function AdminProductsPage() {
                       />
                     )}
 
-                    {/* Nút sửa video cho CTV cao cấp - chỉ hiện khi video trống */}
-                    {canEditVideo && (
+                    {/* Nút sửa video: 
+                        - CTV cao cấp: chỉ hiện khi sản phẩm CHƯA có video
+                        - Admin: hiện cho tất cả sản phẩm
+                    */}
+                    {(isAdmin || (isSeniorCTV && !product.videoUrl)) && (
                       <EditVideoButton
                         productId={product.id}
                         productName={product.name}
                         currentVideoUrl={product.videoUrl}
+                        isAdmin={isAdmin}
                       />
                     )}
 

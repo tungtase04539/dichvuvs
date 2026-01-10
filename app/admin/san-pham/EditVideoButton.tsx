@@ -8,14 +8,14 @@ interface EditVideoButtonProps {
   productId: string;
   productName: string;
   currentVideoUrl: string | null;
+  isAdmin?: boolean;
 }
 
-export default function EditVideoButton({ productId, productName, currentVideoUrl }: EditVideoButtonProps) {
+export default function EditVideoButton({ productId, productName, currentVideoUrl, isAdmin = false }: EditVideoButtonProps) {
   const [showModal, setShowModal] = useState(false);
   const [videoUrl, setVideoUrl] = useState(currentVideoUrl || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Hiển thị nút cho tất cả sản phẩm (CTV cao cấp chỉ thêm được khi chưa có video)
   const hasVideo = !!currentVideoUrl;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,7 +38,6 @@ export default function EditVideoButton({ productId, productName, currentVideoUr
 
       toast.success("Đã cập nhật video hướng dẫn!");
       setShowModal(false);
-      // Reload page to see changes
       window.location.reload();
     } catch {
       toast.error("Có lỗi xảy ra");
@@ -56,7 +55,7 @@ export default function EditVideoButton({ productId, productName, currentVideoUr
             ? "text-green-500 hover:text-green-600 hover:bg-green-50" 
             : "text-amber-500 hover:text-amber-600 hover:bg-amber-50"
         }`}
-        title={hasVideo ? "Xem/Sửa video hướng dẫn" : "Thêm video hướng dẫn"}
+        title={hasVideo ? (isAdmin ? "Sửa video hướng dẫn" : "Đã có video") : "Thêm video hướng dẫn"}
       >
         <Video className="w-4 h-4" />
       </button>
@@ -65,7 +64,9 @@ export default function EditVideoButton({ productId, productName, currentVideoUr
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white rounded-2xl w-full max-w-md mx-4 shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-lg font-bold">Thêm video hướng dẫn</h2>
+              <h2 className="text-lg font-bold">
+                {hasVideo ? "Sửa video hướng dẫn" : "Thêm video hướng dẫn"}
+              </h2>
               <button
                 onClick={() => setShowModal(false)}
                 className="p-2 hover:bg-slate-100 rounded-lg"
@@ -79,6 +80,11 @@ export default function EditVideoButton({ productId, productName, currentVideoUr
                 <p className="text-sm text-slate-600 mb-2">
                   Sản phẩm: <strong>{productName}</strong>
                 </p>
+                {hasVideo && (
+                  <p className="text-sm text-green-600">
+                    Video hiện tại: <a href={currentVideoUrl!} target="_blank" rel="noopener noreferrer" className="underline">Xem video</a>
+                  </p>
+                )}
               </div>
 
               <div>
@@ -98,9 +104,7 @@ export default function EditVideoButton({ productId, productName, currentVideoUr
               </div>
 
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-700">
-                <strong>Lưu ý:</strong> {hasVideo 
-                  ? "Sản phẩm này đã có video. Chỉ Admin mới có thể sửa." 
-                  : "Bạn chỉ có thể thêm video cho sản phẩm chưa có video. Sau khi thêm, chỉ Admin mới có thể sửa."}
+                <strong>Lưu ý:</strong> Sau khi thêm video, chỉ Admin mới có thể sửa.
               </div>
 
               <div className="flex gap-3 pt-4">

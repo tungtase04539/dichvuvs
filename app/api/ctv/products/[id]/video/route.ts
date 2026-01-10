@@ -15,8 +15,11 @@ export async function PUT(
       return NextResponse.json({ error: "Chưa đăng nhập" }, { status: 401 });
     }
 
+    const isAdmin = session.role === "admin";
+    const isSeniorCTV = session.role === "senior_collaborator";
+
     // Chỉ senior_collaborator và admin mới được sửa video
-    if (!["senior_collaborator", "admin"].includes(session.role)) {
+    if (!isAdmin && !isSeniorCTV) {
       return NextResponse.json(
         { error: "Bạn không có quyền sửa video sản phẩm" },
         { status: 403 }
@@ -28,7 +31,23 @@ export async function PUT(
 
     const adminSupabase = createAdminSupabaseClient()!;
 
-    // Chỉ cập nhật videoUrl
+    // Kiểm tra sản phẩm hiện tại
+    const { data: currentProduct } = await adminSupabase
+      .from("Service")
+      .select("id, videoUrl")
+      .eq("id", params.id)
+      .single();
+
+    // CTV cao cấp chỉ được THÊM video cho sản phẩm CHƯA có video
+    // Không được SỬA video đã có (chỉ Admin mới sửa được)
+    if (isSeniorCTV && currentProduct?.videoUrl) {
+      return NextResponse.json(
+        { error: "Sản phẩm đã có video. Chỉ Admin mới có thể sửa video." },
+        { status: 403 }
+      );
+    }
+
+    // Cập nhật videoUrl
     const { data: product, error } = await adminSupabase
       .from("Service")
       .update({

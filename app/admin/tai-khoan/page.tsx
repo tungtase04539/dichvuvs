@@ -21,16 +21,25 @@ interface Account {
 const roleLabels: Record<string, string> = {
   admin: "Quản trị viên",
   staff: "Nhân viên",
+  distributor: "Nhà phân phối",
+  agent: "Đại lý",
+  collaborator: "Cộng tác viên",
 };
 
 const roleIcons: Record<string, React.ReactNode> = {
   admin: <Shield className="w-4 h-4" />,
   staff: <User className="w-4 h-4" />,
+  distributor: <Building2 className="w-4 h-4" />,
+  agent: <UserCheck className="w-4 h-4" />,
+  collaborator: <Users className="w-4 h-4" />,
 };
 
 const roleColors: Record<string, string> = {
   admin: "bg-purple-100 text-purple-700",
   staff: "bg-slate-100 text-slate-700",
+  distributor: "bg-indigo-100 text-indigo-700",
+  agent: "bg-blue-100 text-blue-700",
+  collaborator: "bg-green-100 text-green-700",
 };
 
 export default function AccountsPage() {
@@ -108,7 +117,7 @@ export default function AccountsPage() {
 
       setShowModal(false);
       setEditingAccount(null);
-      setFormData({ email: "", password: "", name: "", role: "agent", phone: "" });
+      setFormData({ email: "", password: "", name: "", role: "collaborator", phone: "" });
       loadAccounts();
     } catch {
       setError("Có lỗi xảy ra");
@@ -150,7 +159,7 @@ export default function AccountsPage() {
   // Open create modal
   const openCreate = () => {
     setEditingAccount(null);
-    setFormData({ email: "", password: "", name: "", role: "agent", phone: "" });
+    setFormData({ email: "", password: "", name: "", role: "collaborator", phone: "" });
     setShowModal(true);
   };
 
@@ -194,10 +203,11 @@ export default function AccountsPage() {
             className="px-4 py-2 border border-slate-200 rounded-lg"
           >
             <option value="">Tất cả vai trò</option>
-            <option value="master_agent">Tổng đại lý</option>
+            <option value="distributor">Nhà phân phối</option>
             <option value="agent">Đại lý</option>
             <option value="collaborator">Cộng tác viên</option>
             <option value="staff">Nhân viên</option>
+            <option value="admin">Quản trị viên</option>
           </select>
         </div>
       </div>
@@ -375,6 +385,9 @@ export default function AccountsPage() {
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                   className="input"
                 >
+                  <option value="collaborator">Cộng tác viên (CTV)</option>
+                  <option value="agent">Đại lý</option>
+                  <option value="distributor">Nhà phân phối (NPP)</option>
                   <option value="staff">Nhân viên</option>
                   <option value="admin">Quản trị viên</option>
                 </select>

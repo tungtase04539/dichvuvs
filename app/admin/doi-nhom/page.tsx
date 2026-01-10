@@ -40,7 +40,7 @@ interface TeamStats {
 }
 
 export default function TeamPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [stats, setStats] = useState<TeamStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);

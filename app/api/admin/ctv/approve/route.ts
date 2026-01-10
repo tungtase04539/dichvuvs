@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession, isAdmin } from "@/lib/auth";
 import { createClient } from "@supabase/supabase-js";
+import { createReferralLinkForUser } from "@/lib/referral";
 
 // Supabase Admin client
 function getSupabaseAdmin() {
@@ -121,9 +122,14 @@ export async function POST(request: NextRequest) {
                 }
             });
 
+            // 3. Tự động tạo referral link cho CTV mới
+            const referralLink = await createReferralLinkForUser(application.userId);
+            const referralCode = referralLink?.code || null;
+
             return NextResponse.json({
                 success: true,
-                message: `Phê duyệt CTV thành công!\nEmail: ${application.email}\nMật khẩu: ${application.phone}`
+                message: `Phê duyệt CTV thành công!\nEmail: ${application.email}\nMật khẩu: ${application.phone}${referralCode ? `\nMã giới thiệu: ${referralCode}` : ''}`,
+                referralCode
             });
         } else {
             // Reject logic

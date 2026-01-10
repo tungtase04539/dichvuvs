@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isAdmin } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { createReferralLinkForUser } from "@/lib/referral";
 
 export const dynamic = "force-dynamic";
 
@@ -101,7 +102,15 @@ export async function POST(request: NextRequest) {
       console.error("Prisma sync error:", pe);
     }
 
-    return NextResponse.json({ success: true, user: data.user });
+    // Tự động tạo referral link cho CTV/Đại lý/NPP
+    let referralCode = null;
+    const eligibleRoles = ['admin', 'master_agent', 'distributor', 'agent', 'collaborator', 'ctv'];
+    if (eligibleRoles.includes(role)) {
+      const referralLink = await createReferralLinkForUser(data.user.id);
+      referralCode = referralLink?.code || null;
+    }
+
+    return NextResponse.json({ success: true, user: data.user, referralCode });
   } catch (error) {
     console.error("Create account error:", error);
     return NextResponse.json({ error: "Lỗi hệ thống" }, { status: 500 });

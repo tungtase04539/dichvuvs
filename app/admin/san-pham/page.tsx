@@ -1,7 +1,7 @@
 import { createAdminSupabaseClient } from "@/lib/supabase-server";
 import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
-import { Plus, Pencil, Package, Link as LinkIcon } from "lucide-react";
+import { Plus, Pencil, Package } from "lucide-react";
 import DeleteProductButton from "./DeleteProductButton";
 import { getSession } from "@/lib/auth";
 import prisma from "@/lib/prisma";

@@ -33,7 +33,7 @@ export default async function AdminLayout({
   }
 
   // STRICT ACCESS CONTROL: Only admin, staff, and partners can access /admin
-  const allowedRoles = ["admin", "staff", "collaborator", "ctv", "agent", "master_agent"];
+  const allowedRoles = ["admin", "staff", "collaborator", "ctv", "senior_collaborator", "agent", "distributor", "master_agent"];
   if (!role || !allowedRoles.includes(role)) {
     console.warn(`[AdminLayout] Unauthorized access attempt by user ${user.email}. Metadata Role: ${user.user_metadata?.role}, DB Role: ${dbUser?.role}`);
     redirect("/tai-khoan");

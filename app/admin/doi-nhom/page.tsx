@@ -63,14 +63,10 @@ export default function TeamPage() {
       }
     };
     
-    // If no user from context after 2s, try direct fetch
-    const timer = setTimeout(() => {
-      if (!user) {
-        fetchUserDirect();
-      }
-    }, 2000);
-    
-    return () => clearTimeout(timer);
+    // Fetch ngay lập tức nếu chưa có user từ context
+    if (!user) {
+      fetchUserDirect();
+    }
   }, [user]);
 
   // Use user from context or fallback
@@ -128,8 +124,11 @@ export default function TeamPage() {
   const allowedRoles = ["agent", "distributor", "master_agent", "admin", "npp"];
   const isAgentOrHigher = effectiveUser?.role && allowedRoles.includes(effectiveUser.role);
 
-  // Show loading while auth is loading (max 3s)
-  if ((authLoading && !authTimeout) && !localUser) {
+  // Show loading while waiting for user (from context or fallback)
+  // Chỉ hiện loading, không hiện lỗi cho đến khi chắc chắn không có user
+  const stillWaitingForUser = !effectiveUser && (authLoading || (!authTimeout && !localUser));
+  
+  if (stillWaitingForUser) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
@@ -137,7 +136,7 @@ export default function TeamPage() {
     );
   }
 
-  // Debug: Show user info
+  // Chỉ hiện lỗi khi đã chắc chắn user không có quyền
   if (!isAgentOrHigher) {
     return (
       <div className="text-center py-20">

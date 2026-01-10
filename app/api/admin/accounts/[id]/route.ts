@@ -28,8 +28,11 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = params;
     const body = await request.json();
     const { name, role, phone, password, parentId } = body;
+
+    console.log("[PUT /api/admin/accounts] Updating user:", id, { name, role, phone, parentId });
 
     const supabaseAdmin = getSupabaseAdmin();
     const updatePayload: any = {
@@ -44,7 +47,7 @@ export async function PUT(
     if (password) updatePayload.password = password;
 
     const { data: updatedAuth, error: authError } = await supabaseAdmin.auth.admin.updateUserById(
-      params.id,
+      id,
       updatePayload
     );
 
@@ -53,25 +56,33 @@ export async function PUT(
       return NextResponse.json({ error: authError.message }, { status: 500 });
     }
 
+    console.log("[PUT /api/admin/accounts] Auth updated, syncing Prisma...");
+
     // Sync Prisma
-    await prisma.user.upsert({
-      where: { id: params.id },
-      update: { name, role, phone, parentId: parentId || null },
-      create: {
-        id: params.id,
-        email: updatedAuth.user.email!,
-        name,
-        role,
-        phone,
-        parentId: parentId || null,
-        password: "",
-      }
-    });
+    try {
+      await prisma.user.upsert({
+        where: { id },
+        update: { name, role, phone, parentId: parentId || null },
+        create: {
+          id,
+          email: updatedAuth.user.email!,
+          name,
+          role,
+          phone,
+          parentId: parentId || null,
+          password: "",
+        }
+      });
+      console.log("[PUT /api/admin/accounts] Prisma synced successfully");
+    } catch (prismaError: any) {
+      console.error("Prisma sync error:", prismaError);
+      // Không fail nếu Prisma lỗi, vì Auth đã update thành công
+    }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Update account error:", error);
-    return NextResponse.json({ error: "Lỗi hệ thống" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Lỗi hệ thống" }, { status: 500 });
   }
 }
 
@@ -86,12 +97,14 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (params.id === session.id) {
+    const { id } = params;
+
+    if (id === session.id) {
       return NextResponse.json({ error: "Không thể xóa chính mình" }, { status: 400 });
     }
 
     const supabaseAdmin = getSupabaseAdmin();
-    const { error } = await supabaseAdmin.auth.admin.deleteUser(params.id);
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(id);
 
     if (error) {
       console.error("Delete user error:", error);

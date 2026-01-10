@@ -15,10 +15,8 @@ export default function EditVideoButton({ productId, productName, currentVideoUr
   const [videoUrl, setVideoUrl] = useState(currentVideoUrl || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Chỉ hiển thị nút nếu video URL trống
-  if (currentVideoUrl) {
-    return null;
-  }
+  // Hiển thị nút cho tất cả sản phẩm (CTV cao cấp chỉ thêm được khi chưa có video)
+  const hasVideo = !!currentVideoUrl;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,8 +51,12 @@ export default function EditVideoButton({ productId, productName, currentVideoUr
     <>
       <button
         onClick={() => setShowModal(true)}
-        className="p-2 text-amber-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
-        title="Thêm video hướng dẫn"
+        className={`p-2 rounded-lg transition-colors ${
+          hasVideo 
+            ? "text-green-500 hover:text-green-600 hover:bg-green-50" 
+            : "text-amber-500 hover:text-amber-600 hover:bg-amber-50"
+        }`}
+        title={hasVideo ? "Xem/Sửa video hướng dẫn" : "Thêm video hướng dẫn"}
       >
         <Video className="w-4 h-4" />
       </button>
@@ -96,7 +98,9 @@ export default function EditVideoButton({ productId, productName, currentVideoUr
               </div>
 
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-700">
-                <strong>Lưu ý:</strong> Bạn chỉ có thể thêm video cho sản phẩm chưa có video. Sau khi thêm, chỉ Admin mới có thể sửa.
+                <strong>Lưu ý:</strong> {hasVideo 
+                  ? "Sản phẩm này đã có video. Chỉ Admin mới có thể sửa." 
+                  : "Bạn chỉ có thể thêm video cho sản phẩm chưa có video. Sau khi thêm, chỉ Admin mới có thể sửa."}
               </div>
 
               <div className="flex gap-3 pt-4">

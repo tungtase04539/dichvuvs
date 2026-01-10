@@ -161,7 +161,7 @@ export default async function AdminProductsPage() {
                     )}
 
                     {/* Nút sửa video cho CTV cao cấp - chỉ hiện khi video trống */}
-                    {canEditVideo && !product.videoUrl && (
+                    {canEditVideo && (
                       <EditVideoButton
                         productId={product.id}
                         productName={product.name}

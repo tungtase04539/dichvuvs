@@ -35,6 +35,8 @@ interface TeamStats {
   subTeamCount: number;
   totalCommission: number;
   commissionCount: number;
+  isEligibleForOverride: boolean;
+  minSubAgentsRequired: number;
 }
 
 export default function TeamPage() {
@@ -64,6 +66,7 @@ export default function TeamPage() {
   const getRoleBadge = (role: string) => {
     const styles: Record<string, { bg: string; text: string; label: string }> = {
       master_agent: { bg: "bg-purple-100", text: "text-purple-700", label: "Tổng đại lý" },
+      distributor: { bg: "bg-purple-100", text: "text-purple-700", label: "Nhà phân phối" },
       agent: { bg: "bg-blue-100", text: "text-blue-700", label: "Đại lý" },
       collaborator: { bg: "bg-green-100", text: "text-green-700", label: "CTV" },
       ctv: { bg: "bg-green-100", text: "text-green-700", label: "CTV" },
@@ -76,7 +79,7 @@ export default function TeamPage() {
     );
   };
 
-  const isAgentOrHigher = user?.role === "agent" || user?.role === "master_agent" || user?.role === "admin";
+  const isAgentOrHigher = user?.role === "agent" || user?.role === "distributor" || user?.role === "master_agent" || user?.role === "admin";
 
   if (!isAgentOrHigher) {
     return (
@@ -101,7 +104,38 @@ export default function TeamPage() {
 
       {/* Stats */}
       {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <>
+          {/* Override Eligibility Alert */}
+          {!stats.isEligibleForOverride && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                <UserPlus className="w-5 h-5 text-yellow-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-yellow-800">Chưa đủ điều kiện nhận hoa hồng Override</h3>
+                <p className="text-sm text-yellow-700 mt-1">
+                  Bạn cần có ít nhất <strong>{stats.minSubAgentsRequired} thành viên</strong> cấp dưới để nhận hoa hồng override từ đội nhóm.
+                  Hiện tại bạn có <strong>{stats.directCount}/{stats.minSubAgentsRequired}</strong> thành viên.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {stats.isEligibleForOverride && (
+            <div className="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0">
+                <TrendingUp className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-green-800">Đủ điều kiện nhận hoa hồng Override ✓</h3>
+                <p className="text-sm text-green-700 mt-1">
+                  Bạn có <strong>{stats.directCount} thành viên</strong> cấp dưới. Khi họ bán được hàng, bạn sẽ nhận được hoa hồng override.
+                </p>
+              </div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
@@ -114,7 +148,7 @@ export default function TeamPage() {
             </div>
           </div>
 
-          {user?.role === "master_agent" && (
+          {user?.role === "master_agent" || user?.role === "distributor" ? (
             <div className="bg-white rounded-2xl p-6 shadow-sm">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
@@ -126,7 +160,7 @@ export default function TeamPage() {
                 </div>
               </div>
             </div>
-          )}
+          ) : null}
 
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <div className="flex items-center gap-4">
@@ -152,6 +186,7 @@ export default function TeamPage() {
             </div>
           </div>
         </div>
+        </>
       )}
 
       {/* Members List */}

@@ -39,7 +39,8 @@ interface NavItem {
 
 const roleLabels: Record<string, string> = {
   admin: "Quản trị viên",
-  master_agent: "Tổng đại lý",
+  master_agent: "Nhà phân phối",
+  distributor: "Nhà phân phối",
   agent: "Đại lý",
   collaborator: "Cộng tác viên",
   ctv: "Cộng tác viên",
@@ -51,8 +52,8 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
 
   // Navigation items based on role
   const getNavItems = (): NavItem[] => {
-    const isPartner = user.role === "collaborator" || user.role === "ctv" || user.role === "agent" || user.role === "master_agent";
-    const isAgentOrHigher = user.role === "agent" || user.role === "master_agent";
+    const isPartner = user.role === "collaborator" || user.role === "ctv" || user.role === "agent" || user.role === "distributor" || user.role === "master_agent";
+    const isAgentOrHigher = user.role === "agent" || user.role === "distributor" || user.role === "master_agent";
     const isAdmin = user.role === "admin";
 
     const items: NavItem[] = [];

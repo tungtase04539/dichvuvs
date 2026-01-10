@@ -37,15 +37,17 @@ END $$;
 -- 2. Xóa dữ liệu cũ trong CommissionSetting (nếu có) và insert mới
 DELETE FROM "CommissionSetting";
 
+-- Cấu hình hoa hồng theo chính sách mới:
+-- Cấp 1: CTV = 10% bán trực tiếp
+-- Cấp 2: Đại lý = 15% bán trực tiếp (override = 15%-10% = 5% từ CTV, cần ≥3 CTV)
+-- Cấp 3: NPP = 20% bán trực tiếp (override = 20%-15% = 5% từ Đại lý, cần ≥3 Đại lý)
 INSERT INTO "CommissionSetting" (id, key, role, type, percent, description, "createdAt", "updatedAt") 
 VALUES
-    ((gen_random_uuid())::text, 'ctv_retail', 'ctv', 'retail', 20, 'CTV bán trực tiếp - 20%', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ((gen_random_uuid())::text, 'collaborator_retail', 'collaborator', 'retail', 20, 'Cộng tác viên bán trực tiếp - 20%', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ((gen_random_uuid())::text, 'agent_retail', 'agent', 'retail', 25, 'Đại lý bán trực tiếp - 25%', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ((gen_random_uuid())::text, 'agent_override', 'agent', 'override', 5, 'Đại lý hưởng từ CTV cấp dưới - 5%', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ((gen_random_uuid())::text, 'master_agent_retail', 'master_agent', 'retail', 30, 'Tổng đại lý bán trực tiếp - 30%', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ((gen_random_uuid())::text, 'master_agent_override_l1', 'master_agent', 'override', 5, 'Tổng đại lý hưởng từ Agent trực tiếp - 5%', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ((gen_random_uuid())::text, 'master_agent_override_l2', 'master_agent', 'override', 2, 'Tổng đại lý hưởng từ CTV (qua Agent) - 2%', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+    ((gen_random_uuid())::text, 'ctv_retail', 'ctv', 'retail', 10, 'CTV bán trực tiếp - 10%', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ((gen_random_uuid())::text, 'collaborator_retail', 'collaborator', 'retail', 10, 'Cộng tác viên bán trực tiếp - 10%', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ((gen_random_uuid())::text, 'agent_retail', 'agent', 'retail', 15, 'Đại lý bán trực tiếp - 15%', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ((gen_random_uuid())::text, 'distributor_retail', 'distributor', 'retail', 20, 'Nhà phân phối bán trực tiếp - 20%', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ((gen_random_uuid())::text, 'master_agent_retail', 'master_agent', 'retail', 20, 'Tổng đại lý bán trực tiếp - 20%', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- 3. Thêm index để tăng performance
 CREATE INDEX IF NOT EXISTS idx_commission_user ON "Commission"("userId");

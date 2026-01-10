@@ -9,8 +9,10 @@ import {
   Users,
   TrendingUp,
   AlertCircle,
+  Info,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { formatCurrency } from "@/lib/utils";
 
 interface CommissionSetting {
   id: string;
@@ -20,6 +22,8 @@ interface CommissionSetting {
   percent: number;
   description: string | null;
 }
+
+const ROLE_ORDER = ["ctv", "collaborator", "agent", "distributor", "master_agent"];
 
 export default function CommissionSettingsPage() {
   const { user } = useAuth();
@@ -77,16 +81,24 @@ export default function CommissionSettingsPage() {
 
   const getRoleLabel = (role: string) => {
     const labels: Record<string, string> = {
-      ctv: "CTV",
-      collaborator: "Cộng tác viên",
-      agent: "Đại lý",
-      master_agent: "Tổng đại lý",
+      ctv: "Cấp 1: CTV",
+      collaborator: "Cấp 1: Cộng tác viên",
+      agent: "Cấp 2: Đại lý",
+      distributor: "Cấp 3: Nhà phân phối",
+      master_agent: "Cấp 3: Tổng đại lý",
     };
     return labels[role] || role;
   };
 
-  const getTypeLabel = (type: string) => {
-    return type === "retail" ? "Bán trực tiếp" : "Override (từ cấp dưới)";
+  const getRoleDescription = (role: string) => {
+    const desc: Record<string, string> = {
+      ctv: "Bán trực tiếp, không có cấp dưới",
+      collaborator: "Bán trực tiếp, không có cấp dưới",
+      agent: "Bán trực tiếp + Hưởng override từ CTV (cần ≥3 CTV)",
+      distributor: "Bán trực tiếp + Hưởng override từ Đại lý (cần ≥3 Đại lý)",
+      master_agent: "Bán trực tiếp + Hưởng override từ Đại lý (cần ≥3 Đại lý)",
+    };
+    return desc[role] || "";
   };
 
   const getRoleColor = (role: string) => {
@@ -94,9 +106,46 @@ export default function CommissionSettingsPage() {
       ctv: "border-green-500 bg-green-50",
       collaborator: "border-green-500 bg-green-50",
       agent: "border-blue-500 bg-blue-50",
+      distributor: "border-purple-500 bg-purple-50",
       master_agent: "border-purple-500 bg-purple-50",
     };
     return colors[role] || "border-slate-500 bg-slate-50";
+  };
+
+  const getRoleIcon = (role: string) => {
+    const icons: Record<string, string> = {
+      ctv: "🧑‍💼",
+      collaborator: "🧑‍💼",
+      agent: "🏪",
+      distributor: "🏢",
+      master_agent: "🏢",
+    };
+    return icons[role] || "👤";
+  };
+
+  // Tính toán ví dụ
+  const getExampleCalculation = () => {
+    const orderValue = 1000000;
+    const ctvSetting = settings.find(s => s.key === 'ctv_retail');
+    const agentSetting = settings.find(s => s.key === 'agent_retail');
+    const distributorSetting = settings.find(s => s.key === 'distributor_retail') || 
+                               settings.find(s => s.key === 'master_agent_retail');
+    
+    const ctvPercent = ctvSetting?.percent || 10;
+    const agentPercent = agentSetting?.percent || 15;
+    const distributorPercent = distributorSetting?.percent || 20;
+    
+    const agentOverride = agentPercent - ctvPercent;
+    const distributorOverride = distributorPercent - agentPercent;
+    
+    return {
+      orderValue,
+      ctv: { percent: ctvPercent, amount: orderValue * ctvPercent / 100 },
+      agentOverride: { percent: agentOverride, amount: orderValue * agentOverride / 100 },
+      distributorOverride: { percent: distributorOverride, amount: orderValue * distributorOverride / 100 },
+      agentDirect: { percent: agentPercent, amount: orderValue * agentPercent / 100 },
+      distributorDirect: { percent: distributorPercent, amount: orderValue * distributorPercent / 100 },
+    };
   };
 
   if (user?.role !== "admin") {
@@ -109,12 +158,14 @@ export default function CommissionSettingsPage() {
     );
   }
 
+  const example = getExampleCalculation();
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Cấu hình hoa hồng</h1>
-          <p className="text-slate-500 mt-1">Thiết lập % hoa hồng cho từng cấp bậc</p>
+          <p className="text-slate-500 mt-1">Thiết lập % hoa hồng cho từng cấp bậc đối tác</p>
         </div>
         <button
           onClick={handleSave}
@@ -143,17 +194,34 @@ export default function CommissionSettingsPage() {
         </div>
       )}
 
-      {/* Info Card */}
-      <div className="bg-primary-50 rounded-2xl p-6 border border-primary-100">
-        <h3 className="font-bold text-primary-900 mb-2 flex items-center gap-2">
-          <TrendingUp className="w-5 h-5" />
-          Cách tính hoa hồng
+      {/* Policy Info Card */}
+      <div className="bg-gradient-to-br from-primary-50 to-blue-50 rounded-2xl p-6 border border-primary-100">
+        <h3 className="font-bold text-primary-900 mb-3 flex items-center gap-2">
+          <Info className="w-5 h-5" />
+          Chính sách hoa hồng
         </h3>
-        <ul className="text-sm text-primary-700 space-y-1">
-          <li>• <strong>Retail (Bán trực tiếp):</strong> % hoa hồng khi CTV/Agent tự bán được đơn hàng</li>
-          <li>• <strong>Override:</strong> % hoa hồng cấp trên nhận được từ doanh số của cấp dưới</li>
-          <li>• Hoa hồng được tính tự động khi đơn hàng chuyển sang trạng thái "Đã xác nhận"</li>
-        </ul>
+        <div className="grid md:grid-cols-3 gap-4 text-sm">
+          <div className="bg-white/70 rounded-xl p-4">
+            <div className="text-2xl mb-2">🧑‍💼</div>
+            <h4 className="font-bold text-green-700">Cấp 1: CTV</h4>
+            <p className="text-slate-600 mt-1">Bán trực tiếp, nhận % retail</p>
+          </div>
+          <div className="bg-white/70 rounded-xl p-4">
+            <div className="text-2xl mb-2">🏪</div>
+            <h4 className="font-bold text-blue-700">Cấp 2: Đại lý</h4>
+            <p className="text-slate-600 mt-1">Cần ≥3 CTV. Bán trực tiếp + Override từ CTV</p>
+          </div>
+          <div className="bg-white/70 rounded-xl p-4">
+            <div className="text-2xl mb-2">🏢</div>
+            <h4 className="font-bold text-purple-700">Cấp 3: Nhà phân phối</h4>
+            <p className="text-slate-600 mt-1">Cần ≥3 Đại lý. Bán trực tiếp + Override từ Đại lý</p>
+          </div>
+        </div>
+        <div className="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+          <p className="text-yellow-800 text-sm">
+            <strong>Lưu ý:</strong> Override = % cấp trên - % cấp dưới. Ví dụ: Đại lý 15% - CTV 10% = Override 5%
+          </p>
+        </div>
       </div>
 
       {isLoading ? (
@@ -169,51 +237,38 @@ export default function CommissionSettingsPage() {
           </p>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Group by role */}
-          {["ctv", "collaborator", "agent", "master_agent"].map((role) => {
-            const roleSettings = settings.filter(s => s.role === role);
-            if (roleSettings.length === 0) return null;
+        <div className="space-y-4">
+          {ROLE_ORDER.map((role) => {
+            const roleSetting = settings.find(s => s.role === role && s.type === 'retail');
+            if (!roleSetting) return null;
 
             return (
               <div key={role} className={`bg-white rounded-2xl shadow-sm overflow-hidden border-l-4 ${getRoleColor(role)}`}>
-                <div className="p-6 border-b border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
-                      <Users className="w-5 h-5 text-slate-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-slate-900">{getRoleLabel(role)}</h3>
-                      <p className="text-sm text-slate-500">{roleSettings.length} cấu hình</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-6 space-y-4">
-                  {roleSettings.map((setting) => (
-                    <div key={setting.key} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-slate-700">{getTypeLabel(setting.type)}</p>
-                          {setting.description && (
-                            <p className="text-xs text-slate-500">{setting.description}</p>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="number"
-                            value={setting.percent}
-                            onChange={(e) => handlePercentChange(setting.key, parseFloat(e.target.value) || 0)}
-                            min="0"
-                            max="100"
-                            step="0.5"
-                            className="w-20 px-3 py-2 border border-slate-200 rounded-lg text-right font-bold"
-                          />
-                          <Percent className="w-4 h-4 text-slate-400" />
-                        </div>
+                <div className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="text-3xl">{getRoleIcon(role)}</div>
+                      <div>
+                        <h3 className="font-bold text-slate-900">{getRoleLabel(role)}</h3>
+                        <p className="text-sm text-slate-500">{getRoleDescription(role)}</p>
                       </div>
                     </div>
-                  ))}
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm text-slate-500">% Bán trực tiếp:</span>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          value={roleSetting.percent}
+                          onChange={(e) => handlePercentChange(roleSetting.key, parseFloat(e.target.value) || 0)}
+                          min="0"
+                          max="100"
+                          step="0.5"
+                          className="w-24 px-4 py-3 border border-slate-200 rounded-xl text-center font-bold text-xl"
+                        />
+                        <Percent className="w-5 h-5 text-slate-400" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             );
@@ -223,16 +278,114 @@ export default function CommissionSettingsPage() {
 
       {/* Example Calculation */}
       <div className="bg-white rounded-2xl p-6 shadow-sm">
-        <h3 className="font-bold text-slate-900 mb-4">Ví dụ tính hoa hồng</h3>
-        <div className="bg-slate-50 rounded-xl p-4 text-sm">
-          <p className="text-slate-600 mb-2">
-            Giả sử đơn hàng <strong>1,000,000đ</strong> từ link giới thiệu của CTV (thuộc Agent, Agent thuộc Master Agent):
-          </p>
-          <ul className="space-y-1 text-slate-700">
-            <li>• CTV nhận: 1,000,000 × 20% = <strong className="text-green-600">200,000đ</strong></li>
-            <li>• Agent nhận (override): 1,000,000 × 5% = <strong className="text-blue-600">50,000đ</strong></li>
-            <li>• Master Agent nhận (override L2): 1,000,000 × 2% = <strong className="text-purple-600">20,000đ</strong></li>
-          </ul>
+        <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+          <TrendingUp className="w-5 h-5 text-primary-500" />
+          Ví dụ tính hoa hồng (Đơn hàng {formatCurrency(example.orderValue)})
+        </h3>
+        
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Case 1: CTV bán, có Đại lý cấp trên */}
+          <div className="bg-slate-50 rounded-xl p-4">
+            <h4 className="font-semibold text-slate-700 mb-3">Trường hợp 1: CTV bán (có Đại lý cấp trên)</h4>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-slate-600">CTV nhận (retail {example.ctv.percent}%):</span>
+                <span className="font-bold text-green-600">{formatCurrency(example.ctv.amount)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-600">Đại lý nhận (override {example.agentOverride.percent}%):</span>
+                <span className="font-bold text-blue-600">{formatCurrency(example.agentOverride.amount)}</span>
+              </div>
+              <div className="border-t pt-2 flex justify-between font-semibold">
+                <span>Tổng chi hoa hồng:</span>
+                <span>{formatCurrency(example.ctv.amount + example.agentOverride.amount)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Case 2: Đại lý bán trực tiếp */}
+          <div className="bg-slate-50 rounded-xl p-4">
+            <h4 className="font-semibold text-slate-700 mb-3">Trường hợp 2: Đại lý bán trực tiếp</h4>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-slate-600">Đại lý nhận (retail {example.agentDirect.percent}%):</span>
+                <span className="font-bold text-blue-600">{formatCurrency(example.agentDirect.amount)}</span>
+              </div>
+              <div className="border-t pt-2 flex justify-between font-semibold">
+                <span>Tổng chi hoa hồng:</span>
+                <span>{formatCurrency(example.agentDirect.amount)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Case 3: CTV bán, có Đại lý + NPP */}
+          <div className="bg-slate-50 rounded-xl p-4">
+            <h4 className="font-semibold text-slate-700 mb-3">Trường hợp 3: CTV bán (có Đại lý + NPP)</h4>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-slate-600">CTV nhận (retail {example.ctv.percent}%):</span>
+                <span className="font-bold text-green-600">{formatCurrency(example.ctv.amount)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-600">Đại lý nhận (override {example.agentOverride.percent}%):</span>
+                <span className="font-bold text-blue-600">{formatCurrency(example.agentOverride.amount)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-600">NPP nhận (override {example.distributorOverride.percent}%):</span>
+                <span className="font-bold text-purple-600">{formatCurrency(example.distributorOverride.amount)}</span>
+              </div>
+              <div className="border-t pt-2 flex justify-between font-semibold">
+                <span>Tổng chi hoa hồng:</span>
+                <span>{formatCurrency(example.ctv.amount + example.agentOverride.amount + example.distributorOverride.amount)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Case 4: NPP bán trực tiếp */}
+          <div className="bg-slate-50 rounded-xl p-4">
+            <h4 className="font-semibold text-slate-700 mb-3">Trường hợp 4: NPP bán trực tiếp</h4>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-slate-600">NPP nhận (retail {example.distributorDirect.percent}%):</span>
+                <span className="font-bold text-purple-600">{formatCurrency(example.distributorDirect.amount)}</span>
+              </div>
+              <div className="border-t pt-2 flex justify-between font-semibold">
+                <span>Tổng chi hoa hồng:</span>
+                <span>{formatCurrency(example.distributorDirect.amount)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Visibility Rules */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm">
+        <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
+          <Users className="w-5 h-5 text-primary-500" />
+          Quy tắc hiển thị dữ liệu
+        </h3>
+        <div className="space-y-3 text-sm">
+          <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
+            <span className="text-xl">🧑‍💼</span>
+            <div>
+              <strong className="text-green-700">CTV:</strong>
+              <span className="text-slate-600 ml-2">Chỉ thấy đơn hàng và khách hàng do mình giới thiệu</span>
+            </div>
+          </div>
+          <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
+            <span className="text-xl">🏪</span>
+            <div>
+              <strong className="text-blue-700">Đại lý:</strong>
+              <span className="text-slate-600 ml-2">Thấy CTV trực thuộc + khách hàng trực tiếp. <em className="text-red-500">Không thấy khách của CTV</em></span>
+            </div>
+          </div>
+          <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
+            <span className="text-xl">🏢</span>
+            <div>
+              <strong className="text-purple-700">Nhà phân phối:</strong>
+              <span className="text-slate-600 ml-2">Thấy Đại lý + CTV trực thuộc + khách trực tiếp. <em className="text-red-500">Không thấy khách của cấp dưới</em></span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -45,6 +45,36 @@ export default function TeamPage() {
   const [stats, setStats] = useState<TeamStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [authTimeout, setAuthTimeout] = useState(false);
+  const [localUser, setLocalUser] = useState<{role: string; email: string} | null>(null);
+
+  // Fallback: fetch user directly if AuthContext fails
+  useEffect(() => {
+    const fetchUserDirect = async () => {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) {
+            setLocalUser({ role: data.user.role, email: data.user.email });
+          }
+        }
+      } catch (e) {
+        console.error("Failed to fetch user:", e);
+      }
+    };
+    
+    // If no user from context after 2s, try direct fetch
+    const timer = setTimeout(() => {
+      if (!user) {
+        fetchUserDirect();
+      }
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, [user]);
+
+  // Use user from context or fallback
+  const effectiveUser = user || localUser;
 
   // Timeout fallback - nếu auth loading quá 3s thì bỏ qua
   useEffect(() => {
@@ -57,13 +87,13 @@ export default function TeamPage() {
   }, [authLoading]);
 
   useEffect(() => {
-    // Fetch khi auth xong hoặc timeout
-    if ((!authLoading || authTimeout) && user) {
+    // Fetch khi có user (từ context hoặc fallback)
+    if (effectiveUser) {
       fetchTeam();
-    } else if ((!authLoading || authTimeout) && !user) {
+    } else if ((!authLoading || authTimeout) && !effectiveUser) {
       setIsLoading(false);
     }
-  }, [authLoading, authTimeout, user]);
+  }, [authLoading, authTimeout, effectiveUser]);
 
   const fetchTeam = async () => {
     setIsLoading(true);
@@ -96,10 +126,10 @@ export default function TeamPage() {
   };
 
   const allowedRoles = ["agent", "distributor", "master_agent", "admin", "npp"];
-  const isAgentOrHigher = user?.role && allowedRoles.includes(user.role);
+  const isAgentOrHigher = effectiveUser?.role && allowedRoles.includes(effectiveUser.role);
 
   // Show loading while auth is loading (max 3s)
-  if (authLoading && !authTimeout) {
+  if ((authLoading && !authTimeout) && !localUser) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
@@ -117,7 +147,7 @@ export default function TeamPage() {
           Bạn cần là Đại lý hoặc Nhà phân phối để quản lý đội nhóm
         </p>
         <p className="text-xs text-slate-400 mt-4">
-          Debug: role={user?.role || "null"}, email={user?.email || "null"}
+          Debug: role={effectiveUser?.role || "null"}, email={effectiveUser?.email || "null"}
         </p>
       </div>
     );
@@ -178,7 +208,7 @@ export default function TeamPage() {
             </div>
           </div>
 
-          {user?.role === "master_agent" || user?.role === "distributor" ? (
+          {effectiveUser?.role === "master_agent" || effectiveUser?.role === "distributor" ? (
             <div className="bg-white rounded-2xl p-6 shadow-sm">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">

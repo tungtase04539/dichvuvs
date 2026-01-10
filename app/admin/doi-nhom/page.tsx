@@ -44,12 +44,26 @@ export default function TeamPage() {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [stats, setStats] = useState<TeamStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [authTimeout, setAuthTimeout] = useState(false);
+
+  // Timeout fallback - nếu auth loading quá 3s thì bỏ qua
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (authLoading) {
+        setAuthTimeout(true);
+      }
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [authLoading]);
 
   useEffect(() => {
-    if (!authLoading && user) {
+    // Fetch khi auth xong hoặc timeout
+    if ((!authLoading || authTimeout) && user) {
       fetchTeam();
+    } else if ((!authLoading || authTimeout) && !user) {
+      setIsLoading(false);
     }
-  }, [authLoading, user]);
+  }, [authLoading, authTimeout, user]);
 
   const fetchTeam = async () => {
     setIsLoading(true);
@@ -84,16 +98,14 @@ export default function TeamPage() {
   const allowedRoles = ["agent", "distributor", "master_agent", "admin", "npp"];
   const isAgentOrHigher = user?.role && allowedRoles.includes(user.role);
 
-  // Show loading while auth is loading
-  if (authLoading) {
+  // Show loading while auth is loading (max 3s)
+  if (authLoading && !authTimeout) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
       </div>
     );
   }
-
-  console.log("[TeamPage] User role:", user?.role, "isAgentOrHigher:", isAgentOrHigher);
 
   if (!isAgentOrHigher) {
     return (

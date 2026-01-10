@@ -6,6 +6,7 @@ import DeleteProductButton from "./DeleteProductButton";
 import { getSession } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import CopyRefButton from "@/app/admin/san-pham/CopyRefButton";
+import EditVideoButton from "./EditVideoButton";
 
 export const dynamic = "force-dynamic";
 
@@ -40,9 +41,11 @@ export default async function AdminProductsPage() {
 
   const isAdmin = session?.role === "admin";
   const isCTV = session?.role === "collaborator" || session?.role === "ctv";
+  const isSeniorCTV = session?.role === "senior_collaborator";
   const isAgent = session?.role === "agent";
   const isDistributor = session?.role === "distributor" || session?.role === "master_agent";
-  const canUseRefLink = isCTV || isAgent || isDistributor;
+  const canUseRefLink = isCTV || isSeniorCTV || isAgent || isDistributor;
+  const canEditVideo = isSeniorCTV; // Chỉ CTV cao cấp mới được sửa video
 
   // Get referral code for CTV/Agent/Distributor
   let refCode = "";
@@ -151,6 +154,15 @@ export default async function AdminProductsPage() {
                       <CopyRefButton
                         slug={product.slug}
                         refCode={refCode}
+                      />
+                    )}
+
+                    {/* Nút sửa video cho CTV cao cấp - chỉ hiện khi video trống */}
+                    {canEditVideo && !product.videoUrl && (
+                      <EditVideoButton
+                        productId={product.id}
+                        productName={product.name}
+                        currentVideoUrl={product.videoUrl}
                       />
                     )}
 

@@ -107,6 +107,7 @@ export default function TeamPage() {
     );
   }
 
+  // Debug: Show user info
   if (!isAgentOrHigher) {
     return (
       <div className="text-center py-20">
@@ -114,6 +115,9 @@ export default function TeamPage() {
         <h2 className="text-xl font-bold text-slate-900 mb-2">Chức năng dành cho Đại lý</h2>
         <p className="text-slate-500">
           Bạn cần là Đại lý hoặc Nhà phân phối để quản lý đội nhóm
+        </p>
+        <p className="text-xs text-slate-400 mt-4">
+          Debug: role={user?.role || "null"}, email={user?.email || "null"}
         </p>
       </div>
     );

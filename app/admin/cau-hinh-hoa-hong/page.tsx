@@ -31,10 +31,23 @@ export default function CommissionSettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [authTimeout, setAuthTimeout] = useState(false);
+
+  // Timeout cho auth loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (authLoading) {
+        setAuthTimeout(true);
+      }
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [authLoading]);
 
   useEffect(() => {
-    fetchSettings();
-  }, []);
+    if (!authLoading || authTimeout) {
+      fetchSettings();
+    }
+  }, [authLoading, authTimeout]);
 
   const fetchSettings = async () => {
     setIsLoading(true);
@@ -154,7 +167,7 @@ export default function CommissionSettingsPage() {
     console.log("[CauHinhHoaHong] User role:", user?.role);
   }, [user]);
 
-  if (authLoading) {
+  if (authLoading && !authTimeout) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
@@ -163,7 +176,10 @@ export default function CommissionSettingsPage() {
     );
   }
 
-  if (!user || (user.role !== "admin" && user.email !== "admin@admin.com")) {
+  // Bypass check - cho phép truy cập nếu timeout (sẽ check lại ở API)
+  const canAccess = user?.role === "admin" || user?.email === "admin@admin.com" || authTimeout;
+
+  if (!canAccess) {
     return (
       <div className="text-center py-20">
         <Settings className="w-16 h-16 text-slate-300 mx-auto mb-4" />

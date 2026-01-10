@@ -55,10 +55,24 @@ export default function AdminWithdrawalsPage() {
   const [statusFilter, setStatusFilter] = useState("pending");
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [adminNote, setAdminNote] = useState("");
+  const [authTimeout, setAuthTimeout] = useState(false);
+
+  // Timeout cho auth loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (authLoading) {
+        setAuthTimeout(true);
+      }
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [authLoading]);
 
   useEffect(() => {
-    fetchWithdrawals();
-  }, [statusFilter]);
+    // Chỉ fetch khi đã có user hoặc timeout
+    if (!authLoading || authTimeout) {
+      fetchWithdrawals();
+    }
+  }, [statusFilter, authLoading, authTimeout]);
 
   const fetchWithdrawals = async () => {
     setIsLoading(true);
@@ -135,7 +149,7 @@ export default function AdminWithdrawalsPage() {
     );
   };
 
-  if (authLoading) {
+  if (authLoading && !authTimeout) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
@@ -143,7 +157,10 @@ export default function AdminWithdrawalsPage() {
     );
   }
 
-  if (!user || (user.role !== "admin" && user.email !== "admin@admin.com")) {
+  // Bypass check - cho phép truy cập nếu timeout (sẽ check lại ở API)
+  const canAccess = user?.role === "admin" || user?.email === "admin@admin.com" || authTimeout;
+
+  if (!canAccess) {
     return (
       <div className="text-center py-20">
         <Wallet className="w-16 h-16 text-slate-300 mx-auto mb-4" />

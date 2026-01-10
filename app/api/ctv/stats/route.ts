@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
-import { getCommissionStats } from "@/lib/commission";
 
 export const dynamic = "force-dynamic";
 
@@ -21,111 +20,83 @@ export async function GET() {
       return NextResponse.json({ error: "Không có quyền truy cập" }, { status: 403 });
     }
 
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
-
-    // Lấy thống kê commission
-    let commissionStats;
-    try {
-      commissionStats = await getCommissionStats(user.id);
-    } catch (commErr) {
-      console.error("[CTV Stats] Commission stats error:", commErr);
-      commissionStats = {
-        pending: { amount: 0, count: 0 },
-        paid: { amount: 0, count: 0 },
-        total: { amount: 0, count: 0 }
-      };
-    }
-
     // Lấy user info với balance
     const userInfo = await prisma.user.findUnique({
       where: { id: user.id },
       select: { balance: true }
     });
 
-    // Đơn hàng tháng này
-    const ordersThisMonth = await prisma.order.aggregate({
-      where: {
-        referrerId: user.id,
-        createdAt: { gte: startOfMonth },
-        status: { in: ["confirmed", "completed"] }
-      },
-      _sum: { totalPrice: true },
-      _count: true
-    });
+    // Lấy commission stats đơn giản
+    const [pendingCommission, paidCommission, totalCommission] = await Promise.all([
+      prisma.commission.aggregate({
+        where: { userId: user.id, status: 'pending' },
+        _sum: { amount: true },
+        _count: true
+      }),
+      prisma.commission.aggregate({
+        where: { userId: user.id, status: 'paid' },
+        _sum: { amount: true },
+        _count: true
+      }),
+      prisma.commission.aggregate({
+        where: { userId: user.id },
+        _sum: { amount: true },
+        _count: true
+      })
+    ]);
 
-    // Đơn hàng tháng trước
-    const ordersLastMonth = await prisma.order.aggregate({
-      where: {
-        referrerId: user.id,
-        createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
-        status: { in: ["confirmed", "completed"] }
-      },
-      _sum: { totalPrice: true },
-      _count: true
-    });
+    // Lấy orders stats
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    // Tổng đơn hàng
-    const totalOrders = await prisma.order.aggregate({
-      where: {
-        referrerId: user.id,
-        status: { in: ["confirmed", "completed"] }
-      },
-      _sum: { totalPrice: true },
-      _count: true
-    });
+    const [ordersThisMonth, totalOrders, pendingOrders] = await Promise.all([
+      prisma.order.aggregate({
+        where: {
+          referrerId: user.id,
+          createdAt: { gte: startOfMonth },
+          status: { in: ["confirmed", "completed"] }
+        },
+        _sum: { totalPrice: true },
+        _count: true
+      }),
+      prisma.order.aggregate({
+        where: {
+          referrerId: user.id,
+          status: { in: ["confirmed", "completed"] }
+        },
+        _sum: { totalPrice: true },
+        _count: true
+      }),
+      prisma.order.count({
+        where: { referrerId: user.id, status: "pending" }
+      })
+    ]);
 
-    // Đơn hàng pending
-    const pendingOrders = await prisma.order.count({
-      where: {
-        referrerId: user.id,
-        status: "pending"
-      }
-    });
-
-    // Referral link stats
+    // Referral links
     const referralLinks = await prisma.referralLink.findMany({
       where: { userId: user.id },
-      select: {
-        code: true,
-        clickCount: true,
-        orderCount: true,
-        revenue: true
-      }
+      select: { code: true, clickCount: true, orderCount: true, revenue: true }
     });
 
     const totalClicks = referralLinks.reduce((sum, link) => sum + link.clickCount, 0);
-    const conversionRate = totalClicks > 0 
-      ? Math.round((totalOrders._count / totalClicks) * 100) 
-      : 0;
 
-    // Số thành viên đội nhóm (nếu là Agent/Master Agent)
+    // Team count
     const teamCount = await prisma.user.count({
       where: { parentId: user.id }
     });
 
-    // Commission từ đội nhóm (level > 1)
-    const teamCommission = await prisma.commission.aggregate({
-      where: {
-        userId: user.id,
-        level: { gt: 1 }
-      },
-      _sum: { amount: true }
-    });
-
     return NextResponse.json({
       balance: userInfo?.balance || 0,
-      commission: commissionStats,
+      commission: {
+        pending: { amount: pendingCommission._sum.amount || 0, count: pendingCommission._count },
+        paid: { amount: paidCommission._sum.amount || 0, count: paidCommission._count },
+        total: { amount: totalCommission._sum.amount || 0, count: totalCommission._count }
+      },
       thisMonth: {
         orders: ordersThisMonth._count,
         revenue: ordersThisMonth._sum.totalPrice || 0
       },
-      lastMonth: {
-        orders: ordersLastMonth._count,
-        revenue: ordersLastMonth._sum.totalPrice || 0
-      },
+      lastMonth: { orders: 0, revenue: 0 },
       total: {
         orders: totalOrders._count,
         revenue: totalOrders._sum.totalPrice || 0
@@ -134,12 +105,9 @@ export async function GET() {
       referral: {
         links: referralLinks,
         totalClicks,
-        conversionRate
+        conversionRate: totalClicks > 0 ? Math.round((totalOrders._count / totalClicks) * 100) : 0
       },
-      team: {
-        count: teamCount,
-        commission: teamCommission._sum.amount || 0
-      }
+      team: { count: teamCount, commission: 0 }
     });
   } catch (error) {
     console.error("[CTV Stats] Error:", error);

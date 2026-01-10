@@ -40,10 +40,13 @@ export default async function AdminProductsPage() {
 
   const isAdmin = session?.role === "admin";
   const isCTV = session?.role === "collaborator" || session?.role === "ctv";
+  const isAgent = session?.role === "agent";
+  const isDistributor = session?.role === "distributor" || session?.role === "master_agent";
+  const canUseRefLink = isCTV || isAgent || isDistributor;
 
-  // Get referral code for CTV
+  // Get referral code for CTV/Agent/Distributor
   let refCode = "";
-  if (isCTV && session?.id) {
+  if (canUseRefLink && session?.id) {
     const refLink = await prisma.referralLink.findFirst({
       where: { userId: session.id }
     });
@@ -144,7 +147,7 @@ export default async function AdminProductsPage() {
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center justify-end gap-2">
-                    {isCTV && (
+                    {canUseRefLink && (
                       <CopyRefButton
                         slug={product.slug}
                         refCode={refCode}

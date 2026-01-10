@@ -43,12 +43,12 @@ export default function AdminLoginPage() {
         const role = data.user.user_metadata?.role;
         const isAdminEmail = data.user.email === "admin@admin.com";
 
-        // Cho phép: admin, staff, collaborator, agent, distributor
-        const allowedRoles = ["admin", "staff", "collaborator", "agent", "distributor"];
+        // Cho phép: admin, staff, collaborator, senior_collaborator, agent, distributor
+        const allowedRoles = ["admin", "staff", "collaborator", "senior_collaborator", "agent", "distributor"];
         
         if (allowedRoles.includes(role) || isAdminEmail) {
           // Redirect theo role
-          const ctvRoles = ["collaborator", "agent", "distributor"];
+          const ctvRoles = ["collaborator", "senior_collaborator", "agent", "distributor"];
           if (ctvRoles.includes(role) && !isAdminEmail) {
             router.push("/admin/ctv-dashboard");
           } else {

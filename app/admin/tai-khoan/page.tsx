@@ -24,6 +24,7 @@ const roleLabels: Record<string, string> = {
   staff: "Nhân viên",
   distributor: "Nhà phân phối",
   agent: "Đại lý",
+  senior_collaborator: "CTV cao cấp",
   collaborator: "Cộng tác viên",
 };
 
@@ -32,6 +33,7 @@ const roleIcons: Record<string, React.ReactNode> = {
   staff: <User className="w-4 h-4" />,
   distributor: <Building2 className="w-4 h-4" />,
   agent: <UserCheck className="w-4 h-4" />,
+  senior_collaborator: <UserCheck className="w-4 h-4" />,
   collaborator: <Users className="w-4 h-4" />,
 };
 
@@ -40,6 +42,7 @@ const roleColors: Record<string, string> = {
   staff: "bg-slate-100 text-slate-700",
   distributor: "bg-indigo-100 text-indigo-700",
   agent: "bg-blue-100 text-blue-700",
+  senior_collaborator: "bg-amber-100 text-amber-700",
   collaborator: "bg-green-100 text-green-700",
 };
 
@@ -71,7 +74,7 @@ export default function AccountsPage() {
   // Lấy danh sách cấp trên phù hợp theo role
   const getParentOptions = (role: string) => {
     if (role === "agent") return distributors; // Đại lý thuộc NPP
-    if (role === "collaborator") return agents; // CTV thuộc Đại lý
+    if (role === "collaborator" || role === "senior_collaborator") return agents; // CTV thuộc Đại lý
     return [];
   };
 
@@ -232,6 +235,7 @@ export default function AccountsPage() {
             <option value="">Tất cả vai trò</option>
             <option value="distributor">Nhà phân phối</option>
             <option value="agent">Đại lý</option>
+            <option value="senior_collaborator">CTV cao cấp</option>
             <option value="collaborator">Cộng tác viên</option>
             <option value="staff">Nhân viên</option>
             <option value="admin">Quản trị viên</option>
@@ -424,6 +428,7 @@ export default function AccountsPage() {
                   className="input"
                 >
                   <option value="collaborator">Cộng tác viên (CTV)</option>
+                  <option value="senior_collaborator">CTV cao cấp</option>
                   <option value="agent">Đại lý</option>
                   <option value="distributor">Nhà phân phối (NPP)</option>
                   <option value="staff">Nhân viên</option>
@@ -432,7 +437,7 @@ export default function AccountsPage() {
               </div>
 
               {/* Thuộc đội nhóm - chỉ hiển thị cho Đại lý và CTV */}
-              {(formData.role === "agent" || formData.role === "collaborator") && (
+              {(formData.role === "agent" || formData.role === "collaborator" || formData.role === "senior_collaborator") && (
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">
                     <Link2 className="w-4 h-4 inline mr-1" />

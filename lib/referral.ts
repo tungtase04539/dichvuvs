@@ -46,8 +46,8 @@ export async function createReferralLinkForUser(userId: string): Promise<Referra
       return null;
     }
 
-    // Chỉ tạo cho các vai trò: admin, distributor, agent, collaborator
-    const eligibleRoles = ['admin', 'distributor', 'agent', 'collaborator'];
+    // Chỉ tạo cho các vai trò: admin, distributor, agent, senior_collaborator, collaborator
+    const eligibleRoles = ['admin', 'distributor', 'agent', 'senior_collaborator', 'collaborator'];
     if (!eligibleRoles.includes(user.role)) {
       console.log(`[Referral] User ${user.email} có vai trò ${user.role} không đủ điều kiện tạo referral link`);
       return null;
@@ -117,7 +117,7 @@ export async function createReferralLinksForUsers(userIds: string[]): Promise<Re
  * Tạo referral link cho tất cả users có vai trò CTV/Đại lý/NPP mà chưa có link
  */
 export async function createReferralLinksForAllEligibleUsers() {
-  const eligibleRoles = ['admin', 'distributor', 'agent', 'collaborator'];
+  const eligibleRoles = ['admin', 'distributor', 'agent', 'senior_collaborator', 'collaborator'];
   
   // Lấy tất cả users có vai trò phù hợp
   const users = await prisma.user.findMany({

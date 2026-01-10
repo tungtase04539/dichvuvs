@@ -14,7 +14,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const allowedRoles = ["collaborator", "agent", "distributor", "admin"];
+    const allowedRoles = ["collaborator", "senior_collaborator", "agent", "distributor", "admin"];
     if (!allowedRoles.includes(user.role)) {
       console.log("[CTV Stats] Role not allowed:", user.role);
       return NextResponse.json({ error: "Không có quyền truy cập" }, { status: 403 });

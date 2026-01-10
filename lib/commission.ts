@@ -107,10 +107,16 @@ export async function calculateAndCreateCommissions(orderId: string): Promise<Co
     const referrerRole = referrer.role;
     let retailKey = `${referrerRole}_retail`;
     
-    // Fallback cho collaborator/ctv
+    // Fallback cho collaborator/ctv/senior_collaborator
     if (!settingsMap.has(retailKey)) {
       if (referrerRole === 'collaborator' || referrerRole === 'ctv') {
         retailKey = 'collaborator_retail';
+      } else if (referrerRole === 'senior_collaborator') {
+        retailKey = 'senior_collaborator_retail';
+        // Fallback to collaborator if senior not configured
+        if (!settingsMap.has(retailKey)) {
+          retailKey = 'collaborator_retail';
+        }
       }
     }
 

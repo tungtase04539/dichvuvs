@@ -110,8 +110,8 @@ export async function POST() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Only admin, distributor, agent, collaborator can create referral links
-    if (!["admin", "distributor", "agent", "collaborator"].includes(user.role)) {
+    // Only admin, distributor, agent, senior_collaborator, collaborator can create referral links
+    if (!["admin", "distributor", "agent", "senior_collaborator", "collaborator"].includes(user.role)) {
       return NextResponse.json(
         { error: "Không có quyền tạo mã giới thiệu" },
         { status: 403 }

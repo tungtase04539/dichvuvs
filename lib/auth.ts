@@ -73,7 +73,7 @@ export async function isStaff(): Promise<boolean> {
 
   if (session.email === "admin@admin.com") return true;
 
-  return ["admin", "staff", "distributor", "agent", "collaborator"].includes(session.role);
+  return ["admin", "staff", "distributor", "agent", "senior_collaborator", "collaborator"].includes(session.role);
 }
 
 // Kiểm tra quyền Đối tác (NPP, Agent, CTV)
@@ -81,7 +81,7 @@ export async function isPartner(): Promise<boolean> {
   const session = await getSession();
   if (!session) return false;
 
-  return ["distributor", "agent", "collaborator"].includes(session.role);
+  return ["distributor", "agent", "senior_collaborator", "collaborator"].includes(session.role);
 }
 
 // Các hàm cũ sẽ trả ra null/empty vì không sử dụng nữa

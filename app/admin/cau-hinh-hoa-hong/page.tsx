@@ -23,7 +23,7 @@ interface CommissionSetting {
   description: string | null;
 }
 
-const ROLE_ORDER = ["collaborator", "agent", "distributor"];
+const ROLE_ORDER = ["collaborator", "senior_collaborator", "agent", "distributor"];
 
 export default function CommissionSettingsPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -95,6 +95,7 @@ export default function CommissionSettingsPage() {
   const getRoleLabel = (role: string) => {
     const labels: Record<string, string> = {
       collaborator: "Cấp 1: Cộng tác viên (CTV)",
+      senior_collaborator: "Cấp 1+: CTV cao cấp",
       agent: "Cấp 2: Đại lý",
       distributor: "Cấp 3: Nhà phân phối (NPP)",
     };
@@ -104,6 +105,7 @@ export default function CommissionSettingsPage() {
   const getRoleDescription = (role: string) => {
     const desc: Record<string, string> = {
       collaborator: "Bán trực tiếp, không có cấp dưới",
+      senior_collaborator: "Bán trực tiếp + Có quyền sửa video sản phẩm",
       agent: "Bán trực tiếp + Hưởng override từ CTV (cần ≥3 CTV)",
       distributor: "Bán trực tiếp + Hưởng override từ Đại lý (cần ≥3 Đại lý)",
     };
@@ -113,6 +115,7 @@ export default function CommissionSettingsPage() {
   const getRoleColor = (role: string) => {
     const colors: Record<string, string> = {
       collaborator: "border-green-500 bg-green-50",
+      senior_collaborator: "border-amber-500 bg-amber-50",
       agent: "border-blue-500 bg-blue-50",
       distributor: "border-purple-500 bg-purple-50",
     };
@@ -122,6 +125,7 @@ export default function CommissionSettingsPage() {
   const getRoleIcon = (role: string) => {
     const icons: Record<string, string> = {
       collaborator: "🧑‍💼",
+      senior_collaborator: "⭐",
       agent: "🏪",
       distributor: "🏢",
     };

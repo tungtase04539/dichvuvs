@@ -39,13 +39,16 @@ export default async function AdminProductsPage() {
     getSession()
   ]);
 
+  // Debug: log session role
+  console.log("[san-pham/page] Session:", session?.email, "Role:", session?.role);
+
   const isAdmin = session?.role === "admin";
   const isCTV = session?.role === "collaborator" || session?.role === "ctv";
   const isSeniorCTV = session?.role === "senior_collaborator";
   const isAgent = session?.role === "agent";
   const isDistributor = session?.role === "distributor" || session?.role === "master_agent";
   const canUseRefLink = isCTV || isSeniorCTV || isAgent || isDistributor;
-  const canEditVideo = isSeniorCTV; // Chỉ CTV cao cấp mới được sửa video
+  const canEditVideo = isSeniorCTV || isAdmin; // CTV cao cấp và Admin đều được sửa video
 
   // Get referral code for CTV/Agent/Distributor
   let refCode = "";

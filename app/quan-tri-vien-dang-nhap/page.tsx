@@ -43,11 +43,14 @@ export default function AdminLoginPage() {
         const role = data.user.user_metadata?.role;
         const isAdminEmail = data.user.email === "admin@admin.com";
 
-        if (role === "admin" || role === "staff" || role === "collaborator" || isAdminEmail) {
+        // Cho phép: admin, staff, collaborator, ctv, agent, master_agent, distributor
+        const allowedRoles = ["admin", "staff", "collaborator", "ctv", "agent", "master_agent", "distributor"];
+        
+        if (allowedRoles.includes(role) || isAdminEmail) {
           router.push("/admin");
           router.refresh();
         } else {
-          // Nếu không phải admin/staff/collaborator, đăng xuất ngay để tránh kẹt session
+          // Nếu không phải role được phép, đăng xuất ngay để tránh kẹt session
           await supabase.auth.signOut();
           setError("Tài khoản này không có quyền truy cập trang quản trị");
           setIsLoading(false);

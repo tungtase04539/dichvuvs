@@ -40,14 +40,16 @@ interface TeamStats {
 }
 
 export default function TeamPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [stats, setStats] = useState<TeamStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchTeam();
-  }, []);
+    if (!authLoading && user) {
+      fetchTeam();
+    }
+  }, [authLoading, user]);
 
   const fetchTeam = async () => {
     setIsLoading(true);
@@ -81,6 +83,17 @@ export default function TeamPage() {
 
   const allowedRoles = ["agent", "distributor", "master_agent", "admin", "npp"];
   const isAgentOrHigher = user?.role && allowedRoles.includes(user.role);
+
+  // Show loading while auth is loading
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    );
+  }
+
+  console.log("[TeamPage] User role:", user?.role, "isAgentOrHigher:", isAgentOrHigher);
 
   if (!isAgentOrHigher) {
     return (

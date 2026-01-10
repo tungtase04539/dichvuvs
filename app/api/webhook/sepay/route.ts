@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { createAdminSupabaseClient } from "@/lib/supabase-server";
+import { calculateAndCreateCommissions } from "@/lib/commission";
 
 // Standard SePay Webhook Payload
 interface SepayWebhookPayload {
@@ -233,6 +234,23 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`[Webhook] SUCCESS: Order ${orderCode} finished`);
+    
+    // 8. Tính commission cho CTV/Đại lý nếu có referrer
+    try {
+      const orderWithReferrer = await prisma.order.findUnique({
+        where: { id: order.id },
+        select: { id: true, referrerId: true }
+      });
+      
+      if (orderWithReferrer?.referrerId) {
+        console.log(`[Webhook] Calculating commission for order ${orderCode}...`);
+        const commissions = await calculateAndCreateCommissions(order.id);
+        console.log(`[Webhook] Created ${commissions.length} commission(s)`);
+      }
+    } catch (commErr: any) {
+      console.error("[Webhook] Commission calculation error (non-blocking):", commErr.message);
+    }
+    
     return NextResponse.json({
       success: true,
       message: `Order ${orderCode} confirmed`,

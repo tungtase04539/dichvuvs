@@ -205,7 +205,11 @@ export async function POST(request: NextRequest) {
         itemPrice = priceGoldGlobal || product.price * 1.5;
       } else if (item.packageType === "platinum") {
         itemPrice = pricePlatinumGlobal || product.price * 2.5;
+      } else if (item.packageType === "single") {
+        // "single" = mua riêng, dùng giá gốc của sản phẩm
+        itemPrice = product.price;
       } else {
+        // "standard" = gói tiêu chuẩn
         itemPrice = priceStandardGlobal || product.price;
       }
 
@@ -218,9 +222,17 @@ export async function POST(request: NextRequest) {
     const mainProduct = productMap.get(mainItem.serviceId);
 
     let mainBasePrice = mainProduct?.price || 29000;
-    if (mainItem.packageType === "gold") mainBasePrice = priceGoldGlobal || mainBasePrice * 1.5;
-    else if (mainItem.packageType === "platinum") mainBasePrice = pricePlatinumGlobal || mainBasePrice * 2.5;
-    else mainBasePrice = priceStandardGlobal || mainBasePrice;
+    if (mainItem.packageType === "gold") {
+      mainBasePrice = priceGoldGlobal || mainBasePrice * 1.5;
+    } else if (mainItem.packageType === "platinum") {
+      mainBasePrice = pricePlatinumGlobal || mainBasePrice * 2.5;
+    } else if (mainItem.packageType === "single") {
+      // "single" = mua riêng, giữ nguyên giá gốc
+      mainBasePrice = mainProduct?.price || 29000;
+    } else {
+      // "standard" = gói tiêu chuẩn
+      mainBasePrice = priceStandardGlobal || mainBasePrice;
+    }
 
     const orderCode = generateOrderCode();
 

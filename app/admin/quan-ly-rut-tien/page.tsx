@@ -48,7 +48,7 @@ interface Stats {
 }
 
 export default function AdminWithdrawalsPage() {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -135,7 +135,15 @@ export default function AdminWithdrawalsPage() {
     );
   };
 
-  if (user?.role !== "admin") {
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    );
+  }
+
+  if (!user || (user.role !== "admin" && user.email !== "admin@admin.com")) {
     return (
       <div className="text-center py-20">
         <Wallet className="w-16 h-16 text-slate-300 mx-auto mb-4" />

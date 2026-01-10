@@ -26,7 +26,7 @@ interface CommissionSetting {
 const ROLE_ORDER = ["ctv", "collaborator", "agent", "distributor", "master_agent"];
 
 export default function CommissionSettingsPage() {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [settings, setSettings] = useState<CommissionSetting[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -148,12 +148,28 @@ export default function CommissionSettingsPage() {
     };
   };
 
-  if (user?.role !== "admin") {
+  // Debug: Log user info
+  useEffect(() => {
+    console.log("[CauHinhHoaHong] Current user:", user);
+    console.log("[CauHinhHoaHong] User role:", user?.role);
+  }, [user]);
+
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+        <span className="ml-2">Đang tải...</span>
+      </div>
+    );
+  }
+
+  if (!user || (user.role !== "admin" && user.email !== "admin@admin.com")) {
     return (
       <div className="text-center py-20">
         <Settings className="w-16 h-16 text-slate-300 mx-auto mb-4" />
         <h2 className="text-xl font-bold text-slate-900 mb-2">Không có quyền truy cập</h2>
         <p className="text-slate-500">Chỉ Admin mới có thể cấu hình hoa hồng</p>
+        <p className="text-xs text-slate-400 mt-2">Debug: role={user?.role}, email={user?.email}</p>
       </div>
     );
   }

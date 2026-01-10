@@ -9,12 +9,15 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const user = await getSession();
+    console.log("[CTV Stats] User from session:", user?.email, user?.id, user?.role);
+    
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const allowedRoles = ["collaborator", "ctv", "agent", "master_agent", "admin"];
+    const allowedRoles = ["collaborator", "ctv", "agent", "master_agent", "admin", "distributor"];
     if (!allowedRoles.includes(user.role)) {
+      console.log("[CTV Stats] Role not allowed:", user.role);
       return NextResponse.json({ error: "Không có quyền truy cập" }, { status: 403 });
     }
 
@@ -24,7 +27,17 @@ export async function GET() {
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
     // Lấy thống kê commission
-    const commissionStats = await getCommissionStats(user.id);
+    let commissionStats;
+    try {
+      commissionStats = await getCommissionStats(user.id);
+    } catch (commErr) {
+      console.error("[CTV Stats] Commission stats error:", commErr);
+      commissionStats = {
+        pending: { amount: 0, count: 0 },
+        paid: { amount: 0, count: 0 },
+        total: { amount: 0, count: 0 }
+      };
+    }
 
     // Lấy user info với balance
     const userInfo = await prisma.user.findUnique({

@@ -79,7 +79,8 @@ export default function TeamPage() {
     );
   };
 
-  const isAgentOrHigher = user?.role === "agent" || user?.role === "distributor" || user?.role === "master_agent" || user?.role === "admin";
+  const allowedRoles = ["agent", "distributor", "master_agent", "admin", "npp"];
+  const isAgentOrHigher = user?.role && allowedRoles.includes(user.role);
 
   if (!isAgentOrHigher) {
     return (
@@ -87,7 +88,7 @@ export default function TeamPage() {
         <Users className="w-16 h-16 text-slate-300 mx-auto mb-4" />
         <h2 className="text-xl font-bold text-slate-900 mb-2">Chức năng dành cho Đại lý</h2>
         <p className="text-slate-500">
-          Bạn cần là Đại lý hoặc Tổng đại lý để quản lý đội nhóm
+          Bạn cần là Đại lý hoặc Nhà phân phối để quản lý đội nhóm
         </p>
       </div>
     );

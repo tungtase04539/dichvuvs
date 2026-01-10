@@ -97,9 +97,23 @@ export async function GET(request: NextRequest) {
       query = query.eq("assignedToId", dbUser.id);
     }
 
-    // CTV chỉ xem đơn hàng của mình (do mình giới thiệu)
-    if (dbUser.role === "collaborator" || dbUser.role === "ctv") {
+    // CTV/Đại lý chỉ xem đơn hàng của mình (do mình giới thiệu)
+    if (["collaborator", "ctv", "agent"].includes(dbUser.role)) {
       query = query.eq("referrerId", dbUser.id);
+    }
+
+    // NPP/Distributor xem đơn của mình và đội nhóm
+    if (dbUser.role === "distributor" || dbUser.role === "master_agent") {
+      // Lấy danh sách ID cấp dưới
+      const { data: subUsers } = await supabase
+        .from("User")
+        .select("id")
+        .eq("parentId", dbUser.id);
+      
+      const subIds = (subUsers || []).map(u => u.id);
+      const allIds = [dbUser.id, ...subIds];
+      
+      query = query.in("referrerId", allIds);
     }
 
     // Admin xem tất cả (không filter thêm)

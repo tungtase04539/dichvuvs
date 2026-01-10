@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const allowedRoles = ["collaborator", "ctv", "agent", "master_agent", "admin"];
+    const allowedRoles = ["collaborator", "agent", "distributor", "admin"];
     if (!allowedRoles.includes(user.role)) {
       return NextResponse.json({ error: "Không có quyền truy cập" }, { status: 403 });
     }

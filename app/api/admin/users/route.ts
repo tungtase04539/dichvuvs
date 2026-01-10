@@ -52,13 +52,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Filter based on current user's role
-    if (user.role === "master_agent") {
+    if (user.role === "distributor") {
       users = users.filter((u: any) => u.parentId === user.id);
     } else if (user.role === "agent") {
       users = users.filter((u: any) => u.parentId === user.id && u.role === "collaborator");
-    } else if (user.role === "collaborator" || user.role === "ctv") {
+    } else if (user.role === "collaborator") {
       users = users.filter((u: any) => u.parentId === user.id);
-    } else if (user.role !== "admin") {
+    } else if (user.role !== "admin" && user.role !== "staff") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -85,8 +85,8 @@ export async function POST(request: NextRequest) {
     }
 
     const allowedRoles: Record<string, string[]> = {
-      admin: ["master_agent", "agent", "collaborator", "staff"],
-      master_agent: ["agent"],
+      admin: ["distributor", "agent", "collaborator", "staff"],
+      distributor: ["agent", "collaborator"],
       agent: ["collaborator"],
     };
 

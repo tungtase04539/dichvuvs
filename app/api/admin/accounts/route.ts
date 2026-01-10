@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
 
     // Tự động tạo referral link cho CTV/Đại lý/NPP
     let referralCode = null;
-    const eligibleRoles = ['admin', 'master_agent', 'distributor', 'agent', 'collaborator', 'ctv'];
+    const eligibleRoles = ['admin', 'distributor', 'agent', 'collaborator'];
     if (eligibleRoles.includes(role)) {
       const referralLink = await createReferralLinkForUser(data.user.id);
       referralCode = referralLink?.code || null;

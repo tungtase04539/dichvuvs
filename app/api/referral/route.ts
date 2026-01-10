@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     if (targetUserId && targetUserId !== user.id) {
       if (user.role === "admin") {
         userId = targetUserId;
-      } else if (user.role === "master_agent") {
+      } else if (user.role === "distributor") {
         // Check if target is a sub-agent
         const targetUser = await prisma.user.findFirst({
           where: { id: targetUserId, parentId: user.id },
@@ -110,8 +110,8 @@ export async function POST() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Only admin, master_agent, agent, collaborator/ctv can create referral links
-    if (!["admin", "master_agent", "agent", "collaborator", "ctv"].includes(user.role)) {
+    // Only admin, distributor, agent, collaborator can create referral links
+    if (!["admin", "distributor", "agent", "collaborator"].includes(user.role)) {
       return NextResponse.json(
         { error: "Không có quyền tạo mã giới thiệu" },
         { status: 403 }

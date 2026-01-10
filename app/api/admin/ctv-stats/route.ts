@@ -16,10 +16,10 @@ export async function GET() {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
     // Đếm số lượng theo role
-    const [ctvCount, agentCount, masterAgentCount] = await Promise.all([
-      prisma.user.count({ where: { role: { in: ["collaborator", "ctv"] } } }),
+    const [ctvCount, agentCount, distributorCount] = await Promise.all([
+      prisma.user.count({ where: { role: "collaborator" } }),
       prisma.user.count({ where: { role: "agent" } }),
-      prisma.user.count({ where: { role: "master_agent" } })
+      prisma.user.count({ where: { role: "distributor" } })
     ]);
 
     // Tổng commission pending
@@ -87,8 +87,8 @@ export async function GET() {
       partners: {
         ctv: ctvCount,
         agent: agentCount,
-        masterAgent: masterAgentCount,
-        total: ctvCount + agentCount + masterAgentCount
+        distributor: distributorCount,
+        total: ctvCount + agentCount + distributorCount
       },
       commission: {
         pending: {

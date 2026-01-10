@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const allowedRoles = ["collaborator", "ctv", "agent", "master_agent", "distributor"];
+    const allowedRoles = ["collaborator", "agent", "distributor"];
     if (!allowedRoles.includes(user.role)) {
       return NextResponse.json({ error: "Không có quyền rút tiền" }, { status: 403 });
     }

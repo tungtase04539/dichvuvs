@@ -15,8 +15,8 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Chỉ Agent, Distributor và Master Agent mới có đội nhóm
-    const allowedRoles = ["agent", "distributor", "master_agent", "admin"];
+    // Chỉ Agent, Distributor mới có đội nhóm
+    const allowedRoles = ["agent", "distributor", "admin"];
     if (!allowedRoles.includes(user.role)) {
       return NextResponse.json({ 
         members: [],
@@ -74,9 +74,9 @@ export async function GET() {
       _count: true
     });
 
-    // Nếu là NPP/Master Agent, lấy thêm số lượng cấp dưới của Đại lý
+    // Nếu là NPP, lấy thêm số lượng cấp dưới của Đại lý
     let subTeamCount = 0;
-    if (user.role === "distributor" || user.role === "master_agent") {
+    if (user.role === "distributor") {
       const agentIds = directMembers
         .filter(m => m.role === "agent")
         .map(m => m.id);

@@ -98,12 +98,12 @@ export async function GET(request: NextRequest) {
     }
 
     // CTV/Đại lý chỉ xem đơn hàng của mình (do mình giới thiệu)
-    if (["collaborator", "ctv", "agent"].includes(dbUser.role)) {
+    if (["collaborator", "agent"].includes(dbUser.role)) {
       query = query.eq("referrerId", dbUser.id);
     }
 
     // NPP/Distributor xem đơn của mình và đội nhóm
-    if (dbUser.role === "distributor" || dbUser.role === "master_agent") {
+    if (dbUser.role === "distributor") {
       // Lấy danh sách ID cấp dưới
       const { data: subUsers } = await supabase
         .from("User")

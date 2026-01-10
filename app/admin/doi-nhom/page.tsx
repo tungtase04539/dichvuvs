@@ -107,11 +107,9 @@ export default function TeamPage() {
 
   const getRoleBadge = (role: string) => {
     const styles: Record<string, { bg: string; text: string; label: string }> = {
-      master_agent: { bg: "bg-purple-100", text: "text-purple-700", label: "Tổng đại lý" },
       distributor: { bg: "bg-purple-100", text: "text-purple-700", label: "Nhà phân phối" },
       agent: { bg: "bg-blue-100", text: "text-blue-700", label: "Đại lý" },
       collaborator: { bg: "bg-green-100", text: "text-green-700", label: "CTV" },
-      ctv: { bg: "bg-green-100", text: "text-green-700", label: "CTV" },
     };
     const style = styles[role] || { bg: "bg-slate-100", text: "text-slate-700", label: role };
     return (
@@ -121,7 +119,7 @@ export default function TeamPage() {
     );
   };
 
-  const allowedRoles = ["agent", "distributor", "master_agent", "admin", "npp"];
+  const allowedRoles = ["agent", "distributor", "admin"];
   const isAgentOrHigher = effectiveUser?.role && allowedRoles.includes(effectiveUser.role);
 
   // Show loading while waiting for user (from context or fallback)
@@ -207,7 +205,7 @@ export default function TeamPage() {
             </div>
           </div>
 
-          {effectiveUser?.role === "master_agent" || effectiveUser?.role === "distributor" ? (
+          {effectiveUser?.role === "distributor" ? (
             <div className="bg-white rounded-2xl p-6 shadow-sm">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">

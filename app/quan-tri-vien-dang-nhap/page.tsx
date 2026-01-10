@@ -47,7 +47,13 @@ export default function AdminLoginPage() {
         const allowedRoles = ["admin", "staff", "collaborator", "ctv", "agent", "master_agent", "distributor"];
         
         if (allowedRoles.includes(role) || isAdminEmail) {
-          router.push("/admin");
+          // Redirect theo role
+          const ctvRoles = ["collaborator", "ctv", "agent", "distributor", "master_agent"];
+          if (ctvRoles.includes(role) && !isAdminEmail) {
+            router.push("/admin/ctv-dashboard");
+          } else {
+            router.push("/admin");
+          }
           router.refresh();
         } else {
           // Nếu không phải role được phép, đăng xuất ngay để tránh kẹt session

@@ -9,8 +9,11 @@ function getSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+  console.log("[getSupabaseAdmin] URL exists:", !!supabaseUrl);
+  console.log("[getSupabaseAdmin] Service key exists:", !!supabaseServiceKey);
+
   if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error("Missing Supabase credentials");
+    throw new Error("Missing Supabase credentials - URL: " + !!supabaseUrl + ", Key: " + !!supabaseServiceKey);
   }
 
   return createClient(supabaseUrl, supabaseServiceKey, {

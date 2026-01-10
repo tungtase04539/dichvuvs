@@ -110,7 +110,7 @@ export async function calculateAndCreateCommissions(orderId: string): Promise<Co
     // Fallback cho collaborator/ctv
     if (!settingsMap.has(retailKey)) {
       if (referrerRole === 'collaborator' || referrerRole === 'ctv') {
-        retailKey = 'ctv_retail';
+        retailKey = 'collaborator_retail';
       }
     }
 
@@ -216,7 +216,11 @@ export async function calculateAndCreateCommissions(orderId: string): Promise<Co
         if (grandParentSubCount >= minSubAgentsRequired && 
             (grandParentRole === 'distributor' || grandParentRole === 'master_agent')) {
           
-          const grandParentRetailKey = `${grandParentRole}_retail`;
+          // Fallback master_agent -> distributor
+          let grandParentRetailKey = `${grandParentRole}_retail`;
+          if (!settingsMap.has(grandParentRetailKey) && grandParentRole === 'master_agent') {
+            grandParentRetailKey = 'distributor_retail';
+          }
           const parentRetailKey = `${parentRole}_retail`;
           
           const grandParentRetailSetting = settingsMap.get(grandParentRetailKey);

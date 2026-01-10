@@ -23,7 +23,7 @@ interface CommissionSetting {
   description: string | null;
 }
 
-const ROLE_ORDER = ["ctv", "collaborator", "agent", "distributor", "master_agent"];
+const ROLE_ORDER = ["collaborator", "agent", "distributor"];
 
 export default function CommissionSettingsPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -94,44 +94,36 @@ export default function CommissionSettingsPage() {
 
   const getRoleLabel = (role: string) => {
     const labels: Record<string, string> = {
-      ctv: "Cấp 1: CTV",
-      collaborator: "Cấp 1: Cộng tác viên",
+      collaborator: "Cấp 1: Cộng tác viên (CTV)",
       agent: "Cấp 2: Đại lý",
-      distributor: "Cấp 3: Nhà phân phối",
-      master_agent: "Cấp 3: Tổng đại lý",
+      distributor: "Cấp 3: Nhà phân phối (NPP)",
     };
     return labels[role] || role;
   };
 
   const getRoleDescription = (role: string) => {
     const desc: Record<string, string> = {
-      ctv: "Bán trực tiếp, không có cấp dưới",
       collaborator: "Bán trực tiếp, không có cấp dưới",
       agent: "Bán trực tiếp + Hưởng override từ CTV (cần ≥3 CTV)",
       distributor: "Bán trực tiếp + Hưởng override từ Đại lý (cần ≥3 Đại lý)",
-      master_agent: "Bán trực tiếp + Hưởng override từ Đại lý (cần ≥3 Đại lý)",
     };
     return desc[role] || "";
   };
 
   const getRoleColor = (role: string) => {
     const colors: Record<string, string> = {
-      ctv: "border-green-500 bg-green-50",
       collaborator: "border-green-500 bg-green-50",
       agent: "border-blue-500 bg-blue-50",
       distributor: "border-purple-500 bg-purple-50",
-      master_agent: "border-purple-500 bg-purple-50",
     };
     return colors[role] || "border-slate-500 bg-slate-50";
   };
 
   const getRoleIcon = (role: string) => {
     const icons: Record<string, string> = {
-      ctv: "🧑‍💼",
       collaborator: "🧑‍💼",
       agent: "🏪",
       distributor: "🏢",
-      master_agent: "🏢",
     };
     return icons[role] || "👤";
   };
@@ -139,7 +131,7 @@ export default function CommissionSettingsPage() {
   // Tính toán ví dụ
   const getExampleCalculation = () => {
     const orderValue = 1000000;
-    const ctvSetting = settings.find(s => s.key === 'ctv_retail');
+    const ctvSetting = settings.find(s => s.key === 'collaborator_retail');
     const agentSetting = settings.find(s => s.key === 'agent_retail');
     const distributorSetting = settings.find(s => s.key === 'distributor_retail') || 
                                settings.find(s => s.key === 'master_agent_retail');

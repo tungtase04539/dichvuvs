@@ -7,13 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Roles: admin, agent, ctv, customer
+// Roles: admin, staff, master_agent, agent, collaborator/ctv, customer
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String
   name      String
-  role      String   @default("customer") // admin, agent, ctv, customer
+  role      String   @default("customer") // admin, staff, master_agent, agent, collaborator, ctv, customer
   balance   Float    @default(0)
   phone     String?
   avatar    String?
@@ -33,6 +33,11 @@ model User {
   referredOrders Order[]         @relation("ReferrerOrders")
   ctvApplication CTVApplication?
   commissions    Commission[]    @relation("Recipient")
+  withdrawals    Withdrawal[]    @relation("UserWithdrawals")
+  processedWithdrawals Withdrawal[] @relation("ProcessedWithdrawals")
+
+  @@index([parentId])
+  @@index([role])
 }
 
 // Don dang ky lam CTV
@@ -164,6 +169,9 @@ model Order {
   updatedAt DateTime @updatedAt
 
   commissions Commission[]
+
+  @@index([referrerId])
+  @@index([status])
 }
 
 model ChatSession {
@@ -231,6 +239,7 @@ model ChatbotInventory {
   serviceId String
   service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
+  chatbotLink    String? // Link chatbot
   activationCode String // Ma kich hoat
 
   isUsed  Boolean @default(false)
@@ -278,6 +287,7 @@ model ReferralClick {
   createdAt DateTime @default(now())
 }
 
+// Hoa hong cho CTV/Agent
 model Commission {
   id      String @id @default(uuid())
   orderId String
@@ -288,22 +298,69 @@ model Commission {
 
   amount  Float
   percent Float // Phan tram tai thoi diem do
-  level   Int // 1: truc tiep, 2: cap tren...
+  level   Int // 1: truc tiep, 2: cap tren (override)...
 
   status String @default("pending") // pending, paid
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([status])
 }
 
+// Cau hinh % hoa hong
 model CommissionSetting {
   id          String  @id @default(uuid())
   key         String  @unique // vd: "ctv_retail", "agent_retail", "agent_override"
-  role        String // admin, agent, ctv
+  role        String // admin, agent, ctv, collaborator, master_agent
   type        String // retail (tu ban), override (huong tu cap duoi)
   percent     Float
   description String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Yeu cau rut tien
+model Withdrawal {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation("UserWithdrawals", fields: [userId], references: [id], onDelete: Cascade)
+
+  amount      Float
+  bankName    String?
+  bankAccount String?
+  bankHolder  String?
+
+  status    String  @default("pending") // pending, approved, rejected, paid
+  note      String? // Ghi chu cua user
+  adminNote String? // Ghi chu cua admin
+
+  processedBy String? // Admin xu ly
+  processor   User?     @relation("ProcessedWithdrawals", fields: [processedBy], references: [id])
+  processedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+// Lich su thanh toan don hang
+model PaymentHistory {
+  id            String   @id @default(uuid())
+  orderId       String
+  orderCode     String
+  customerName  String
+  customerPhone String
+  customerEmail String?
+  amount        Float
+  paymentMethod String?  @default("bank_transfer")
+  transactionId String?
+  paidAt        DateTime @default(now())
+  notes         String?
+  createdAt     DateTime @default(now())
 }

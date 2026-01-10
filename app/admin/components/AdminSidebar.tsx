@@ -13,6 +13,9 @@ import {
   Link2,
   Building2,
   Wallet,
+  DollarSign,
+  TrendingUp,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +42,7 @@ const roleLabels: Record<string, string> = {
   master_agent: "Tổng đại lý",
   agent: "Đại lý",
   collaborator: "Cộng tác viên",
+  ctv: "Cộng tác viên",
   staff: "Nhân viên",
 };
 
@@ -48,25 +52,40 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
   // Navigation items based on role
   const getNavItems = (): NavItem[] => {
     const isPartner = user.role === "collaborator" || user.role === "ctv" || user.role === "agent" || user.role === "master_agent";
+    const isAgentOrHigher = user.role === "agent" || user.role === "master_agent";
     const isAdmin = user.role === "admin";
 
-    const items: NavItem[] = [
-      { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
-      { href: "/admin/don-hang", icon: Package, label: "Đơn hàng" },
-      { href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" },
-    ];
+    const items: NavItem[] = [];
 
-    // Only show 'Duyệt CTV' to admin/staff
-    if (!isPartner) {
+    // CTV/Agent Dashboard
+    if (isPartner) {
+      items.push({ href: "/admin/ctv-dashboard", icon: TrendingUp, label: "Dashboard CTV" });
+      items.push({ href: "/admin/don-hang", icon: Package, label: "Đơn hàng" });
+      items.push({ href: "/admin/hoa-hong", icon: DollarSign, label: "Hoa hồng" });
+      items.push({ href: "/admin/rut-tien", icon: Wallet, label: "Rút tiền" });
+      
+      // Đội nhóm chỉ cho Agent trở lên
+      if (isAgentOrHigher) {
+        items.push({ href: "/admin/doi-nhom", icon: Users, label: "Đội nhóm" });
+      }
+      
+      items.push({ href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" });
+    } else {
+      // Admin/Staff menu
+      items.push({ href: "/admin", icon: LayoutDashboard, label: "Dashboard" });
+      items.push({ href: "/admin/don-hang", icon: Package, label: "Đơn hàng" });
+      items.push({ href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" });
       items.push({ href: "/admin/ctv-duyet", icon: Users, label: "Duyệt CTV" });
-    }
+      items.push({ href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" });
 
-    items.push({ href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" });
-
-    // Only show technical/admin configs to admins
-    if (isAdmin) {
-      items.push({ href: "/admin/cau-hinh-goi", icon: Bot, label: "Cấu hình gói" });
-      items.push({ href: "/admin/tai-khoan", icon: Key, label: "Tài khoản" });
+      // Admin only
+      if (isAdmin) {
+        items.push({ href: "/admin/hoa-hong", icon: DollarSign, label: "Quản lý hoa hồng" });
+        items.push({ href: "/admin/quan-ly-rut-tien", icon: Wallet, label: "Yêu cầu rút tiền" });
+        items.push({ href: "/admin/cau-hinh-goi", icon: Bot, label: "Cấu hình gói" });
+        items.push({ href: "/admin/cau-hinh-hoa-hong", icon: Settings, label: "Cấu hình hoa hồng" });
+        items.push({ href: "/admin/tai-khoan", icon: Key, label: "Tài khoản" });
+      }
     }
 
     return items;

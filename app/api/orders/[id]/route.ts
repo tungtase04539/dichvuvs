@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { calculateAndCreateCommissions } from "@/lib/commission";
 
 export async function GET(
   request: NextRequest,
@@ -113,6 +114,7 @@ export async function PATCH(
         status: true,
         totalPrice: true,
         notes: true,
+        referrerId: true,
         service: {
           select: {
             id: true,
@@ -127,6 +129,17 @@ export async function PATCH(
         },
       },
     });
+
+    // Tự động tính commission khi đơn hàng được xác nhận
+    if (status === "confirmed" && order.referrerId) {
+      try {
+        const commissions = await calculateAndCreateCommissions(order.id);
+        console.log(`[Order ${order.orderCode}] Created ${commissions.length} commissions`);
+      } catch (commError) {
+        console.error(`[Order ${order.orderCode}] Commission calculation error:`, commError);
+        // Không throw error để không ảnh hưởng đến việc update order
+      }
+    }
 
     return NextResponse.json({ order });
   } catch (error) {

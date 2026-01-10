@@ -11,6 +11,10 @@ import {
   Mail,
   Phone,
   Calendar,
+  X,
+  Check,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -45,7 +49,19 @@ export default function TeamPage() {
   const [stats, setStats] = useState<TeamStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [authTimeout, setAuthTimeout] = useState(false);
-  const [localUser, setLocalUser] = useState<{role: string; email: string} | null>(null);
+  const [localUser, setLocalUser] = useState<{id: string; role: string; email: string} | null>(null);
+
+  // Modal tạo CTV
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createError, setCreateError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    name: "",
+    phone: "",
+  });
 
   // Fallback: fetch user directly if AuthContext fails
   useEffect(() => {
@@ -55,7 +71,7 @@ export default function TeamPage() {
         if (res.ok) {
           const data = await res.json();
           if (data.user) {
-            setLocalUser({ role: data.user.role, email: data.user.email });
+            setLocalUser({ id: data.user.id, role: data.user.role, email: data.user.email });
           }
         }
       } catch (e) {
@@ -121,6 +137,48 @@ export default function TeamPage() {
 
   const allowedRoles = ["agent", "distributor", "admin"];
   const isAgentOrHigher = effectiveUser?.role && allowedRoles.includes(effectiveUser.role);
+  // Đại lý và NPP có thể tạo CTV
+  const canCreateCTV = effectiveUser?.role === "agent" || effectiveUser?.role === "distributor";
+
+  console.log("TeamPage debug:", { 
+    role: effectiveUser?.role, 
+    canCreateCTV, 
+    isAgentOrHigher 
+  });
+
+  // Tạo CTV mới
+  const handleCreateCTV = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreateError("");
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch("/api/ctv/team/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          role: "collaborator",
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setCreateError(data.error || "Có lỗi xảy ra");
+        return;
+      }
+
+      // Reset form và đóng modal
+      setShowCreateModal(false);
+      setFormData({ email: "", password: "", name: "", phone: "" });
+      fetchTeam(); // Reload danh sách
+    } catch {
+      setCreateError("Có lỗi xảy ra");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Show loading while waiting for user (from context or fallback)
   // Chỉ hiện loading, không hiện lỗi cho đến khi chắc chắn không có user
@@ -156,7 +214,18 @@ export default function TeamPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Đội nhóm của tôi</h1>
           <p className="text-slate-500 mt-1">Quản lý CTV và đại lý cấp dưới</p>
+          {/* Debug info - có thể xóa sau */}
+          <p className="text-xs text-slate-400">Role: {effectiveUser?.role} | canCreateCTV: {canCreateCTV ? "true" : "false"}</p>
         </div>
+        {canCreateCTV && (
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="btn btn-primary flex items-center gap-2"
+          >
+            <UserPlus className="w-5 h-5" />
+            Thêm CTV
+          </button>
+        )}
       </div>
 
       {/* Stats */}
@@ -341,6 +410,123 @@ export default function TeamPage() {
           </div>
         )}
       </div>
+
+      {/* Modal tạo CTV */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-2xl w-full max-w-md mx-4 shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b">
+              <h2 className="text-xl font-bold">Thêm CTV mới</h2>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="p-2 hover:bg-slate-100 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateCTV} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
+                  className="input"
+                  placeholder="email@example.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Mật khẩu <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    required
+                    className="input pr-10"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Họ tên <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                  className="input"
+                  placeholder="Nguyễn Văn A"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Số điện thoại
+                </label>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="input"
+                  placeholder="0901234567"
+                />
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700">
+                <strong>Lưu ý:</strong> CTV được tạo sẽ tự động thuộc đội nhóm của bạn và bạn sẽ nhận hoa hồng override khi họ bán hàng.
+              </div>
+
+              {createError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                  {createError}
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  className="flex-1 px-4 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 btn btn-primary"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <Check className="w-5 h-5" />
+                      Tạo CTV
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

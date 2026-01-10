@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import {
   Users, Plus, Trash2, Edit2, Loader2, Search,
   UserPlus, Shield, Building2, UserCheck, User,
-  Eye, EyeOff, X, Check
+  Eye, EyeOff, X, Check, Link2
 } from "lucide-react";
 
 interface Account {
@@ -14,6 +14,7 @@ interface Account {
   role: string;
   phone: string;
   parentId: string | null;
+  parentName?: string;
   createdAt: string;
   lastSignIn: string | null;
 }
@@ -57,10 +58,29 @@ export default function AccountsPage() {
     email: "",
     password: "",
     name: "",
-    role: "staff",
+    role: "collaborator",
     phone: "",
+    parentId: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+
+  // Danh sách NPP và Đại lý để chọn làm cấp trên
+  const distributors = accounts.filter(a => a.role === "distributor");
+  const agents = accounts.filter(a => a.role === "agent");
+
+  // Lấy danh sách cấp trên phù hợp theo role
+  const getParentOptions = (role: string) => {
+    if (role === "agent") return distributors; // Đại lý thuộc NPP
+    if (role === "collaborator") return agents; // CTV thuộc Đại lý
+    return [];
+  };
+
+  // Lấy tên cấp trên
+  const getParentName = (parentId: string | null) => {
+    if (!parentId) return null;
+    const parent = accounts.find(a => a.id === parentId);
+    return parent?.name || null;
+  };
 
   // Load accounts
   const loadAccounts = async () => {
@@ -102,10 +122,16 @@ export default function AccountsPage() {
         ? `/api/admin/accounts/${editingAccount.id}`
         : "/api/admin/accounts";
 
+      // Gửi parentId nếu có
+      const submitData = {
+        ...formData,
+        parentId: formData.parentId || null,
+      };
+
       const res = await fetch(url, {
         method: editingAccount ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData),
       });
 
       const data = await res.json();
@@ -117,7 +143,7 @@ export default function AccountsPage() {
 
       setShowModal(false);
       setEditingAccount(null);
-      setFormData({ email: "", password: "", name: "", role: "collaborator", phone: "" });
+      setFormData({ email: "", password: "", name: "", role: "collaborator", phone: "", parentId: "" });
       loadAccounts();
     } catch {
       setError("Có lỗi xảy ra");
@@ -152,6 +178,7 @@ export default function AccountsPage() {
       name: account.name,
       role: account.role,
       phone: account.phone || "",
+      parentId: account.parentId || "",
     });
     setShowModal(true);
   };
@@ -159,7 +186,7 @@ export default function AccountsPage() {
   // Open create modal
   const openCreate = () => {
     setEditingAccount(null);
-    setFormData({ email: "", password: "", name: "", role: "collaborator", phone: "" });
+    setFormData({ email: "", password: "", name: "", role: "collaborator", phone: "", parentId: "" });
     setShowModal(true);
   };
 
@@ -241,6 +268,7 @@ export default function AccountsPage() {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600">Tài khoản</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600">Vai trò</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600">Đội nhóm</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600">SĐT</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600">Ngày tạo</th>
                 <th className="px-6 py-3 text-center text-xs font-semibold text-slate-600">Thao tác</th>
@@ -267,6 +295,16 @@ export default function AccountsPage() {
                       {roleIcons[account.role]}
                       {roleLabels[account.role]}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 text-slate-600 text-sm">
+                    {account.parentId ? (
+                      <span className="inline-flex items-center gap-1 text-blue-600">
+                        <Link2 className="w-3 h-3" />
+                        {getParentName(account.parentId) || "N/A"}
+                      </span>
+                    ) : (
+                      <span className="text-slate-400">-</span>
+                    )}
                   </td>
                   <td className="px-6 py-4 text-slate-600">{account.phone || "-"}</td>
                   <td className="px-6 py-4 text-slate-600 text-sm">
@@ -382,7 +420,7 @@ export default function AccountsPage() {
                 </label>
                 <select
                   value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value, parentId: "" })}
                   className="input"
                 >
                   <option value="collaborator">Cộng tác viên (CTV)</option>
@@ -392,6 +430,36 @@ export default function AccountsPage() {
                   <option value="admin">Quản trị viên</option>
                 </select>
               </div>
+
+              {/* Thuộc đội nhóm - chỉ hiển thị cho Đại lý và CTV */}
+              {(formData.role === "agent" || formData.role === "collaborator") && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <Link2 className="w-4 h-4 inline mr-1" />
+                    Thuộc đội nhóm
+                    <span className="text-slate-400 text-xs ml-1">
+                      ({formData.role === "agent" ? "Chọn NPP cấp trên" : "Chọn Đại lý cấp trên"})
+                    </span>
+                  </label>
+                  <select
+                    value={formData.parentId}
+                    onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
+                    className="input"
+                  >
+                    <option value="">-- Không thuộc đội nhóm nào --</option>
+                    {getParentOptions(formData.role).map((parent) => (
+                      <option key={parent.id} value={parent.id}>
+                        {parent.name} ({parent.email})
+                      </option>
+                    ))}
+                  </select>
+                  {getParentOptions(formData.role).length === 0 && (
+                    <p className="text-xs text-amber-600 mt-1">
+                      Chưa có {formData.role === "agent" ? "NPP" : "Đại lý"} nào trong hệ thống
+                    </p>
+                  )}
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">

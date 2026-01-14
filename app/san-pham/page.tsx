@@ -136,7 +136,7 @@ function ProductsContent() {
       <section className="bg-gradient-hero pt-32 pb-20">
         <div className="container mx-auto px-4 text-center">
           <Link 
-            href="/goi-dich-vu"
+            href="/goi"
             className="inline-flex items-center gap-2 px-4 py-2 bg-primary-400/20 text-primary-400 rounded-full text-sm font-bold mb-6 border border-primary-400/30 tracking-wide hover:bg-primary-400/30 hover:border-primary-400/50 transition-all cursor-pointer"
           >
             <Bot className="w-4 h-4" />

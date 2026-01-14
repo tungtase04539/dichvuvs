@@ -143,7 +143,7 @@ function ProductsContent() {
             Ac muốn nhận siêu xịn sò & kiếm ko giới hạn từ con số 0 với AI
           </Link>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 uppercase">
-            TẤT CẢ <span className="text-primary-400">CHATBOT</span>
+            TẤT CẢ <span className="text-primary-400">TRỢ LÝ AI</span>
           </h1>
           <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-8">
             Chọn ChatBot AI phù hợp với nhu cầu kinh doanh của bạn.

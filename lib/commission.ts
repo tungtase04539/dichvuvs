@@ -45,7 +45,20 @@ interface TeamMember {
  * - CTV bán (có Đại lý cấp trên): CTV nhận 10%, Đại lý nhận 5% override
  * - Đại lý bán trực tiếp: Đại lý nhận 15%
  * - Đại lý bán (có NPP cấp trên): Đại lý nhận 15%, NPP nhận 5% override
+ * 
+ * LƯU Ý: Thuế TNCN 10% được trừ tự động từ số tiền hoa hồng thực nhận.
+ * Công thức: Thực nhận = Hoa hồng × (1 - 10%)
  */
+
+// Thuế thu nhập cá nhân (TNCN) - 10%
+const TNCN_TAX_RATE = 0.10;
+
+/**
+ * Tính số tiền thực nhận sau khi trừ thuế TNCN
+ */
+function applyTNCNTax(grossAmount: number): number {
+  return grossAmount * (1 - TNCN_TAX_RATE);
+}
 
 /**
  * Tính và tạo commission cho một đơn hàng
@@ -122,36 +135,37 @@ export async function calculateAndCreateCommissions(orderId: string): Promise<Co
 
     const retailSetting = settingsMap.get(retailKey);
     if (retailSetting) {
-      const amount = (orderValue * retailSetting.percent) / 100;
+      const grossAmount = (orderValue * retailSetting.percent) / 100;
+      const netAmount = applyTNCNTax(grossAmount); // Trừ 10% thuế TNCN
       
       await prisma.commission.create({
         data: {
           orderId,
           userId: referrer.id,
-          amount,
+          amount: netAmount, // Lưu số tiền thực nhận (đã trừ thuế)
           percent: retailSetting.percent,
           level: 1,
           status: 'pending'
         }
       });
 
-      // Cập nhật balance của user
+      // Cập nhật balance của user (số tiền thực nhận)
       await prisma.user.update({
         where: { id: referrer.id },
-        data: { balance: { increment: amount } }
+        data: { balance: { increment: netAmount } }
       });
 
       results.push({
         userId: referrer.id,
         userName: referrer.name,
         role: referrerRole,
-        amount,
+        amount: netAmount,
         percent: retailSetting.percent,
         level: 1,
         type: 'retail'
       });
 
-      console.log(`[Commission] Level 1 (Retail): ${referrer.name} (${referrerRole}) nhận ${amount.toLocaleString()}đ (${retailSetting.percent}%)`);
+      console.log(`[Commission] Level 1 (Retail): ${referrer.name} (${referrerRole}) nhận ${netAmount.toLocaleString()}đ (${retailSetting.percent}% - 10% thuế TNCN)`);
     }
 
     // 5. Tính commission override cho cấp trên (Level 2)
@@ -177,13 +191,14 @@ export async function calculateAndCreateCommissions(orderId: string): Promise<Co
           const overridePercent = parentRetailSetting.percent - childRetailSetting.percent;
           
           if (overridePercent > 0) {
-            const amount = (orderValue * overridePercent) / 100;
+            const grossAmount = (orderValue * overridePercent) / 100;
+            const netAmount = applyTNCNTax(grossAmount); // Trừ 10% thuế TNCN
 
             await prisma.commission.create({
               data: {
                 orderId,
                 userId: parent.id,
-                amount,
+                amount: netAmount,
                 percent: overridePercent,
                 level: 2,
                 status: 'pending'
@@ -192,20 +207,20 @@ export async function calculateAndCreateCommissions(orderId: string): Promise<Co
 
             await prisma.user.update({
               where: { id: parent.id },
-              data: { balance: { increment: amount } }
+              data: { balance: { increment: netAmount } }
             });
 
             results.push({
               userId: parent.id,
               userName: parent.name,
               role: parentRole,
-              amount,
+              amount: netAmount,
               percent: overridePercent,
               level: 2,
               type: 'override'
             });
 
-            console.log(`[Commission] Level 2 (Override): ${parent.name} (${parentRole}) nhận ${amount.toLocaleString()}đ (${overridePercent}%) - có ${parentSubCount} cấp dưới`);
+            console.log(`[Commission] Level 2 (Override): ${parent.name} (${parentRole}) nhận ${netAmount.toLocaleString()}đ (${overridePercent}% - 10% thuế TNCN) - có ${parentSubCount} cấp dưới`);
           }
         }
       } else {
@@ -236,13 +251,14 @@ export async function calculateAndCreateCommissions(orderId: string): Promise<Co
             const overridePercent = grandParentRetailSetting.percent - parentRetailSetting.percent;
             
             if (overridePercent > 0) {
-              const amount = (orderValue * overridePercent) / 100;
+              const grossAmount = (orderValue * overridePercent) / 100;
+              const netAmount = applyTNCNTax(grossAmount); // Trừ 10% thuế TNCN
 
               await prisma.commission.create({
                 data: {
                   orderId,
                   userId: grandParent.id,
-                  amount,
+                  amount: netAmount,
                   percent: overridePercent,
                   level: 3,
                   status: 'pending'
@@ -251,20 +267,20 @@ export async function calculateAndCreateCommissions(orderId: string): Promise<Co
 
               await prisma.user.update({
                 where: { id: grandParent.id },
-                data: { balance: { increment: amount } }
+                data: { balance: { increment: netAmount } }
               });
 
               results.push({
                 userId: grandParent.id,
                 userName: grandParent.name,
                 role: grandParentRole,
-                amount,
+                amount: netAmount,
                 percent: overridePercent,
                 level: 3,
                 type: 'override'
               });
 
-              console.log(`[Commission] Level 3 (Override): ${grandParent.name} (${grandParentRole}) nhận ${amount.toLocaleString()}đ (${overridePercent}%) - có ${grandParentSubCount} cấp dưới`);
+              console.log(`[Commission] Level 3 (Override): ${grandParent.name} (${grandParentRole}) nhận ${netAmount.toLocaleString()}đ (${overridePercent}% - 10% thuế TNCN) - có ${grandParentSubCount} cấp dưới`);
             }
           }
         }

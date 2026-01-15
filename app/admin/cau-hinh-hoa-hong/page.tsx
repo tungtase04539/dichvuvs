@@ -132,7 +132,9 @@ export default function CommissionSettingsPage() {
     return icons[role] || "👤";
   };
 
-  // Tính toán ví dụ
+  // Tính toán ví dụ (bao gồm trừ thuế TNCN 10%)
+  const TNCN_TAX_RATE = 0.10; // 10% thuế TNCN
+  
   const getExampleCalculation = () => {
     const orderValue = 1000000;
     const ctvSetting = settings.find(s => s.key === 'collaborator_retail');
@@ -147,13 +149,37 @@ export default function CommissionSettingsPage() {
     const agentOverride = agentPercent - ctvPercent;
     const distributorOverride = distributorPercent - agentPercent;
     
+    // Tính số tiền trước thuế và sau thuế
+    const applyTax = (gross: number) => gross * (1 - TNCN_TAX_RATE);
+    
     return {
       orderValue,
-      ctv: { percent: ctvPercent, amount: orderValue * ctvPercent / 100 },
-      agentOverride: { percent: agentOverride, amount: orderValue * agentOverride / 100 },
-      distributorOverride: { percent: distributorOverride, amount: orderValue * distributorOverride / 100 },
-      agentDirect: { percent: agentPercent, amount: orderValue * agentPercent / 100 },
-      distributorDirect: { percent: distributorPercent, amount: orderValue * distributorPercent / 100 },
+      taxRate: TNCN_TAX_RATE * 100,
+      ctv: { 
+        percent: ctvPercent, 
+        gross: orderValue * ctvPercent / 100,
+        net: applyTax(orderValue * ctvPercent / 100)
+      },
+      agentOverride: { 
+        percent: agentOverride, 
+        gross: orderValue * agentOverride / 100,
+        net: applyTax(orderValue * agentOverride / 100)
+      },
+      distributorOverride: { 
+        percent: distributorOverride, 
+        gross: orderValue * distributorOverride / 100,
+        net: applyTax(orderValue * distributorOverride / 100)
+      },
+      agentDirect: { 
+        percent: agentPercent, 
+        gross: orderValue * agentPercent / 100,
+        net: applyTax(orderValue * agentPercent / 100)
+      },
+      distributorDirect: { 
+        percent: distributorPercent, 
+        gross: orderValue * distributorPercent / 100,
+        net: applyTax(orderValue * distributorPercent / 100)
+      },
     };
   };
 
@@ -250,6 +276,13 @@ export default function CommissionSettingsPage() {
             <strong>Lưu ý:</strong> Override = % cấp trên - % cấp dưới. Ví dụ: Đại lý 15% - CTV 10% = Override 5%
           </p>
         </div>
+        {/* TNCN Tax Notice */}
+        <div className="mt-3 p-3 bg-red-50 rounded-lg border border-red-200">
+          <p className="text-red-800 text-sm">
+            <strong>⚠️ Thuế TNCN:</strong> Tất cả hoa hồng được trừ <strong>10% thuế thu nhập cá nhân (TNCN)</strong> trước khi cộng vào số dư.
+            <br/><span className="text-red-600">Công thức: Thực nhận = Hoa hồng × 90%</span>
+          </p>
+        </div>
       </div>
 
       {isLoading ? (
@@ -317,16 +350,16 @@ export default function CommissionSettingsPage() {
             <h4 className="font-semibold text-slate-700 mb-3">Trường hợp 1: CTV bán (có Đại lý cấp trên)</h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-slate-600">CTV nhận (retail {example.ctv.percent}%):</span>
-                <span className="font-bold text-green-600">{formatCurrency(example.ctv.amount)}</span>
+                <span className="text-slate-600">CTV nhận ({example.ctv.percent}% - 10% thuế):</span>
+                <span className="font-bold text-green-600">{formatCurrency(example.ctv.net)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600">Đại lý nhận (override {example.agentOverride.percent}%):</span>
-                <span className="font-bold text-blue-600">{formatCurrency(example.agentOverride.amount)}</span>
+                <span className="text-slate-600">Đại lý nhận ({example.agentOverride.percent}% - 10% thuế):</span>
+                <span className="font-bold text-blue-600">{formatCurrency(example.agentOverride.net)}</span>
               </div>
               <div className="border-t pt-2 flex justify-between font-semibold">
-                <span>Tổng chi hoa hồng:</span>
-                <span>{formatCurrency(example.ctv.amount + example.agentOverride.amount)}</span>
+                <span>Tổng thực nhận:</span>
+                <span>{formatCurrency(example.ctv.net + example.agentOverride.net)}</span>
               </div>
             </div>
           </div>
@@ -336,12 +369,12 @@ export default function CommissionSettingsPage() {
             <h4 className="font-semibold text-slate-700 mb-3">Trường hợp 2: Đại lý bán trực tiếp</h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-slate-600">Đại lý nhận (retail {example.agentDirect.percent}%):</span>
-                <span className="font-bold text-blue-600">{formatCurrency(example.agentDirect.amount)}</span>
+                <span className="text-slate-600">Đại lý nhận ({example.agentDirect.percent}% - 10% thuế):</span>
+                <span className="font-bold text-blue-600">{formatCurrency(example.agentDirect.net)}</span>
               </div>
               <div className="border-t pt-2 flex justify-between font-semibold">
-                <span>Tổng chi hoa hồng:</span>
-                <span>{formatCurrency(example.agentDirect.amount)}</span>
+                <span>Tổng thực nhận:</span>
+                <span>{formatCurrency(example.agentDirect.net)}</span>
               </div>
             </div>
           </div>
@@ -351,20 +384,20 @@ export default function CommissionSettingsPage() {
             <h4 className="font-semibold text-slate-700 mb-3">Trường hợp 3: CTV bán (có Đại lý + NPP)</h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-slate-600">CTV nhận (retail {example.ctv.percent}%):</span>
-                <span className="font-bold text-green-600">{formatCurrency(example.ctv.amount)}</span>
+                <span className="text-slate-600">CTV nhận ({example.ctv.percent}% - 10% thuế):</span>
+                <span className="font-bold text-green-600">{formatCurrency(example.ctv.net)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600">Đại lý nhận (override {example.agentOverride.percent}%):</span>
-                <span className="font-bold text-blue-600">{formatCurrency(example.agentOverride.amount)}</span>
+                <span className="text-slate-600">Đại lý nhận ({example.agentOverride.percent}% - 10% thuế):</span>
+                <span className="font-bold text-blue-600">{formatCurrency(example.agentOverride.net)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600">NPP nhận (override {example.distributorOverride.percent}%):</span>
-                <span className="font-bold text-purple-600">{formatCurrency(example.distributorOverride.amount)}</span>
+                <span className="text-slate-600">NPP nhận ({example.distributorOverride.percent}% - 10% thuế):</span>
+                <span className="font-bold text-purple-600">{formatCurrency(example.distributorOverride.net)}</span>
               </div>
               <div className="border-t pt-2 flex justify-between font-semibold">
-                <span>Tổng chi hoa hồng:</span>
-                <span>{formatCurrency(example.ctv.amount + example.agentOverride.amount + example.distributorOverride.amount)}</span>
+                <span>Tổng thực nhận:</span>
+                <span>{formatCurrency(example.ctv.net + example.agentOverride.net + example.distributorOverride.net)}</span>
               </div>
             </div>
           </div>
@@ -374,12 +407,12 @@ export default function CommissionSettingsPage() {
             <h4 className="font-semibold text-slate-700 mb-3">Trường hợp 4: NPP bán trực tiếp</h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-slate-600">NPP nhận (retail {example.distributorDirect.percent}%):</span>
-                <span className="font-bold text-purple-600">{formatCurrency(example.distributorDirect.amount)}</span>
+                <span className="text-slate-600">NPP nhận ({example.distributorDirect.percent}% - 10% thuế):</span>
+                <span className="font-bold text-purple-600">{formatCurrency(example.distributorDirect.net)}</span>
               </div>
               <div className="border-t pt-2 flex justify-between font-semibold">
-                <span>Tổng chi hoa hồng:</span>
-                <span>{formatCurrency(example.distributorDirect.amount)}</span>
+                <span>Tổng thực nhận:</span>
+                <span>{formatCurrency(example.distributorDirect.net)}</span>
               </div>
             </div>
           </div>

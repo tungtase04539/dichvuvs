@@ -349,7 +349,6 @@ model Withdrawal {
   @@index([status])
 }
 
-// Lich su thanh toan don hang
 model PaymentHistory {
   id            String   @id @default(uuid())
   orderId       String
@@ -364,3 +363,21 @@ model PaymentHistory {
   notes         String?
   createdAt     DateTime @default(now())
 }
+
+// Log tất cả webhook requests từ SePay để debug
+model WebhookLog {
+  id         String   @id @default(uuid())
+  requestId  String   @unique
+  ipAddress  String?
+  userAgent  String?
+  rawBody    String   @db.Text
+  orderCode  String?
+  status     String   // success, error, no_order_code, order_not_found, etc.
+  message    String?
+  createdAt  DateTime @default(now())
+
+  @@index([orderCode])
+  @@index([status])
+  @@index([createdAt])
+}
+

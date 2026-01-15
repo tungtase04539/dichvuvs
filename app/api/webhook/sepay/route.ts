@@ -77,6 +77,24 @@ export async function POST(request: NextRequest) {
     if (!orderCodeMatch) {
       console.warn(`[Webhook][${requestId}] NO ORDER CODE FOUND in: "${content}"`);
       console.warn(`[Webhook][${requestId}] Full transaction for debugging:`, JSON.stringify(transaction));
+      
+      // Log to database for debugging
+      try {
+        await prisma.webhookLog.create({
+          data: {
+            requestId,
+            ipAddress: forwardedFor,
+            userAgent,
+            rawBody,
+            orderCode: null,
+            status: "no_order_code",
+            message: `No order code found in content: ${content.substring(0, 200)}`
+          }
+        });
+      } catch (logErr) {
+        console.error(`[Webhook][${requestId}] Failed to log to DB:`, logErr);
+      }
+      
       return NextResponse.json({ success: true, message: "No order code found", requestId });
     }
 
@@ -109,8 +127,26 @@ export async function POST(request: NextRequest) {
     });
 
     if (!order) {
-      console.warn("[Webhook] Order not found in DB:", orderCode);
-      return NextResponse.json({ success: true, message: "Order not found" });
+      console.warn(`[Webhook][${requestId}] Order not found in DB: ${orderCode}`);
+      
+      // Log to database
+      try {
+        await prisma.webhookLog.create({
+          data: {
+            requestId,
+            ipAddress: forwardedFor,
+            userAgent,
+            rawBody,
+            orderCode,
+            status: "order_not_found",
+            message: `Order ${orderCode} not found in DB`
+          }
+        });
+      } catch (logErr) {
+        console.error(`[Webhook][${requestId}] Failed to log to DB:`, logErr);
+      }
+      
+      return NextResponse.json({ success: true, message: "Order not found", requestId });
     }
 
     if (order.status !== "pending") {

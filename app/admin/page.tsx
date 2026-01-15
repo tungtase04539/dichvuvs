@@ -26,7 +26,7 @@ async function getDashboardStats(userId: string, role: string) {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const isPartner = role === "collaborator" || role === "ctv" || role === "agent" || role === "master_agent";
+  const isPartner = role === "collaborator" || role === "ctv" || role === "senior_collaborator" || role === "agent" || role === "distributor" || role === "master_agent";
 
   // Base filters for data isolation
   const orderFilter: any = { createdAt: { gte: startOfMonth } };
@@ -159,7 +159,7 @@ export default async function AdminDashboard() {
   });
 
   const role = dbUser?.role || (user.user_metadata?.role as string) || "customer";
-  const isPartner = role === "collaborator" || role === "ctv" || role === "agent" || role === "master_agent";
+  const isPartner = role === "collaborator" || role === "ctv" || role === "senior_collaborator" || role === "agent" || role === "distributor" || role === "master_agent";
   const isAdmin = role === "admin";
 
   const stats = await getDashboardStats(user.id, role);

@@ -20,28 +20,69 @@ interface SepayWebhookPayload {
 }
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  const requestId = `REQ-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+  
   try {
-    console.log("[Webhook] Starting SePay processing...");
-    const transaction: SepayWebhookPayload = await request.json();
-    console.log("[Webhook] Payload received:", JSON.stringify(transaction));
+    // Enhanced logging for debugging real payments
+    const headers = Object.fromEntries(request.headers.entries());
+    const userAgent = headers['user-agent'] || 'unknown';
+    const forwardedFor = headers['x-forwarded-for'] || headers['x-real-ip'] || 'unknown';
+    
+    console.log(`[Webhook][${requestId}] ========== NEW REQUEST ==========`);
+    console.log(`[Webhook][${requestId}] Time: ${new Date().toISOString()}`);
+    console.log(`[Webhook][${requestId}] IP: ${forwardedFor}`);
+    console.log(`[Webhook][${requestId}] User-Agent: ${userAgent}`);
+    
+    let rawBody = "";
+    try {
+      rawBody = await request.text();
+      console.log(`[Webhook][${requestId}] Raw Body: ${rawBody.substring(0, 500)}`);
+    } catch (e) {
+      console.error(`[Webhook][${requestId}] Failed to read raw body`);
+    }
+    
+    let transaction: SepayWebhookPayload;
+    try {
+      transaction = JSON.parse(rawBody);
+    } catch (e) {
+      console.error(`[Webhook][${requestId}] JSON Parse Error:`, e);
+      return NextResponse.json({ success: false, message: "Invalid JSON" }, { status: 400 });
+    }
+    
+    console.log(`[Webhook][${requestId}] Parsed Payload:`, JSON.stringify(transaction));
 
     // 1. Filter incoming transfers
     if (transaction.transferType !== "in") {
-      console.log("[Webhook] Ignoring outgoing transfer");
+      console.log(`[Webhook][${requestId}] Ignoring outgoing transfer (type: ${transaction.transferType})`);
       return NextResponse.json({ success: true, message: "Outgoing transfer ignored" });
     }
 
-    // 2. Extract Order Code
+    // 2. Extract Order Code with multiple patterns
     const content = transaction.content || transaction.description || "";
-    const orderCodeMatch = content.match(/VS\d{6}[A-Z0-9]{4}/i);
+    console.log(`[Webhook][${requestId}] Searching order code in content: "${content}"`);
+    
+    // Try multiple patterns to be more flexible
+    let orderCodeMatch = content.match(/VS\d{6}[A-Z0-9]{4}/i);
+    if (!orderCodeMatch) {
+      // Fallback: try to find any VS followed by alphanumeric
+      orderCodeMatch = content.match(/VS[A-Z0-9]{8,12}/i);
+    }
+    if (!orderCodeMatch) {
+      // Last resort: look in description and code fields too
+      const allText = `${content} ${transaction.description || ''} ${transaction.code || ''}`;
+      orderCodeMatch = allText.match(/VS\d{6}[A-Z0-9]{4}/i) || allText.match(/VS[A-Z0-9]{8,12}/i);
+    }
 
     if (!orderCodeMatch) {
-      console.warn("[Webhook] No order code found in content:", content);
-      return NextResponse.json({ success: true, message: "No order code found" });
+      console.warn(`[Webhook][${requestId}] NO ORDER CODE FOUND in: "${content}"`);
+      console.warn(`[Webhook][${requestId}] Full transaction for debugging:`, JSON.stringify(transaction));
+      return NextResponse.json({ success: true, message: "No order code found", requestId });
     }
 
     const orderCode = orderCodeMatch[0].toUpperCase();
-    console.log("[Webhook] Searching for order:", orderCode);
+    console.log(`[Webhook][${requestId}] Found order code: ${orderCode}`);
+
 
     // 3. Find Order with resilient select
     const order = await prisma.order.findUnique({

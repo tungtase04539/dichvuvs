@@ -71,6 +71,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       }
       
       items.push({ href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" });
+      items.push({ href: "/admin/link-gioi-thieu", icon: Link2, label: "Link giới thiệu" });
     } else {
       // Admin/Staff menu
       items.push({ href: "/admin", icon: LayoutDashboard, label: "Dashboard" });

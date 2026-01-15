@@ -52,6 +52,11 @@ async function getDashboardStats(userId: string, role: string) {
     recentApplications,
     recentOrders,
     recentChats,
+    // New: Revenue source separation
+    directRevenue,
+    ctvRevenue,
+    directOrderCount,
+    ctvOrderCount,
   ] = await Promise.all([
     prisma.order.count({ where: orderFilter }),
     prisma.order.count({ where: { ...orderFilter, status: "pending" } }),
@@ -100,6 +105,24 @@ async function getDashboardStats(userId: string, role: string) {
       orderBy: { lastActivity: "desc" },
       take: 5,
     }),
+    // Direct revenue (no referrer) - Admin only
+    isPartner ? { _sum: { totalPrice: 0 } } : prisma.order.aggregate({
+      where: { ...revenueFilter, referrerId: null },
+      _sum: { totalPrice: true },
+    }),
+    // CTV revenue (has referrer) - Admin only  
+    isPartner ? { _sum: { totalPrice: 0 } } : prisma.order.aggregate({
+      where: { ...revenueFilter, referrerId: { not: null } },
+      _sum: { totalPrice: true },
+    }),
+    // Direct order count
+    isPartner ? 0 : prisma.order.count({
+      where: { ...revenueFilter, referrerId: null },
+    }),
+    // CTV order count
+    isPartner ? 0 : prisma.order.count({
+      where: { ...revenueFilter, referrerId: { not: null } },
+    }),
   ]);
 
   return {
@@ -114,6 +137,11 @@ async function getDashboardStats(userId: string, role: string) {
     recentApplications,
     recentOrders,
     recentChats,
+    // Revenue source separation
+    directRevenue: (directRevenue as any)?._sum?.totalPrice || 0,
+    ctvRevenue: (ctvRevenue as any)?._sum?.totalPrice || 0,
+    directOrderCount: typeof directOrderCount === 'number' ? directOrderCount : 0,
+    ctvOrderCount: typeof ctvOrderCount === 'number' ? ctvOrderCount : 0,
   };
 }
 
@@ -171,6 +199,39 @@ export default async function AdminDashboard() {
           </p>
           <p className="text-sm text-slate-500">Doanh thu tháng này</p>
         </div>
+
+        {/* Revenue Source Separation - Admin only */}
+        {isAdmin && (
+          <>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-emerald-100">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-emerald-600" />
+                </div>
+              </div>
+              <p className="text-2xl font-bold text-emerald-700">
+                {formatCurrency(stats.directRevenue)}
+              </p>
+              <p className="text-sm text-slate-500">
+                💼 Trực tiếp ({stats.directOrderCount} đơn)
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-indigo-100">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center">
+                  <Link2 className="w-6 h-6 text-indigo-600" />
+                </div>
+              </div>
+              <p className="text-2xl font-bold text-indigo-700">
+                {formatCurrency(stats.ctvRevenue)}
+              </p>
+              <p className="text-sm text-slate-500">
+                🤝 Từ CTV ({stats.ctvOrderCount} đơn)
+              </p>
+            </div>
+          </>
+        )}
 
         {/* Show active chats only to Admin/Staff */}
         {!isPartner && (

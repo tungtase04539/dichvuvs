@@ -13,9 +13,13 @@ export async function GET(request: NextRequest) {
     const amount = searchParams.get("amount") || "30000";
     const content = searchParams.get("content") || "";
 
+    // Add SEVQR prefix for VietinBank compatibility (required by SePay)
+    // Format: SEVQR [OrderCode]
+    const paymentContent = content.startsWith("SEVQR") ? content : `SEVQR ${content}`;
+
     // Generate SePay QR URL directly (no DB call needed)
     // Format: https://qr.sepay.vn/img?acc=ACCOUNT&bank=BANK&amount=AMOUNT&des=CONTENT
-    const qrUrl = `https://qr.sepay.vn/img?acc=${BANK_ACCOUNT}&bank=${BANK_NAME}&amount=${amount}&des=${encodeURIComponent(content)}&template=compact`;
+    const qrUrl = `https://qr.sepay.vn/img?acc=${BANK_ACCOUNT}&bank=${BANK_NAME}&amount=${amount}&des=${encodeURIComponent(paymentContent)}&template=compact`;
 
     return NextResponse.json({
       success: true,
@@ -24,7 +28,7 @@ export async function GET(request: NextRequest) {
       accountNumber: BANK_ACCOUNT,
       accountName: BANK_OWNER,
       amount: parseInt(amount),
-      content,
+      content: paymentContent, // Return the content with SEVQR prefix
     });
   } catch (error) {
     console.error("QR generation error:", error);

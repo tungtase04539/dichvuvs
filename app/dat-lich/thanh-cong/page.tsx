@@ -53,8 +53,10 @@ export default async function BookingSuccessPage({
   const rawBankName = bankInfo.bank_name || process.env.SEPAY_BANK_NAME || "MB Bank";
   const bankCode = bankNameMap[rawBankName] || "MBBank";
   const amount = order ? Math.round(order.totalPrice) : 0;
+  // Add SEVQR prefix for VietinBank compatibility (required by SePay)
+  const paymentContent = `SEVQR ${orderCode}`;
   const qrUrl = bankAccount 
-    ? `https://qr.sepay.vn/img?bank=${bankCode}&acc=${bankAccount}&template=compact&amount=${amount}&des=${encodeURIComponent(orderCode)}`
+    ? `https://qr.sepay.vn/img?bank=${bankCode}&acc=${bankAccount}&template=compact&amount=${amount}&des=${encodeURIComponent(paymentContent)}`
     : "";
 
   return (
@@ -122,8 +124,8 @@ export default async function BookingSuccessPage({
               <div className="flex justify-between items-center">
                 <span className="text-slate-500">Nội dung:</span>
                 <div className="flex items-center gap-1">
-                  <span className="font-mono font-medium text-emerald-600">{orderCode}</span>
-                  <CopyButton text={orderCode} />
+                  <span className="font-mono font-medium text-emerald-600">SEVQR {orderCode}</span>
+                  <CopyButton text={`SEVQR ${orderCode}`} />
                 </div>
               </div>
             </div>

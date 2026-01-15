@@ -16,6 +16,7 @@ export default function QRPayment({ orderCode, amount }: QRPaymentProps) {
     bankName: string;
     accountNumber: string;
     accountName: string;
+    content: string;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -33,6 +34,7 @@ export default function QRPayment({ orderCode, amount }: QRPaymentProps) {
             bankName: data.bankName || "MB Bank",
             accountNumber: data.accountNumber || "0123456789",
             accountName: data.accountName || "CHATBOT VN",
+            content: data.content || orderCode, // Use content from API (with SEVQR prefix)
           });
         }
       } catch (error) {
@@ -105,8 +107,8 @@ export default function QRPayment({ orderCode, amount }: QRPaymentProps) {
         <div className="flex items-center justify-between py-2 bg-primary-50 -mx-4 px-4 rounded-b-xl">
           <span className="text-sm text-primary-700 font-medium">Nội dung CK</span>
           <div className="flex items-center gap-2">
-            <span className="font-mono font-bold text-primary-700">{orderCode}</span>
-            <CopyButton text={orderCode} />
+            <span className="font-mono font-bold text-primary-700">{bankInfo?.content || orderCode}</span>
+            <CopyButton text={bankInfo?.content || orderCode} />
           </div>
         </div>
       </div>

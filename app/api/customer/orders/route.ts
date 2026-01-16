@@ -28,6 +28,7 @@ export async function GET() {
         totalPrice: true,
         createdAt: true,
         serviceId: true,
+        orderPackageType: true, // Loại gói: standard, gold, platinum, single
         service: {
           select: {
             name: true,

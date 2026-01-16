@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
         createdAt: true,
         notes: true,
         serviceId: true,
+        orderPackageType: true, // Loại gói: standard, gold, platinum, single
         service: {
           select: {
             id: true,

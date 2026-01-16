@@ -16,6 +16,7 @@ import {
   DollarSign,
   TrendingUp,
   Settings,
+  Trophy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -78,6 +79,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       items.push({ href: "/admin/don-hang", icon: Package, label: "Đơn hàng" });
       items.push({ href: "/admin/khach-hang", icon: UserCheck, label: "Khách hàng" });
       items.push({ href: "/admin/ctv-duyet", icon: Users, label: "Duyệt CTV" });
+      items.push({ href: "/admin/ctv-ranking", icon: Trophy, label: "Xếp hạng CTV" });
       items.push({ href: "/admin/san-pham", icon: ShoppingBag, label: "Sản phẩm" });
 
       // Admin only

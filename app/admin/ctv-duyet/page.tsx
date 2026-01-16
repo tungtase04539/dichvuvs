@@ -12,7 +12,8 @@ import {
     Phone,
     Mail,
     Calendar,
-    AlertCircle
+    AlertCircle,
+    Download
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDateTime } from "@/lib/utils";
@@ -32,6 +33,7 @@ export default function AdminCTVApprovalPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [processingId, setProcessingId] = useState<string | null>(null);
+    const [isExporting, setIsExporting] = useState(false);
 
     const fetchApplications = async () => {
         setIsLoading(true);
@@ -69,6 +71,31 @@ export default function AdminCTVApprovalPage() {
     useEffect(() => {
         loadApps();
     }, []);
+
+    const handleExport = async () => {
+        setIsExporting(true);
+        try {
+            const res = await fetch("/api/admin/ctv/export");
+            if (res.ok) {
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `ctv_export_${new Date().toISOString().split("T")[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            } else {
+                alert("Lỗi xuất dữ liệu");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Lỗi kết nối");
+        } finally {
+            setIsExporting(false);
+        }
+    };
 
     const handleAction = async (id: string, action: "approve" | "reject") => {
         setProcessingId(id);
@@ -110,13 +137,23 @@ export default function AdminCTVApprovalPage() {
                     <h1 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">Duyệt Cộng tác viên</h1>
                     <p className="text-slate-500 mt-1 font-medium">Danh sách các cá nhân đăng ký làm CTV đang chờ phê duyệt</p>
                 </div>
-                <button
-                    onClick={loadApps}
-                    disabled={isLoading}
-                    className="p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all shadow-sm active:scale-95"
-                >
-                    <RefreshCw className={cn("w-5 h-5 text-slate-600", isLoading && "animate-spin")} />
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={handleExport}
+                        disabled={isExporting}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/20 active:scale-95 disabled:opacity-50"
+                    >
+                        {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                        Xuất Excel
+                    </button>
+                    <button
+                        onClick={loadApps}
+                        disabled={isLoading}
+                        className="p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all shadow-sm active:scale-95"
+                    >
+                        <RefreshCw className={cn("w-5 h-5 text-slate-600", isLoading && "animate-spin")} />
+                    </button>
+                </div>
             </div>
 
             <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">

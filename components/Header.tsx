@@ -45,7 +45,7 @@ export default function Header({ settings }: HeaderProps) {
   const navLinks = [
     { href: "/", label: "TRANG CHỦ" },
     { href: "/goi", label: "GÓI DỊCH VỤ" },
-    { href: "/bo-tro-ly", label: "BỘ TRỢ LÝ" },
+    { href: "/bo-tro-ly", label: "BỘ TRỢ LÝ", highlight: true },
     { href: "/dung-thu", label: "DÙNG THỬ MIỄN PHÍ" },
     { href: "/san-pham", label: "SẢN PHẨM" },
     { href: "/qua-tang", label: "QUÀ TẶNG" },
@@ -91,9 +91,20 @@ export default function Header({ settings }: HeaderProps) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="font-bold text-yellow-400 hover:text-white transition-colors tracking-wide"
+                  className={cn(
+                    "font-bold transition-colors tracking-wide relative",
+                    link.highlight
+                      ? "text-white bg-gradient-to-r from-amber-500 to-yellow-400 px-4 py-1.5 rounded-full shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 animate-pulse"
+                      : "text-yellow-400 hover:text-white"
+                  )}
+                  style={link.highlight ? { animationDuration: '2s' } : undefined}
                 >
                   {link.label}
+                  {link.highlight && (
+                    <span className="absolute -top-2 -right-2 px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full animate-bounce" style={{ animationDuration: '1s' }}>
+                      MỚI
+                    </span>
+                  )}
                 </Link>
               ))}
             </nav>
@@ -222,10 +233,20 @@ export default function Header({ settings }: HeaderProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-4 py-4 rounded-xl font-bold text-yellow-400 hover:bg-white/10 text-lg"
+                className={cn(
+                  "px-4 py-4 rounded-xl font-bold text-lg relative",
+                  link.highlight
+                    ? "bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-900 shadow-lg"
+                    : "text-yellow-400 hover:bg-white/10"
+                )}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.label}
+                {link.highlight && (
+                  <span className="absolute top-2 right-4 px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full">
+                    MỚI
+                  </span>
+                )}
               </Link>
             ))}
           </nav>

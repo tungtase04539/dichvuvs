@@ -381,3 +381,81 @@ model WebhookLog {
   @@index([createdAt])
 }
 
+// =============================================
+// BỘ TRỢ LÝ AI (Assistant Bundles)
+// =============================================
+
+model AssistantBundle {
+  id              String   @id @default(uuid())
+  name            String   // Tên bộ: "Bộ Trợ Lý Marketing", "Bộ Trợ Lý Giáo Dục"...
+  slug            String   @unique
+  description     String   // Mô tả ngắn
+  longDescription String?  @db.Text // Chi tiết (HTML/Markdown)
+  price           Float    // Giá bộ
+  image           String?  // Ảnh đại diện
+  videoUrl        String?  // Video demo
+  featured        Boolean  @default(false)
+  active          Boolean  @default(true)
+  industry        String?  // Ngành nghề: marketing, education, ecommerce...
+  
+  // Các gói Gold/Platinum
+  priceGold       Float?
+  pricePlatinum   Float?
+  
+  // Delivery
+  chatbotLink         String?  
+  chatbotLinkGold     String?
+  chatbotLinkPlatinum String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  orders    BundleOrder[]
+  inventory BundleInventory[]
+
+  @@index([industry])
+  @@index([active])
+}
+
+model BundleOrder {
+  id               String   @id @default(uuid())
+  orderCode        String   @unique
+  customerName     String
+  customerPhone    String
+  customerEmail    String?
+  
+  bundleId         String
+  bundle           AssistantBundle @relation(fields: [bundleId], references: [id])
+  
+  basePrice        Float
+  totalPrice       Float
+  status           String   @default("pending") // pending, confirmed, completed, cancelled
+  orderPackageType String?  // standard, gold, platinum
+  
+  referrerId       String?
+  referralCode     String?
+  notes            String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  credential BundleInventory?
+
+  @@index([status])
+  @@index([bundleId])
+}
+
+model BundleInventory {
+  id             String   @id @default(uuid())
+  bundleId       String
+  bundle         AssistantBundle @relation(fields: [bundleId], references: [id])
+  
+  activationCode String   // Mã kích hoạt
+  orderId        String?  @unique
+  order          BundleOrder? @relation(fields: [orderId], references: [id])
+  
+  createdAt DateTime @default(now())
+
+  @@index([bundleId])
+}

@@ -85,6 +85,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         items.push({ href: "/admin/hoa-hong", icon: DollarSign, label: "Quản lý hoa hồng" });
         items.push({ href: "/admin/quan-ly-rut-tien", icon: Wallet, label: "Yêu cầu rút tiền" });
         items.push({ href: "/admin/cau-hinh-goi", icon: Bot, label: "Cấu hình gói" });
+        items.push({ href: "/admin/bo-tro-ly", icon: Building2, label: "Bộ Trợ Lý" });
         items.push({ href: "/admin/cau-hinh-hoa-hong", icon: Settings, label: "Cấu hình hoa hồng" });
         items.push({ href: "/admin/tai-khoan", icon: Key, label: "Tài khoản" });
       }

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Bot, Star, Sparkles, MessageCircle, Copy, Check, ArrowLeft, Loader2 } from "lucide-react";
+import { Bot, Star, Sparkles, MessageCircle, Copy, Check, ArrowLeft, Loader2, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 

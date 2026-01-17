@@ -148,16 +148,29 @@ export default function FreeTrialPage() {
 
                     <div className="w-full space-y-6">
                       {/* Link Button */}
-                      <a
-                        href={product.chatbotLink || "https://t.me/your_bot"}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="flex items-center justify-center gap-3 w-full py-5 bg-amber-400 text-black rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-amber-400/20 hover:scale-[1.02] active:scale-95 transition-all text-sm"
-                      >
-                        <MessageCircle className="w-5 h-5" />
-                        Mở Trợ Lý AI
-                      </a>
+                      <div className="space-y-3 w-full">
+                        <a
+                          href={product.chatbotLink || "https://t.me/your_bot"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center justify-center gap-3 w-full py-4 bg-amber-400 text-black rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-amber-400/20 hover:scale-[1.02] active:scale-95 transition-all text-sm"
+                        >
+                          <MessageCircle className="w-5 h-5" />
+                          Mở Trợ Lý AI
+                        </a>
+
+                        <a
+                          href="https://zalo.me/g/nfcsbd681"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center justify-center gap-3 w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-95 transition-all text-sm"
+                        >
+                          <Users className="w-5 h-5" />
+                          Tham gia Zalo
+                        </a>
+                      </div>
 
                       {/* verification code */}
                       {product.trialCode && (

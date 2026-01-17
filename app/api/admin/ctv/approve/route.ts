@@ -123,8 +123,13 @@ export async function POST(request: NextRequest) {
             });
 
             // 3. Tự động tạo referral link cho CTV mới
-            const referralLink = await createReferralLinkForUser(application.userId);
-            const referralCode = referralLink?.code || null;
+            let referralCode = null;
+            try {
+                const referralLink = await createReferralLinkForUser(application.userId);
+                referralCode = referralLink?.code || null;
+            } catch (refError) {
+                console.error("[Referral] Silent failure during CTV approval:", refError);
+            }
 
             return NextResponse.json({
                 success: true,
@@ -150,7 +155,7 @@ export async function POST(request: NextRequest) {
         console.error("CTV Approval error:", error);
         return NextResponse.json({
             error: error.message || "Lỗi hệ thống khi xử lý đơn",
-            details: error
+            details: typeof error === 'object' ? { message: error.message, stack: error.stack } : String(error)
         }, { status: 500 });
     }
 }

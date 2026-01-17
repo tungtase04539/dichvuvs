@@ -107,18 +107,32 @@ export default function AdminCTVApprovalPage() {
             });
 
             if (res.ok) {
-                const data = await res.json();
+                let data;
+                try {
+                    data = await res.json();
+                } catch (e) {
+                    console.error("Failed to parse success response:", e);
+                    data = { message: "Duyệt thành công (nhưng không thể đọc phản hồi từ server)" };
+                }
+                
                 if (action === "approve") {
                     alert(data.message || "Duyệt thành công");
                 }
                 setApplications(prev => prev.filter(app => app.id !== id));
             } else {
-                const data = await res.json();
-                alert(data.error || "Có lỗi xảy ra");
+                let errorMsg = "Có lỗi xảy ra";
+                try {
+                    const data = await res.json();
+                    errorMsg = data.error || errorMsg;
+                } catch (e) {
+                    console.error("Failed to parse error response:", e);
+                    errorMsg = `Lỗi server (${res.status}): Không thể đọc chi tiết lỗi.`;
+                }
+                alert(errorMsg);
             }
         } catch (err) {
             console.error(err);
-            alert("Lỗi kết nối server");
+            alert("Lỗi kết nối server: Vui lòng kiểm tra mạng hoặc thử lại sau.");
         } finally {
             setProcessingId(null);
         }

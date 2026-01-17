@@ -12,7 +12,8 @@
     "lint": "next lint",
     "db:push": "npx prisma db push",
     "db:seed": "npx ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
-    "db:assign-categories": "npx ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/assign-categories.ts"
+    "db:assign-categories": "npx ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/assign-categories.ts",
+    "test:commissions": "npx ts-node --compiler-options '{\"module\":\"CommonJS\"}' verify_commissions.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
